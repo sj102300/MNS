@@ -128,7 +128,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="JsonParser.cpp" />
+    <ClCompile Include="Scene_Parser.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="sim.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="example.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ScenarioParser.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

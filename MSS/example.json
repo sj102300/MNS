@@ -1,0 +1,40 @@
+{
+    "scenario_id": "SCENE-01",
+    "scenario_title": "�װ��� 6��� �̻��� 6���� ���ñ��� ��Ȳ",
+    "aircraft_count": 2,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "start_point": {
+                "latitude": 37.123456,
+                "longitude": 127.123456,
+                "altitude": 10.000000
+            },
+            "end_point": {
+                "latitude": 44.654321,
+                "longitude": 128.654321,
+                "altitude": 10.000000
+            },
+            "friend_or_foe": "E"
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "start_point": {
+                "latitude": 37.111111,
+                "longitude": 127.111111,
+                "altitude": 10.000000
+            },
+            "end_point": {
+                "latitude": 36.666666,
+                "longitude": 128.666666,
+                "altitude": 10.000000
+            },
+            "friend_or_foe": "O"
+        }
+    ],
+    "battery_location": {
+        "latitude": 35.123456,
+        "longitude": 129.123456,
+        "altitude": 10.000000
+    }
+}
