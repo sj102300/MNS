@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Extensions.DependencyInjection;
+using OCC.ViewModels;
 
 namespace OCC.Views
 {
@@ -20,16 +22,18 @@ namespace OCC.Views
     /// </summary>
     public partial class InitPage : Page
     {
-        public InitPage()
+        public InitPage(NavigationService navigationService)
         {
             InitializeComponent();
-        }
 
-        private void ScenarioCreateBtn_Click(object sender, RoutedEventArgs e)
-        {
-            // SccenarioCreatePage.xaml로 이동
-            Uri uri = new Uri("/Views/ScenarioCreatePage.xaml", UriKind.Relative);
-            NavigationService.Navigate(uri);
+            // DI 컨테이너에서 NavigationService와 InitViewModel 가져오기
+            if (navigationService == null)
+            {
+                throw new InvalidOperationException("NavigationService를 가져올 수 없습니다. InitPage가 NavigationWindow 또는 Frame 내에서 사용되고 있는지 확인하세요.");
+            }
+            var viewModel = new InitViewModel(navigationService);
+            // NavigationService를 ViewModel에 전달
+            DataContext = viewModel;
         }
     }
 

@@ -10,6 +10,7 @@ namespace OCC.Models
 {
     class Scenario
     {
+        // 서버에서 생성(클라이언트에서는 null or 0 넣어서 보내기)
         [JsonPropertyName("scenario_id")]
         public string ScenarioId { get; set; }
 

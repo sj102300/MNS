@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OCC.Views;
 
 namespace OCC;
 
@@ -19,5 +20,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        // InitPage를 Frame에 로드
+        MainFrame.Navigate(new InitPage(MainFrame.NavigationService));
     }
 }

@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OCC.ViewModels;
 
 namespace OCC.Views
 {
@@ -35,9 +36,12 @@ namespace OCC.Views
         public ScenarioCreatePage()
         {
             InitializeComponent();
+            var viewModel = new ScenarioCreateViewModel();
+            DataContext = viewModel;
             InitializeMap();
         }
 
+        //Position : 위/경도 정보 -> 입력 순서는 경도, 위도 순서
         private void InitializeMap()
         {
             // config map
