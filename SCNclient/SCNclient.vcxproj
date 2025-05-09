@@ -132,6 +132,8 @@
     <ClCompile Include="SCNclient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="JsonParser.h" />
+    <ClInclude Include="ScenarioPrinter.h" />
     <ClInclude Include="SCNclient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
