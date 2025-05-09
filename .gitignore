@@ -1,0 +1,20 @@
+# 무시할 폴더들
+.vs/
+x64/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+*.log
+*.obj
+*.exe
+*.pdb
+*.cache
+*.ipch
+*.aps
+*.ncb
+*.sdf
+*.opensdf
+*.tlog
+*.log
+*.ilk
