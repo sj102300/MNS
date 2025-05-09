@@ -21,6 +21,12 @@
     <ClCompile Include="aircraft.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="TcpReceiver.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LaunchCommandReceiver.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aircraft.h">
@@ -30,6 +36,15 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="scenario.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpReceiver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpReceiver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LaunchCommandReceiver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
