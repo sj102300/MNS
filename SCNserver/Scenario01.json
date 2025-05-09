@@ -1,7 +1,6 @@
 {
     "scenario_id": "SCENE-01",
-    "scenario_title": "Àû±â 1´ë °ø½À ÈÆ·Ã ½Ã³ª¸®¿À",
-    "aircraft_count": 2,
+    "scenario_title": "ì ê¸° 1ëŒ€ ì¹¨ê³µ êµì „í›ˆë ¨ ì‹œë‚˜ë¦¬ì˜¤",
     "aircraft_list": [
         {
             "aircraft_id": "ATS-0001",

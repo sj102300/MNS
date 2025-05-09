@@ -1,6 +1,8 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
 #include "SCNclient.h"
+#include "JsonParser.h"
+#include "ScenarioPrinter.h"  //  출력 확인 안할거면 삭제 가능
 
 #include <windows.h>
 #include <cpprest/http_client.h>
@@ -8,15 +10,74 @@
 #include <iostream>
 #include <locale>
 
+// === 파서 사용 여부 설정 ===
+// 필요한 것만 1로 설정하고, 사용하지 않을 항목은 0으로 비활성화하세요.
+
+#define USE_SCENARIO_INFO    1   // 시나리오 개요 (식별자, 제목)
+#define USE_BATTERY_LOCATION 1   // 포대 위치 (위경고도)
+#define USE_AIRCRAFT_LIST    1   // 항공기 목록 (식별자, 피아구분, 시점, 종점)
+
 using namespace web;
 using namespace web::http;
 using namespace web::http::client;
 
+ScenarioInfo scenario_info;
+Coordinate battery_location;
+std::vector<AircraftInfo> aircraft_list;
+
+ScenarioInfo parse_scenario_info(const json::value& root);
+Coordinate parse_battery_location(const json::value& root);
+std::vector<AircraftInfo> parse_aircraft_list(const json::value& root);
+
+// 출력용
 std::string to_utf8(const std::wstring& wstr) {
 	if (wstr.empty()) return {};
 	int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
 	std::string result(size_needed, 0);
 	WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), (int)wstr.size(), &result[0], size_needed, nullptr, nullptr);
+	return result;
+}
+
+ScenarioInfo parse_scenario_info(const json::value& root) {
+	return ScenarioInfo(
+		to_utf8(root.at(U("scenario_id")).as_string()),
+		to_utf8(root.at(U("scenario_title")).as_string())
+	);
+}
+
+Coordinate parse_battery_location(const json::value& root) {
+	auto battery = root.at(U("battery_location")).as_object();
+	return Coordinate(
+		battery.at(U("latitude")).as_double(),
+		battery.at(U("longitude")).as_double(),
+		battery.at(U("altitude")).as_double()
+	);
+}
+
+std::vector<AircraftInfo> parse_aircraft_list(const json::value& root) {
+	std::vector<AircraftInfo> result;
+	auto aircraft_array = root.at(U("aircraft_list")).as_array();
+
+	for (const auto& item : aircraft_array) {
+		auto a = item.as_object();
+		auto sp = a.at(U("start_point")).as_object();
+		auto ep = a.at(U("end_point")).as_object();
+
+		result.emplace_back(
+			to_utf8(a.at(U("aircraft_id")).as_string()),
+			to_utf8(a.at(U("friend_or_foe")).as_string()),
+			Coordinate(
+				sp.at(U("latitude")).as_double(),
+				sp.at(U("longitude")).as_double(),
+				sp.at(U("altitude")).as_double()
+			),
+			Coordinate(
+				ep.at(U("latitude")).as_double(),
+				ep.at(U("longitude")).as_double(),
+				ep.at(U("altitude")).as_double()
+			)
+		);
+	}
 	return result;
 }
 
@@ -34,40 +95,24 @@ void request_scenario() {
 		if (response.status_code() == status_codes::OK) {
 			json::value scenario_json = response.extract_json().get();
 
-			std::string json_utf8 = to_utf8(scenario_json.serialize());
-			std::cout << u8"[서버가 응답한 JSON 전체]\n" << json_utf8 << "\n";
+			// 전체 출력 - 제대로 들어왔는지 확인
+			//std::string json_utf8 = to_utf8(scenario_json.serialize());
+			//std::cout << u8"[서버가 응답한 JSON 전체]\n" << json_utf8 << "\n";
 
-			std::cout << u8"\n[시나리오 정보]\n";
-			std::cout << u8"식별자: " << to_utf8(scenario_json.at(U("scenario_id")).as_string()) << "\n";
-			std::cout << u8"제목: " << to_utf8(scenario_json.at(U("scenario_title")).as_string()) << "\n";
-			std::cout << u8"항공기 개수: " << scenario_json.at(U("aircraft_count")).as_integer() << "\n";
+#if USE_SCENARIO_INFO
+			ScenarioInfo scenario_info = parse_scenario_info(scenario_json);
+			print_scenario_info(scenario_info);
+#endif
 
-			auto battery = scenario_json.at(U("battery_location")).as_object();
-			std::cout << u8"\n[포대 위치]\n";
-			std::cout << u8"위도: " << battery.at(U("latitude")).as_double() << "\n";
-			std::cout << u8"경도: " << battery.at(U("longitude")).as_double() << "\n";
-			std::cout << u8"고도: " << battery.at(U("altitude")).as_double() << "\n";
+#if USE_BATTERY_LOCATION
+			Coordinate battery_location = parse_battery_location(scenario_json);
+			print_battery_location(battery_location);
+#endif
 
-			std::cout << u8"\n[항공기 목록]\n";
-			auto aircraft_array = scenario_json.at(U("aircraft_list")).as_array();
-			for (size_t i = 0; i < aircraft_array.size(); ++i) {
-				auto aircraft = aircraft_array[i].as_object();
-				std::cout << u8"\n항공기 " << i + 1 << "\n";
-				std::cout << u8"식별자: " << to_utf8(aircraft.at(U("aircraft_id")).as_string()) << "\n";
-				std::cout << u8"피아정보: " << to_utf8(aircraft.at(U("friend_or_foe")).as_string()) << "\n";
-
-				auto start = aircraft.at(U("start_point")).as_object();
-				std::cout << u8"[시점]\n";
-				std::cout << u8"위도: " << start.at(U("latitude")).as_double() << "\n";
-				std::cout << u8"경도: " << start.at(U("longitude")).as_double() << "\n";
-				std::cout << u8"고도: " << start.at(U("altitude")).as_double() << "\n";
-
-				auto end = aircraft.at(U("end_point")).as_object();
-				std::cout << u8"[종점]\n";
-				std::cout << u8"위도: " << end.at(U("latitude")).as_double() << "\n";
-				std::cout << u8"경도: " << end.at(U("longitude")).as_double() << "\n";
-				std::cout << u8"고도: " << end.at(U("altitude")).as_double() << "\n";
-			}
+#if USE_AIRCRAFT_LIST
+			std::vector<AircraftInfo> aircraft_list = parse_aircraft_list(scenario_json);
+			print_aircraft_list(aircraft_list);
+#endif
 		}
 		else {
 			std::cerr << u8"시나리오 요청 실패: HTTP " << response.status_code() << std::endl;
