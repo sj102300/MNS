@@ -1,5 +1,7 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
+#include "OCC.h"
+
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
 #include <iostream>
