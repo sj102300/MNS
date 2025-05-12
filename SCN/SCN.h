@@ -8,3 +8,6 @@ std::string to_utf8(const std::wstring& wstr);
 
 // POST 요청 처리 함수 선언
 void handle_post(web::http::http_request request);
+
+// GET 요청 처리 함수 선언
+void handle_get(web::http::http_request request);

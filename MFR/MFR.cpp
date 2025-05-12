@@ -1,6 +1,7 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
 #include "MFR.h"
+#include "GlobalState.h"
 #include "JsonParser.h"
 #include "ScenarioInfoPrinter.h"  //  출력 확인 안할거면 삭제 가능
 
@@ -90,7 +91,11 @@ void request_scenario() {
 		http_request req(methods::POST);
 		req.set_request_uri(U("/scenario/detail"));
 		req.headers().set_content_type(U("application/json"));
-		req.set_body(U("{}"));
+
+		// scenario_id를 JSON으로 설정
+		json::value postData;
+		postData[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(g_scenario_id));
+		req.set_body(postData);
 
 		http_response response = client.request(req).get();
 

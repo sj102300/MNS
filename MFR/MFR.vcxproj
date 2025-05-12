@@ -133,6 +133,7 @@
     <ClCompile Include="StartSignalReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GlobalState.h" />
     <ClInclude Include="JsonParser.h" />
     <ClInclude Include="MFR.h" />
     <ClInclude Include="ScenarioInfoPrinter.h" />

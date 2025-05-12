@@ -16,13 +16,18 @@ int main() {
 
 	std::cout << u8"[서버 실행 경로]: " << std::filesystem::current_path().string() << std::endl;
 
-	http_listener listener(U("http://127.0.0.1:8000/scenario/detail"));
-	listener.support(methods::POST, handle_post);
+	http_listener post_listener(U("http://127.0.0.1:8000/scenario/detail"));
+	post_listener.support(methods::POST, handle_post);
+
+	http_listener get_listener(U("http://127.0.0.1:8000/scenario/list"));
+	get_listener.support(methods::GET, handle_get);
 
 	try {
-		listener.open().wait();
+		post_listener.open().wait();
+		get_listener.open().wait();
 		std::cout << u8"시나리오 서버가 실행 중입니다: POST /scenario/detail" << std::endl;
-		std::cout << u8"Scenario01.json 파일이 있는 위치에서 실행되어야 합니다." << std::endl;
+		std::cout << u8"시나리오 서버가 실행 중입니다: GET /scenario/list" << std::endl;
+		std::cout << u8".json 시나리오 파일이 있는 위치에서 실행되어야 합니다." << std::endl;
 
 		std::string line;
 		std::getline(std::cin, line);  // 엔터 입력 시 종료
