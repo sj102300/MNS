@@ -131,17 +131,21 @@
     <ClCompile Include="aircraft.cpp" />
     <ClCompile Include="AircraftReceiver.cpp" />
     <ClCompile Include="LaunchCommandReceiver.cpp" />
+    <ClCompile Include="LaunchCommandSender.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TcpReceiver.cpp" />
+    <ClCompile Include="TcpSender.cpp" />
     <ClCompile Include="UdpMulticastReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aircraft.h" />
     <ClInclude Include="AircraftReceiver.h" />
     <ClInclude Include="LaunchCommandReceiver.h" />
+    <ClInclude Include="LaunchCommandSender.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="share.h" />
     <ClInclude Include="TcpReceiver.h" />
+    <ClInclude Include="TcpSender.h" />
     <ClInclude Include="UdpMulticastReceiver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
