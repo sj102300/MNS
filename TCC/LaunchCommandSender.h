@@ -25,4 +25,6 @@ public:
     void start() override;
 
 	void getResponse() override;
+
+	void sendLoop();
 };

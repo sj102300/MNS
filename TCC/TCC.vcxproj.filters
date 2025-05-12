@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="aircraft.cpp">
+    <ClCompile Include="Aircraft.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="TcpReceiver.cpp">
@@ -33,21 +33,27 @@
     <ClCompile Include="AircraftReceiver.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="TcpSender.cpp">
+    <ClCompile Include="AircraftManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AircraftManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="LaunchCommandSender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="TcpSender.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="aircraft.h">
+    <ClInclude Include="Aircraft.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="share.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="scenario.h">
+    <ClInclude Include="Scenario.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="TcpReceiver.h">
@@ -62,10 +68,10 @@
     <ClInclude Include="AircraftReceiver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="TcpSender.h">
+    <ClInclude Include="LaunchCommandSender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="LaunchCommandSender.h">
+    <ClInclude Include="TcpSender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
