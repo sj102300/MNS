@@ -18,11 +18,15 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="OCC.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{cdfffe43-c8cd-4bb3-8c64-76efb167bdfc}</ProjectGuid>
-    <RootNamespace>SCNserver</RootNamespace>
+    <ProjectGuid>{26231b52-5627-4352-b974-029ecce39ca3}</ProjectGuid>
+    <RootNamespace>OCC</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,16 +131,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="SCNserver.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Scenario01.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="SCNserver.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

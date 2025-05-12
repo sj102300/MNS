@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e86748d0-4287-4685-a108-0420974d8908}</ProjectGuid>
-    <RootNamespace>SCNclient</RootNamespace>
+    <ProjectGuid>{9A202096-C9CD-4580-952D-9B649AC24FB9}</ProjectGuid>
+    <RootNamespace>SCNserver</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -129,12 +129,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SCNclient.cpp" />
+    <ClCompile Include="SCN.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="JsonParser.h" />
-    <ClInclude Include="ScenarioPrinter.h" />
-    <ClInclude Include="SCNclient.h" />
+    <None Include="Scenario01.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SCN.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
