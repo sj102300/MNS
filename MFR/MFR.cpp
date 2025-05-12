@@ -1,8 +1,8 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
-#include "SCNclient.h"
+#include "MFR.h"
 #include "JsonParser.h"
-#include "ScenarioPrinter.h"  //  출력 확인 안할거면 삭제 가능
+#include "ScenarioInfoPrinter.h"  //  출력 확인 안할거면 삭제 가능
 
 #include <windows.h>
 #include <cpprest/http_client.h>
@@ -10,16 +10,18 @@
 #include <iostream>
 #include <locale>
 
+using namespace web;
+using namespace web::http;
+using namespace web::http::client;
+
 // === 파서 사용 여부 설정 ===
-// 필요한 것만 1로 설정하고, 사용하지 않을 항목은 0으로 비활성화하세요.
+// 필요한 것만 1로 설정하고, 사용하지 않을 항목은 0으로 비활성화
 
 #define USE_SCENARIO_INFO    1   // 시나리오 개요 (식별자, 제목)
 #define USE_BATTERY_LOCATION 1   // 포대 위치 (위경고도)
 #define USE_AIRCRAFT_LIST    1   // 항공기 목록 (식별자, 피아구분, 시점, 종점)
-
-using namespace web;
-using namespace web::http;
-using namespace web::http::client;
+constexpr char ADDRESS[] = "http://127.0.0.1:8000";  // client + port
+const utility::string_t SCENARIO_SERVER_URL = utility::conversions::to_string_t(ADDRESS);
 
 ScenarioInfo scenario_info;
 Coordinate battery_location;
@@ -82,7 +84,7 @@ std::vector<AircraftInfo> parse_aircraft_list(const json::value& root) {
 }
 
 void request_scenario() {
-	http_client client(U("http://127.0.0.1:8000"));
+	http_client client(SCENARIO_SERVER_URL);
 
 	try {
 		http_request req(methods::POST);

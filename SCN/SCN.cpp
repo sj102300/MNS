@@ -1,6 +1,6 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
-#include "SCNserver.h"
+#include "SCN.h"
 
 #include <cpprest/json.h>
 #include <fstream>

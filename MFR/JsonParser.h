@@ -1,4 +1,3 @@
-// ScenarioTypes.h
 #pragma once
 
 #include <string>
