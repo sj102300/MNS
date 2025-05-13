@@ -27,11 +27,11 @@ namespace OCC
 
         private readonly List<(string url, string id)> subsystems = new()
         {
-            //("http://localhost:9011", "TCC"),
-            //("http://localhost:9012", "MSS"),
-            //("http://localhost:9013", "ATS"),
-            //("http://localhost:9014", "LCH"),
-            ("http://localhost:9015", "MFR")
+            //("http://127.0.0.1:9011", "TCC"),
+            //("http://127.0.0.1:9012", "MSS"),
+            //("http://127.0.0.1:9013", "ATS"),
+            //("http://127.0.0.1:9014", "LCH"),
+            ("http://127.0.0.1:9015", "MFR")
         };
 
         public MainWindow()

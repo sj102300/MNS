@@ -1,0 +1,21 @@
+{
+    "scenario_id": "SCENE-04",
+    "scenario_title": "교차 경로 충돌 회피 및 분리 훈련",
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "start_point": { "latitude": 37.800, "longitude": 127.000, "altitude": 10.0 },
+            "end_point":   { "latitude": 36.800, "longitude": 128.000, "altitude": 10.0 },
+            "friend_or_foe": "E"
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "start_point": { "latitude": 36.800, "longitude": 128.000, "altitude": 10.0 },
+            "end_point":   { "latitude": 37.800, "longitude": 127.000, "altitude": 10.0 },
+            "friend_or_foe": "O"
+        }
+    ],
+    "battery_location": {
+        "latitude": 35.800, "longitude": 129.800, "altitude": 10.0
+    }
+}

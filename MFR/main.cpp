@@ -7,7 +7,7 @@
 #include <iostream>
 
 // 설정 상수
-constexpr char ADDRESS[] = "http://localhost:9015";
+constexpr char ADDRESS[] = "http://127.0.0.1:9015";
 constexpr char CLIENT_ID[] = "MFR";
 
 int main() {
