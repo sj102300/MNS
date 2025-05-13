@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace OCC
 {
@@ -97,7 +98,7 @@ namespace OCC
 
         private async void LoadScenarios_Click(object sender, RoutedEventArgs e)
         {
-            string serverUrl = "http://localhost:8000/scenario/list"; // 시나리오 서버 주소로 교체
+            string serverUrl = "http://127.0.0.1:8000/scenario/list"; // 시나리오 서버 주소로 교체
 
             try
             {
@@ -106,20 +107,15 @@ namespace OCC
                 {
                     using var client = new HttpClient();
 
-                    // 📌 타이머 시작
-                    //var sw = System.Diagnostics.Stopwatch.StartNew();
-
                     var response = await client.GetAsync(serverUrl);
 
-                    // 📌 타이머 종료
-                    //sw.Stop();
-                    //MessageBox.Show($"[OCC] 시나리오 목록 요청 응답 시간: {sw.ElapsedMilliseconds}ms",
-                                    //"응답 속도 측정", MessageBoxButton.OK, MessageBoxImage.Information);
                     if (!response.IsSuccessStatusCode)
                         throw new Exception($"서버 응답 오류: {(int)response.StatusCode}");
 
                     string jsonString = await response.Content.ReadAsStringAsync();
+
                     var parsed = JsonConvert.DeserializeObject<List<ScenarioInfo>>(jsonString);
+
                     return parsed ?? new List<ScenarioInfo>();
                 });
 

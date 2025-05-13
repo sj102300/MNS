@@ -13,8 +13,14 @@ using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-// 시나리오 파일들이 있는 폴더 경로 (로컬 고정 경로)
-const std::string FOLDER_PATH = "C:\\Users\\user\\source\\repos\\MnS_LSY\\x64\\Debug\\Scenarios";
+// 캐시 구조체 및 전역 변수
+struct ScenarioMeta {
+	std::string scenario_id;
+	std::string scenario_title;
+};
+
+std::vector<ScenarioMeta> cached_scenario_list;
+std::mutex cache_mutex;
 
 // UTF-16 → UTF-8 변환 함수 정의
 std::string to_utf8(const std::wstring& wstr) {
@@ -74,42 +80,52 @@ void handle_post(http_request request) {
 	).wait(); // 비동기 작업 대기
 }
 
+// GET 요청 처리 함수
 void handle_get(http_request request) {
-	std::vector<json::value> scenario_list;
+    std::lock_guard<std::mutex> lock(cache_mutex);
 
-	for (const auto& entry : std::filesystem::directory_iterator(FOLDER_PATH)) {
-		if (entry.is_regular_file() && entry.path().extension() == ".json") {
-			try {
-				std::ifstream file(entry.path());
-				if (!file.is_open()) continue;
+    json::value response = json::value::array();
+    for (size_t i = 0; i < cached_scenario_list.size(); ++i) {
+        json::value item;
+        item[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(cached_scenario_list[i].scenario_id));
+        item[U("scenario_title")] = json::value::string(utility::conversions::to_string_t(cached_scenario_list[i].scenario_title));
+        response[i] = item;
+    }
 
-				std::stringstream buffer;
-				buffer << file.rdbuf();
-				file.close();
-
-				json::value data = json::value::parse(buffer.str());
-
-				if (data.has_field(U("scenario_id")) && data.has_field(U("scenario_title"))) {
-					json::value item;
-					item[U("scenario_id")] = data[U("scenario_id")];
-					item[U("scenario_title")] = data[U("scenario_title")];
-					scenario_list.push_back(item);
-				}
-			}
-			catch (...) {
-				std::cerr << u8"[오류] JSON 파싱 실패: " << entry.path().string() << std::endl;
-				continue;
-			}
-		}
-	}
-
-	// 응답 배열 생성
-	json::value response = json::value::array();
-	for (size_t i = 0; i < scenario_list.size(); ++i) {
-		response[i] = scenario_list[i];
-	}
-
-	std::cout << u8"[GET /scenarios] 반환된 시나리오 수: " << scenario_list.size() << std::endl;
-	request.reply(status_codes::OK, response);
+    std::cout << u8"[GET /scenarios] 반환된 시나리오 수: " << cached_scenario_list.size() << std::endl;
+    request.reply(status_codes::OK, response);
 }
 
+// 시나리오 목록 캐싱 함수
+void load_scenario_meta_cache(const std::string& directory_path) {
+    std::lock_guard<std::mutex> lock(cache_mutex);
+    cached_scenario_list.clear();
+
+    for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".json") {
+            try {
+                std::ifstream file(entry.path());
+                if (!file.is_open()) continue;
+
+                std::stringstream buffer;
+                buffer << file.rdbuf();
+                file.close();
+
+                auto data = json::value::parse(buffer.str());
+
+                if (data.has_field(U("scenario_id")) && data.has_field(U("scenario_title"))) {
+                    ScenarioMeta meta;
+                    meta.scenario_id = utility::conversions::to_utf8string(data[U("scenario_id")].as_string());
+                    meta.scenario_title = utility::conversions::to_utf8string(data[U("scenario_title")].as_string());
+                    cached_scenario_list.push_back(meta);
+                }
+            }
+            catch (...) {
+                std::cerr << u8"[오류] 캐싱 중 JSON 파싱 실패: " << entry.path().string() << std::endl;
+                continue;
+            }
+        }
+    }
+
+    std::cout << u8"[SCN] 시나리오 캐시 로드 완료 (총 " << cached_scenario_list.size() << u8"개)\n";
+}
