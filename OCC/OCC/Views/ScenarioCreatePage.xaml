@@ -35,17 +35,23 @@
         <!-- 드롭다운 및 저장 버튼 -->
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" Margin="10" Orientation="Vertical" VerticalAlignment="Top">
             <!-- 적군/아군/포대 선택 -->
-            <TextBlock Text="적군/아군/포대 선택" Margin="0,0,0,5" />
-            <ComboBox 
-                ItemsSource="{Binding ComboboxItem}"
-                SelectedIndex="{Binding ComboboxIndex}" />
+            <ComboBox ItemsSource="{Binding Items}" 
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center" 
+                Width="100" />
+            <TextBlock Text="{Binding SelectedItem}" 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Bottom" 
+                Margin="0,0,0,30" 
+                FontSize="16" />
         </StackPanel>
 
         <!-- 시나리오 저장 버튼 -->
         <Border Grid.Row="1" Grid.Column="1">
-            <Button 
-                Content="시나리오 저장"
-                Command="{Binding ScenarioSaveCommand}" />  
+        <Button Content="저장" 
+            Command="{Binding SaveCommand}" 
+            Margin="10"  />
         </Border>
     </Grid>
 </Page>
