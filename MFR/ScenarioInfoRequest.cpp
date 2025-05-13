@@ -1,6 +1,6 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
-#include "MFR.h"
+#include "ScenarioInfoRequest.h"
 #include "GlobalState.h"
 #include "JsonParser.h"
 #include "ScenarioInfoPrinter.h"  //  출력 확인 안할거면 삭제 가능
