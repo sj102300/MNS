@@ -13,13 +13,7 @@ using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-// 캐시 구조체 및 전역 변수
-struct ScenarioMeta {
-	std::string scenario_id;
-	std::string scenario_title;
-};
-
-std::vector<ScenarioMeta> cached_scenario_list;
+web::json::value cached_json_response = json::value::array();  // 캐싱된 시나리오 목록
 std::mutex cache_mutex;
 
 // UTF-16 → UTF-8 변환 함수 정의
@@ -83,24 +77,16 @@ void handle_post(http_request request) {
 // GET 요청 처리 함수
 void handle_get(http_request request) {
     std::lock_guard<std::mutex> lock(cache_mutex);
-
-    json::value response = json::value::array();
-    for (size_t i = 0; i < cached_scenario_list.size(); ++i) {
-        json::value item;
-        item[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(cached_scenario_list[i].scenario_id));
-        item[U("scenario_title")] = json::value::string(utility::conversions::to_string_t(cached_scenario_list[i].scenario_title));
-        response[i] = item;
-    }
-
-    std::cout << u8"[GET /scenarios] 반환된 시나리오 수: " << cached_scenario_list.size() << std::endl;
-    request.reply(status_codes::OK, response);
+    std::cout << u8"[GET /scenario/list] 반환 시나리오 수: " << cached_json_response.size() << std::endl;
+    request.reply(status_codes::OK, cached_json_response);
 }
 
 // 시나리오 목록 캐싱 함수
 void load_scenario_meta_cache(const std::string& directory_path) {
     std::lock_guard<std::mutex> lock(cache_mutex);
-    cached_scenario_list.clear();
+    cached_json_response = web::json::value::array();
 
+    size_t index = 0;
     for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
         if (entry.is_regular_file() && entry.path().extension() == ".json") {
             try {
@@ -114,10 +100,10 @@ void load_scenario_meta_cache(const std::string& directory_path) {
                 auto data = json::value::parse(buffer.str());
 
                 if (data.has_field(U("scenario_id")) && data.has_field(U("scenario_title"))) {
-                    ScenarioMeta meta;
-                    meta.scenario_id = utility::conversions::to_utf8string(data[U("scenario_id")].as_string());
-                    meta.scenario_title = utility::conversions::to_utf8string(data[U("scenario_title")].as_string());
-                    cached_scenario_list.push_back(meta);
+                    json::value item;
+                    item[U("scenario_id")] = data[U("scenario_id")];
+                    item[U("scenario_title")] = data[U("scenario_title")];
+                    cached_json_response[index++] = item;
                 }
             }
             catch (...) {
@@ -127,5 +113,5 @@ void load_scenario_meta_cache(const std::string& directory_path) {
         }
     }
 
-    std::cout << u8"[SCN] 시나리오 캐시 로드 완료 (총 " << cached_scenario_list.size() << u8"개)\n";
+    std::cout << u8"[SCN] 시나리오 캐시 로드 완료 (총 " << index << u8"개)\n";
 }
