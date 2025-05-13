@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{d8b66067-225c-4e5e-8a2c-fd8bc56590e7}</ProjectGuid>
-    <RootNamespace>ATS</RootNamespace>
+    <ProjectGuid>{a8d11cc9-88cf-4453-ab51-a6ae1bc9c024}</ProjectGuid>
+    <RootNamespace>Aircraft</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -104,6 +104,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,6 +121,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +133,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\main.cpp" />
+    <ClCompile Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\MFR.cpp" />
+    <ClCompile Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\StartSignalReceiver.cpp" />
+    <ClCompile Include="AircraftCoordinate_makePoint.cpp" />
+    <ClCompile Include="AircraftCoordinate_Reciever.cpp" />
+    <ClCompile Include="AircraftCoordinate_Sender.cpp" />
+    <ClCompile Include="ShootDownCheck.h" />
+    <ClCompile Include="ShootDownCheck_Reciever.cpp" />
+    <ClCompile Include="ShootDownCheck_Sender.cpp" />
+    <ClCompile Include="ShootDownCheck_ShootDown.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\GlobalState.h" />
+    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\JsonParser.h" />
+    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\MFR.h" />
+    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\ScenarioInfoPrinter.h" />
+    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\StartSignalReceiver.h" />
+    <ClInclude Include="AircraftCoordinate.h" />
+    <ClInclude Include="CoordinateGeneration.h" />
+    <ClInclude Include="ShootDownChecker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
