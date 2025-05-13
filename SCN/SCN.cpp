@@ -14,7 +14,7 @@ using namespace web::http;
 using namespace web::http::experimental::listener;
 
 // 시나리오 파일들이 있는 폴더 경로 (로컬 고정 경로)
-const std::string FOLDER_PATH = "C:\\Users\\user\\source\\repos\\MnS_LSY\\x64\\Debug";
+const std::string FOLDER_PATH = "C:\\Users\\user\\source\\repos\\MnS_LSY\\x64\\Debug\\Scenarios";
 
 // UTF-16 → UTF-8 변환 함수 정의
 std::string to_utf8(const std::wstring& wstr) {
@@ -41,7 +41,7 @@ void handle_post(http_request request) {
             auto scenario_id = utility::conversions::to_utf8string(body.at(U("scenario_id")).as_string());
 
             // 예: "SCENE-03" → "SCENE-03.json"로 파일명 구성
-            std::string filename = scenario_id + ".json";
+            std::string filename = "Scenarios\\" + scenario_id + ".json";
             std::cout << u8"[시나리오 요청 ID]: " << scenario_id << std::endl;
             std::cout << u8"[파일 열기 시도]: " << filename << std::endl;
 

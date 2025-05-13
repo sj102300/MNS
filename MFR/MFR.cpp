@@ -21,7 +21,7 @@ using namespace web::http::client;
 #define USE_SCENARIO_INFO    1   // 시나리오 개요 (식별자, 제목)
 #define USE_BATTERY_LOCATION 1   // 포대 위치 (위경고도)
 #define USE_AIRCRAFT_LIST    1   // 항공기 목록 (식별자, 피아구분, 시점, 종점)
-constexpr char ADDRESS[] = "http://127.0.0.1:8000";  // client + port
+constexpr char ADDRESS[] = "http://127.0.0.1:8000";  // client + port 설정
 const utility::string_t SCENARIO_SERVER_URL = utility::conversions::to_string_t(ADDRESS);
 
 ScenarioInfo scenario_info;
