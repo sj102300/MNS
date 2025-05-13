@@ -27,7 +27,7 @@ int main() {
 		get_listener.open().wait();
 		std::cout << u8"시나리오 서버가 실행 중입니다: POST /scenario/detail" << std::endl;
 		std::cout << u8"시나리오 서버가 실행 중입니다: GET /scenario/list" << std::endl;
-		std::cout << u8".json 시나리오 파일이 있는 위치에서 실행되어야 합니다." << std::endl;
+		//std::cout << u8".json 시나리오 파일이 있는 위치에서 실행되어야 합니다." << std::endl;
 
 		std::string line;
 		std::getline(std::cin, line);  // 엔터 입력 시 종료

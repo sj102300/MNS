@@ -98,37 +98,42 @@ namespace OCC
         private async void LoadScenarios_Click(object sender, RoutedEventArgs e)
         {
             string serverUrl = "http://localhost:8000/scenario/list"; // 시나리오 서버 주소로 교체
-            ScenarioList.Items.Clear();
-            loadedScenarios.Clear();
 
             try
             {
-                using var client = new HttpClient();
-                var response = await client.GetAsync(serverUrl);
-
-                if (!response.IsSuccessStatusCode)
+                // 백그라운드에서 네트워크 요청 및 파싱
+                var scenarios = await Task.Run(async () =>
                 {
-                    MessageBox.Show($"서버 응답 오류: {(int)response.StatusCode}");
-                    return;
-                }
+                    using var client = new HttpClient();
 
-                string jsonString = await response.Content.ReadAsStringAsync();
+                    // 📌 타이머 시작
+                    //var sw = System.Diagnostics.Stopwatch.StartNew();
 
-                var scenarios = JsonConvert.DeserializeObject<List<ScenarioInfo>>(jsonString);
+                    var response = await client.GetAsync(serverUrl);
 
-                if (scenarios != null)
+                    // 📌 타이머 종료
+                    //sw.Stop();
+                    //MessageBox.Show($"[OCC] 시나리오 목록 요청 응답 시간: {sw.ElapsedMilliseconds}ms",
+                                    //"응답 속도 측정", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (!response.IsSuccessStatusCode)
+                        throw new Exception($"서버 응답 오류: {(int)response.StatusCode}");
+
+                    string jsonString = await response.Content.ReadAsStringAsync();
+                    var parsed = JsonConvert.DeserializeObject<List<ScenarioInfo>>(jsonString);
+                    return parsed ?? new List<ScenarioInfo>();
+                });
+
+                // UI 쓰레드에서 한 번에 업데이트
+                loadedScenarios = scenarios;
+                ScenarioList.Items.Clear();  // UI 업데이트는 최소화
+                foreach (var scenario in scenarios)
                 {
-                    loadedScenarios = scenarios;
-
-                    foreach (var scenario in scenarios)
-                    {
-                        ScenarioList.Items.Add($"[{scenario.scenario_id}] {scenario.scenario_title}");
-                    }
+                    ScenarioList.Items.Add($"[{scenario.scenario_id}] {scenario.scenario_title}");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"예외 발생: {ex.Message}");
+                MessageBox.Show($"시나리오 목록 불러오기 실패: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
