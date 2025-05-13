@@ -1,7 +1,7 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
 #include "StartSignalReceiver.h"
-#include "MFR.h"  // request_scenario()
+#include "ScenarioInfoRequest.h"  // request_scenario()
 
 #include <windows.h>
 #include <iostream>
