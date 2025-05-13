@@ -2,22 +2,33 @@
 
 #include "UdpMulticastReceiver.h"
 #include "share.h"
+#include <regex>
+#include <queue>
+#include <mutex>
 
-class AircraftReceiver : public TCC::UdpMulticastReceiver {
-private:
+class IAircraftReceiver {
+public:
 	typedef struct _aircraft_message {
-		std::string aircraftId; //8ÀÚ
+		char aircraftId[8]; //8ÀÚ
 		TCC::Position location;
 		bool isEnemy;
-	}AircraftMSG;
+	} AircraftMSG;
 
+	virtual void getAircraftData() = 0;
+	virtual void pushRecvQueue(IAircraftReceiver::AircraftMSG& msg) = 0;
+	virtual bool popRecvQueue(IAircraftReceiver::AircraftMSG& msg) = 0;
+};
+
+class AircraftReceiver : public TCC::UdpMulticastReceiver, public IAircraftReceiver {
 public:
-	AircraftReceiver(std::string multicastIp, int port);
+	AircraftReceiver(const std::string& multicastIp, int port);
+	void getAircraftData() override;
+	void pushRecvQueue(IAircraftReceiver::AircraftMSG &msg) override;
+	bool popRecvQueue(IAircraftReceiver::AircraftMSG &msg) override;
 
-	void parseMsg(AircraftMSG& msg, const char* buffer, int length);
-
-	void receiveLoop() override;
-
-	void start() override;
-
+private:
+	bool parseMsg(AircraftMSG& msg, const char* buffer, const int length);
+	void receive() override;
+	std::mutex mtx_;
+	std::queue<IAircraftReceiver::AircraftMSG> recvQueue_;
 };

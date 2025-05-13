@@ -1,12 +1,14 @@
 ﻿#include <iostream>
 
-#include "LaunchCommandReceiver.h"
+#include "AircraftManager.h"
 
 int main() {
 
-    //송수신 모듈 만들기
-    LaunchCommandReceiver LaunchCommandReceiverImpl("127.0.0.1", 8080);
-    LaunchCommandReceiverImpl.start();
+    IAircraftReceiver* aircraftReceiver = new AircraftReceiver(std::string("239.0.0.2"), 9999);
+    IAircraftSender* aircraftSender = new AircraftSender(std::string("127.0.0.1"), 8081);
+    AircraftManager aircraftmanager(aircraftReceiver, aircraftSender);
+
+    aircraftmanager.updateAircraftPosition();
     
     return 0;
 }

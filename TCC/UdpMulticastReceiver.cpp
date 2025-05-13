@@ -1,7 +1,9 @@
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "UdpMulticastReceiver.h"
 
-TCC::UdpMulticastReceiver::UdpMulticastReceiver(std::string& multicastIp, int port) : multicastIp_(multicastIp), port_(port) {
+TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, int port) : multicastIp_(multicastIp), port_(port), serverSocket_(INVALID_SOCKET)
+{
 
 }
 

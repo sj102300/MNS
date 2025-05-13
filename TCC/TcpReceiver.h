@@ -17,10 +17,10 @@ namespace TCC {
         // 클라이언트 연결 수락
         bool connectClient();
 
-        virtual void receive() = 0;
-
-        // 메인에서 한번만 호출. 스레드로 만들어서 대기
+        //recv 스레드 시작시 한번만 호출
         virtual void start() = 0;
+
+        virtual void receive() = 0;
 
         // 응답 처리
         virtual void response() = 0;
