@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OCC.ViewModels;
 
 namespace OCC.Views
 {
@@ -20,9 +21,28 @@ namespace OCC.Views
     /// </summary>
     public partial class ScenarioLoadPage : Page
     {
+        private ScenarioLoadViewModel _viewModel;
         public ScenarioLoadPage()
         {
             InitializeComponent();
+
+            _viewModel = new ScenarioLoadViewModel();
+            DataContext = _viewModel;
+
+            // Loaded 이벤트를 통해 NavigationService를 설정
+            Loaded += ScenarioLoadPage_Loaded;
+        }
+
+        private void ScenarioLoadPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (NavigationService != null)
+            {
+                _viewModel.NavigationService = NavigationService;
+            }
+            else if (Parent is Frame frame && frame.NavigationService != null)
+            {
+                _viewModel.NavigationService = frame.NavigationService;
+            }
         }
     }
 }

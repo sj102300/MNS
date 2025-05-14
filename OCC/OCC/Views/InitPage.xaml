@@ -21,7 +21,9 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Row="1" Grid.Column="0">
-            <TextBlock Text="지대공 시뮬레이터" 
+            <TextBlock Text="지대공 유도무기 시뮬레이터"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
                        FontSize="30"/>
         </Border>
         

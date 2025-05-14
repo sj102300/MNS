@@ -26,7 +26,7 @@ namespace OCC.ViewModels
 
         public ObservableCollection<string> Items { get; set; } // 콤보박스 항목
         public ObservableCollection<Aircraft> AircraftList { get; set; } // 항공기 리스트
-        public Scenario ScenarioData { get; set; } // 시나리오 데이터
+        public ScenarioPost ScenarioData { get; set; } // 시나리오 데이터
 
         public Coordinate? BatteryLocation
         {
@@ -35,6 +35,30 @@ namespace OCC.ViewModels
             {
                 ScenarioData.BatteryLocation = value;
                 OnPropertyChanged();
+            }
+        }
+
+        public Coordinate? StartPoint
+        {
+            get => _startPoint;
+            set
+            {
+                if (SetProperty(ref _startPoint, value))
+                {
+                    OnPropertyChanged(nameof(StartPoint));
+                }
+            }
+        }
+
+        public Coordinate? EndPoint
+        {
+            get => _endPoint;
+            set
+            {
+                if (SetProperty(ref _endPoint, value))
+                {
+                    OnPropertyChanged(nameof(EndPoint));
+                }
             }
         }
 
@@ -55,6 +79,7 @@ namespace OCC.ViewModels
         public ICommand MapClickCommand { get; set; } // 지도 클릭 명령
         public ICommand SaveCommand { get; set; } // 저장 명령
         public ICommand ExportToJsonCommand { get; set; } // JSON 내보내기 명령
+        public ICommand GoBackCommand { get; }
 
         public ScenarioCreateViewModel()
         {
@@ -70,7 +95,7 @@ namespace OCC.ViewModels
             SelectedItem = "적군";
 
             // 시나리오 데이터 초기화
-            ScenarioData = new Scenario
+            ScenarioData = new ScenarioPost
             {
                 ScenarioId = Guid.NewGuid().ToString(),
                 ScenarioTitle = "새 시나리오",
@@ -89,6 +114,12 @@ namespace OCC.ViewModels
             SaveCommand = new RelayCommand<object>(
                 execute: async _ => await SaveScenarioAsync(),
                 canExecute: _ => CanSaveScenario()
+            );
+
+            // 뒤로가기 버튼 초기화
+            GoBackCommand = new RelayCommand<object>(
+                 execute: _ => GoBack(),
+                 canExecute: _ => NavigationService?.CanGoBack == true
             );
         }
 
