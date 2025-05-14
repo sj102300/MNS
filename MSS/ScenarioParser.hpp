@@ -4,12 +4,13 @@
 #include <vector>
 
 using namespace std;
-
+#pragma pack(push, 1)
 struct Location {
 	double latitude;
 	double longitude;
 	double altitude;
 };
+#pragma pack(pop)
 
 struct Aircraft {
 	string id;
@@ -17,6 +18,8 @@ struct Aircraft {
 	Location end_point;
 	char friend_or_foe;
 };
+
+
 struct Scenario {
 	string scenario_id;
 	string title;

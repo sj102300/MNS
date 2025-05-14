@@ -21,6 +21,12 @@
     <ClCompile Include="sim.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="UdpReceiver.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpSender.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="example.json">
@@ -29,6 +35,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ScenarioParser.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Isender.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Ireceiver.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

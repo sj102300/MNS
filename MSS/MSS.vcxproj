@@ -132,11 +132,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="sim.cpp" />
+    <ClCompile Include="UdpReceiver.hpp" />
+    <ClCompile Include="UdpSender.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="example.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ireceiver.hpp" />
+    <ClInclude Include="Isender.hpp" />
+    <ClInclude Include="Packet.hpp" />
     <ClInclude Include="ScenarioParser.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
