@@ -130,13 +130,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SCN.cpp" />
+    <ClCompile Include="ScenarioService.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Scenario01.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="SCN.h" />
+    <ClInclude Include="ScenarioService.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
