@@ -129,13 +129,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MFR.cpp" />
+    <ClCompile Include="ScenarioInfoRequest.cpp" />
     <ClCompile Include="StartSignalReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GlobalState.h" />
     <ClInclude Include="JsonParser.h" />
-    <ClInclude Include="MFR.h" />
+    <ClInclude Include="ScenarioInfoRequest.h" />
     <ClInclude Include="ScenarioInfoPrinter.h" />
     <ClInclude Include="StartSignalReceiver.h" />
   </ItemGroup>
