@@ -129,8 +129,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -143,11 +144,13 @@
   <ItemGroup>
     <ClInclude Include="JsonParser.h" />
     <ClInclude Include="ScenarioInfoPrinter.h" />
+    <ClInclude Include="ScenarioInit.h" />
     <ClInclude Include="ScenarioManager.h" />
     <ClInclude Include="StartSignalReceiver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScenarioInfoPrinter.cpp" />
+    <ClCompile Include="ScenarioInit.cpp" />
     <ClCompile Include="ScenarioManager.cpp" />
     <ClCompile Include="StartSignalReceiver.cpp" />
   </ItemGroup>
