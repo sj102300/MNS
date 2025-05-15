@@ -16,7 +16,6 @@ public:
 private:
     web::json::value cached_json_response_;
     std::mutex cache_mutex_;
-
     std::string scenario_dir_;
 };
 

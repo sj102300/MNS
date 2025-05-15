@@ -2,6 +2,7 @@
 
 #include "ScenarioManager.h"
 #include "ScenarioInfoPrinter.h"
+#include <functional>
 
 class ScenarioInit {
 public:
@@ -11,7 +12,8 @@ public:
 
     void run();
 
-    // 시나리오 정보 접근용 getter
+    void setOnReadyCallback(std::function<void()> cb);  // 콜백 등록 함수
+
     ScenarioInfo getScenarioInfo() const;
     Coordinate getBatteryLocation() const;
     std::vector<AircraftInfo> getAircraftList() const;
@@ -21,6 +23,8 @@ private:
     std::string client_id_;
     std::shared_ptr<ScenarioManager> scenario_manager_;
     ScenarioInfoPrinter printer_;
+
+    std::function<void()> on_ready_cb_;  // 등록된 콜백 저장
 
     void handleStartSignal(const std::string& scenario_id);
 };

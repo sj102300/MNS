@@ -12,7 +12,9 @@ using namespace web::http::experimental::listener;
 void setup_start_signal_listener(
     const std::string& address,
     const std::string& client_id,
-    std::function<void(const std::string&)> on_start_callback)
+    std::function<void(const std::string&)> on_start_callback
+    //std::function<void(const std::string&)> on_quit_callback
+)
 {
     static http_listener listener(utility::conversions::to_string_t(address));
     listener.support(methods::POST, [=](http_request request) {

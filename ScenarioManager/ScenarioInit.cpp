@@ -24,6 +24,10 @@ void ScenarioInit::run() {
     std::cout << u8"[" << client_id_ << u8"] OCC에서 시작신호를 기다립니다.\n";
 }
 
+void ScenarioInit::setOnReadyCallback(std::function<void()> cb) {
+    on_ready_cb_ = std::move(cb);
+}
+
 void ScenarioInit::handleStartSignal(const std::string& scenario_id) {
     std::cout << u8"[" << client_id_ << u8"] 시나리오 요청 시작\n";
 
@@ -35,7 +39,12 @@ void ScenarioInit::handleStartSignal(const std::string& scenario_id) {
     printer_.printInfo(*scenario_manager_);
     printer_.printBattery(*scenario_manager_);
     printer_.printAircraftList(*scenario_manager_);
+
+    if (on_ready_cb_) {
+        on_ready_cb_();  // 외부에서 등록한 콜백 호출
+    }
 }
+
 
 ScenarioInfo ScenarioInit::getScenarioInfo() const {
     return scenario_manager_->getScenarioInfo();
