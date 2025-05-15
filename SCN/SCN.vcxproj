@@ -121,7 +121,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\user\source\repos\MnS_LSY\Util</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,14 +134,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ScenarioService.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ScenarioService.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Util\Util.vcxproj">
-      <Project>{9fe4d5b2-fd66-4867-a052-8f8405b88c09}</Project>
-    </ProjectReference>
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

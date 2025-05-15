@@ -13,36 +13,54 @@ using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-ScenarioService::ScenarioService() {
-    cached_json_response_ = json::value::array();
+ScenarioService::ScenarioService(const std::string& scenario_dir)
+    : scenario_dir_(scenario_dir) {
+    cached_json_response_ = web::json::value::array();
 }
 
-void ScenarioService::loadMetaCache(const std::string& directory) {
+void ScenarioService::loadMetaCache() {
     std::lock_guard<std::mutex> lock(cache_mutex_);
-    cached_json_response_ = json::value::array();
+    cached_json_response_ = web::json::value::array();
+
+    // 디렉터리 존재 여부 확인
+    if (!std::filesystem::exists(scenario_dir_)) {
+        std::cerr << u8"[오류] 시나리오 디렉터리 없음: " << scenario_dir_ << std::endl;
+        return;
+    }
+
+    if (!std::filesystem::is_directory(scenario_dir_)) {
+        std::cerr << u8"[오류] 경로가 디렉터리가 아님: " << scenario_dir_ << std::endl;
+        return;
+    }
 
     size_t index = 0;
-    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+    for (const auto& entry : std::filesystem::directory_iterator(scenario_dir_)) {
         if (entry.is_regular_file() && entry.path().extension() == ".json") {
             try {
                 std::ifstream file(entry.path());
-                if (!file.is_open()) continue;
+                if (!file.is_open()) {
+                    std::cerr << u8"[경고] 파일 열기 실패: " << entry.path() << std::endl;
+                    continue;
+                }
 
                 std::stringstream buffer;
                 buffer << file.rdbuf();
                 file.close();
 
-                auto data = json::value::parse(buffer.str());
+                auto data = web::json::value::parse(buffer.str());
 
                 if (data.has_field(U("scenario_id")) && data.has_field(U("scenario_title"))) {
-                    json::value item;
+                    web::json::value item;
                     item[U("scenario_id")] = data[U("scenario_id")];
                     item[U("scenario_title")] = data[U("scenario_title")];
                     cached_json_response_[index++] = item;
                 }
+                else {
+                    std::cerr << u8"[경고] 필드 누락: " << entry.path() << std::endl;
+                }
             }
             catch (...) {
-                std::cerr << u8"[오류] 캐싱 중 JSON 파싱 실패: " << entry.path().string() << std::endl;
+                std::cerr << u8"[오류] JSON 파싱 실패: " << entry.path() << std::endl;
             }
         }
     }
