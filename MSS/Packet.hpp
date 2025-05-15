@@ -2,7 +2,7 @@
 #include "ScenarioParser.hpp"
 #include <mutex>
 
-struct Packet  {
+struct Missile  {
     char MissileId[8];
     uint32_t MissileState;
     Location MissileLoc;

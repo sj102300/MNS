@@ -36,7 +36,7 @@ public:
         return true;
     }
 
-    void setPacket(const Packet& pkt) {
+    void setPacket(const Missile& pkt) {
         std::lock_guard<std::mutex> lock(packetMutex_);
         currentPacket_ = pkt;
     }
@@ -47,13 +47,13 @@ public:
     }
     void run() override {
         while (running_) {
-            Packet pktCopy;
+            Missile pktCopy;
             {
                 std::lock_guard<std::mutex> lock(packetMutex_);
                 pktCopy = currentPacket_;
             }
 
-            send(reinterpret_cast<const char*>(&pktCopy), sizeof(Packet));
+            send(reinterpret_cast<const char*>(&pktCopy), sizeof(Missile));
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // 0.01√  ¡÷±‚
         }
@@ -88,7 +88,7 @@ private:
     std::atomic<bool> running_;
 
 
-    Packet currentPacket_;
+    Missile currentPacket_;
     std::mutex packetMutex_;
     std::atomic<bool> packetReady_ = false;
 };

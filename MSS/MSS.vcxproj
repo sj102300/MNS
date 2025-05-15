@@ -128,10 +128,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MissileController.cpp" />
     <ClCompile Include="Scene_Parser.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="sim.cpp" />
+    <ClCompile Include="UdpMuticast.hpp" />
     <ClCompile Include="UdpReceiver.hpp" />
     <ClCompile Include="UdpSender.hpp" />
   </ItemGroup>
@@ -141,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="Ireceiver.hpp" />
     <ClInclude Include="Isender.hpp" />
+    <ClInclude Include="MissileController.h" />
     <ClInclude Include="Packet.hpp" />
     <ClInclude Include="ScenarioParser.hpp" />
   </ItemGroup>

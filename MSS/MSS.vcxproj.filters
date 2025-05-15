@@ -27,6 +27,12 @@
     <ClCompile Include="UdpSender.hpp">
       <Filter>헤더 파일</Filter>
     </ClCompile>
+    <ClCompile Include="UdpMuticast.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MissileController.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="example.json">
@@ -44,6 +50,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Packet.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileController.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
