@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OCC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd568f6143db2c233d18602ec7274a36d53bcac9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5bc5b2a0f52ecffac24263ecf271034adf128b39")]
 [assembly: System.Reflection.AssemblyProductAttribute("OCC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OCC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
