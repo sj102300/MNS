@@ -19,7 +19,7 @@ bool ScenarioManager::requestScenario(const std::string& scenario_id) {
 
     try {
         http_request req(methods::POST);
-        req.set_request_uri(U("/scenario/detail"));
+        req.set_request_uri(U("/scenario/info"));
         req.headers().set_content_type(U("application/json"));
 
         json::value postData;

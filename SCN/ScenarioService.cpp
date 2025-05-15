@@ -15,6 +15,7 @@ using namespace web::http::experimental::listener;
 
 ScenarioService::ScenarioService(const std::string& scenario_dir)
     : scenario_dir_(scenario_dir) {
+    std::filesystem::create_directories(scenario_dir_);  // 해당 디렉토리가 없으면 생성
     cached_json_response_ = web::json::value::array();
 }
 
@@ -74,7 +75,7 @@ void ScenarioService::handleGet(http_request request) {
     request.reply(status_codes::OK, cached_json_response_);
 }
 
-void ScenarioService::handlePost(http_request request) {
+void ScenarioService::handlePostInfo(http_request request) {
     request.extract_json().then([=](pplx::task<json::value> task) {
         try {
             auto body = task.get();
@@ -108,6 +109,54 @@ void ScenarioService::handlePost(http_request request) {
         }
         catch (const std::exception& e) {
             std::cerr << u8"[예외] handlePost: " << e.what() << std::endl;
+            request.reply(status_codes::InternalError, utility::conversions::to_string_t(e.what()));
+        }
+        }).wait();
+}
+
+void ScenarioService::handlePostSave(http_request request) {
+    request.extract_json().then([=](pplx::task<json::value> task) {
+        try {
+            auto body = task.get();
+
+            // 필수 필드 확인
+            if (!body.has_field(U("scenario_id"))) {
+                request.reply(status_codes::BadRequest, U("Missing scenario_id"));
+                return;
+            }
+
+            auto scenario_id = utility::conversions::to_utf8string(body.at(U("scenario_id")).as_string());
+            std::string filename = scenario_dir_ + "/" + scenario_id + ".json";
+
+            // 파일로 저장
+            std::ofstream file(filename);
+            if (!file.is_open()) {
+                std::cerr << u8"[오류] 파일 저장 실패: " << filename << std::endl;
+                request.reply(status_codes::InternalError, U("파일 저장 실패"));
+                return;
+            }
+
+            file << utils::to_utf8(body.serialize());
+            file.close();
+
+            // 캐시 갱신
+            if (body.has_field(U("scenario_id")) && body.has_field(U("scenario_title"))) {
+                std::lock_guard<std::mutex> lock(cache_mutex_);
+
+                // 새로운 항목 추가
+                web::json::value new_item;
+                new_item[U("scenario_id")] = body.at(U("scenario_id"));
+                new_item[U("scenario_title")] = body.at(U("scenario_title"));
+                
+                // 캐시 재로딩
+                loadMetaCache();
+                std::cout << u8"[SCN] 시나리오 저장 + 캐시 갱신 완료: " << filename << std::endl;
+            }
+
+            request.reply(status_codes::OK, U("시나리오 저장 완료"));
+        }
+        catch (const std::exception& e) {
+            std::cerr << u8"[예외] handlePostSave: " << e.what() << std::endl;
             request.reply(status_codes::InternalError, utility::conversions::to_string_t(e.what()));
         }
         }).wait();

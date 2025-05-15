@@ -11,7 +11,8 @@ public:
 
     void loadMetaCache();
     void handleGet(web::http::http_request request);
-    void handlePost(web::http::http_request request);
+    void handlePostInfo(web::http::http_request request);
+    void handlePostSave(web::http::http_request request);
 
 private:
     web::json::value cached_json_response_;
