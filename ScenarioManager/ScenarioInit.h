@@ -11,6 +11,11 @@ public:
 
     void run();
 
+    // 시나리오 정보 접근용 getter
+    ScenarioInfo getScenarioInfo() const;
+    Coordinate getBatteryLocation() const;
+    std::vector<AircraftInfo> getAircraftList() const;
+
 private:
     std::string listen_address_;
     std::string client_id_;

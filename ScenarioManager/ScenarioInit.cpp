@@ -36,3 +36,15 @@ void ScenarioInit::handleStartSignal(const std::string& scenario_id) {
     printer_.printBattery(*scenario_manager_);
     printer_.printAircraftList(*scenario_manager_);
 }
+
+ScenarioInfo ScenarioInit::getScenarioInfo() const {
+    return scenario_manager_->getScenarioInfo();
+}
+
+Coordinate ScenarioInit::getBatteryLocation() const {
+    return scenario_manager_->getBatteryLocation();
+}
+
+std::vector<AircraftInfo> ScenarioInit::getAircraftList() const {
+    return scenario_manager_->getAircraftList();
+}
