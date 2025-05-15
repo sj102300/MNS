@@ -119,14 +119,25 @@ void ScenarioService::handlePostSave(http_request request) {
         try {
             auto body = task.get();
 
-            // 필수 필드 확인
-            if (!body.has_field(U("scenario_id"))) {
-                request.reply(status_codes::BadRequest, U("Missing scenario_id"));
-                return;
+            // 현재 보유 중인 시나리오 파일 개수 파악
+            size_t count = 0;
+            for (const auto& entry : std::filesystem::directory_iterator(scenario_dir_)) {
+                if (entry.is_regular_file() && entry.path().extension() == ".json") {
+                    ++count;
+                }
             }
 
-            auto scenario_id = utility::conversions::to_utf8string(body.at(U("scenario_id")).as_string());
-            std::string filename = scenario_dir_ + "/" + scenario_id + ".json";
+            // 새 ID 생성 (SCENE-01, SCENE-02, ...)
+            std::ostringstream oss;
+            oss << "SCENE-" << std::setw(2) << std::setfill('0') << (count + 1);
+            std::string new_id = oss.str();
+
+            // ID와 제목 자동 설정
+            body[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(new_id));
+            body[U("scenario_title")] = json::value::string(utility::conversions::to_string_t(new_id));
+
+            // 저장 경로
+            std::string filename = scenario_dir_ + "/" + new_id + ".json";
 
             // 파일로 저장
             std::ofstream file(filename);
