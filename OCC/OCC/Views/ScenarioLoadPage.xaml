@@ -29,7 +29,19 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3">
-                <ListBox ItemsSource="{Binding ScenarioList}" />
+                <ListBox ItemsSource="{Binding ScenarioCollection}"
+                    SelectedItem="{Binding SelectedScenario, Mode=TwoWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="["/>
+                                <TextBlock Text="{Binding ScenarioId}" FontWeight="Bold"/>
+                                <TextBlock Text="] " />
+                                <TextBlock Text="{Binding ScenarioTitle}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Border>
 
             <!-- 시나리오 불러오기 버튼 -->

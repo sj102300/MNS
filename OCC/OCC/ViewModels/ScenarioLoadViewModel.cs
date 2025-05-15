@@ -61,6 +61,9 @@ namespace OCC.ViewModels
                  execute: _ => Start(),
                  canExecute: _ => SelectedScenario != null
             );
+
+            ScenarioCollection = new ObservableCollection<ScenarioGet>();
+
         }
 
 
@@ -68,39 +71,57 @@ namespace OCC.ViewModels
         {
             string serverUrl = "http://127.0.0.1:8000/scenario/list"; // 시나리오 서버 주소로 교체
 
-            try
+            // UI 쓰레드에서 ObservableCollection 업데이트
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                // 백그라운드에서 네트워크 요청 및 파싱
-                var scenarios = await Task.Run(async () =>
-                {
-                    using var client = new HttpClient();
+                ScenarioCollection.Clear();
 
-                    var response = await client.GetAsync(serverUrl);
+                // 더미 데이터 추가
+                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-01", ScenarioTitle = "더미 시나리오 1" });
+                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-02", ScenarioTitle = "더미 시나리오 2" });
+                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-03", ScenarioTitle = "더미 시나리오 3" });
+                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-04", ScenarioTitle = "더미 시나리오 4" });
+                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-05", ScenarioTitle = "더미 시나리오 5" });
+                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-06", ScenarioTitle = "더미 시나리오 6" });
+            });
 
-                    if (!response.IsSuccessStatusCode)
-                        throw new Exception($"서버 응답 오류: {(int)response.StatusCode}");
+            //try
+            //{
+            //    // 백그라운드에서 네트워크 요청 및 파싱
+            //    var scenarios = await Task.Run(async () =>
+            //    {
+            //        using var client = new HttpClient();
 
-                    string jsonString = await response.Content.ReadAsStringAsync();
+            //        var response = await client.GetAsync(serverUrl);
 
-                    var parsed = JsonConvert.DeserializeObject<List<ScenarioGet>>(jsonString);
+            //        if (!response.IsSuccessStatusCode)
+            //            throw new Exception($"서버 응답 오류: {(int)response.StatusCode}");
 
-                    return parsed ?? new List<ScenarioGet>();
-                });
+            //        string jsonString = await response.Content.ReadAsStringAsync();
 
-                // UI 쓰레드에서 ObservableCollection 업데이트
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    ScenarioCollection.Clear();
-                    foreach (var scenario in scenarios)
-                    {
-                        ScenarioCollection.Add(scenario);
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"시나리오 목록 불러오기 실패: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            //        var parsed = JsonConvert.DeserializeObject<List<ScenarioGet>>(jsonString);
+
+            //        return parsed ?? new List<ScenarioGet>();
+            //    });
+
+            //    // UI 쓰레드에서 ObservableCollection 업데이트
+            //    Application.Current.Dispatcher.Invoke(() =>
+            //    {
+            //        ScenarioCollection.Clear();
+            //        foreach (var scenario in scenarios)
+            //        {
+            //            ScenarioCollection.Add(scenario);
+            //        }
+
+            //        // 더미 데이터 추가
+            //        ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-01", ScenarioTitle = "더미 시나리오 1" });
+            //        ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-02", ScenarioTitle = "더미 시나리오 2" });
+            //    });
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"시나리오 목록 불러오기 실패: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
         }
 
         private async void Start()
