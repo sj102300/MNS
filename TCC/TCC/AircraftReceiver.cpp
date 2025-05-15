@@ -1,5 +1,6 @@
 
 #include "AircraftReceiver.h"
+#include "AircraftManager.h"
 
 AircraftReceiver::AircraftReceiver(const std::string& multicastIp, int port) : UdpMulticastReceiver(multicastIp, port) {
 	std::cout << "AircraftReceiver created\n";
@@ -10,9 +11,7 @@ void AircraftReceiver::getAircraftData() {
 		std::cout << "AircraftReceiver Init() Failed\n";
 		return;
 	}
-
 	recvThread_ = std::thread(&AircraftReceiver::receive, this);
-
 	return;
 }
 
@@ -22,7 +21,7 @@ void AircraftReceiver::receive() {
 	int addrLen = sizeof(senderAddr);
 
 	AircraftMSG msg;
-
+	AircraftManager::NewAircraft newAircraft;
 	while (true) {
 		int bytesReceived = recvfrom(serverSocket_, buffer, sizeof(buffer), 0, (struct sockaddr*)&senderAddr, &addrLen);
 
@@ -35,7 +34,12 @@ void AircraftReceiver::receive() {
 			std::cout << "AircraftReceiver received bad packet\n";
 			continue;
 		}
-		pushRecvQueue(msg);
+
+		newAircraft.aircraftId_ = std::string(msg.aircraftId, 8);
+		newAircraft.location_ = msg.location;
+		newAircraft.isEnemy_ = msg.friend_or_our == 'E';
+
+		aircraftmanager_->pushNewAircraftQueue(newAircraft);
 	}
 }
 
@@ -53,31 +57,9 @@ bool AircraftReceiver::parseMsg(AircraftMSG & msg, const char* buffer, const int
 	}
 
 	char friendOrEnemy = *(char*)(buffer + 32);
-	if (friendOrEnemy == 'E') {
-		msg.isEnemy = true;
-	}
-	else if (friendOrEnemy == 'O') {
-		msg.isEnemy = false;
-	}
-	else {
+	if (friendOrEnemy != 'E' || friendOrEnemy != 'O')
 		return false;
-	}
 
-	return true;
-}
-
-void AircraftReceiver::pushRecvQueue(AircraftMSG &msg) {
-	std::lock_guard<std::mutex> lock(mtx_);
-	recvQueue_.push(msg);
-}
-
-bool AircraftReceiver::popRecvQueue(AircraftMSG& msg) {
-	std::lock_guard<std::mutex> lock(mtx_);
-	if (recvQueue_.empty()) {
-		return false;
-	}
-	msg = recvQueue_.front();
-	recvQueue_.pop();
 	return true;
 }
 

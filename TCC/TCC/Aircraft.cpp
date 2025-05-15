@@ -7,6 +7,10 @@ const bool Aircraft::isEnemy() const {
 	return isEnemy_;
 }
 
+void Aircraft::updatePosition(TCC::Position& newLocation) {
+    pos_ = newLocation;
+}
+
 namespace {
 
     constexpr double PI = 3.14159265358979323846;
@@ -47,7 +51,7 @@ void Aircraft::calcDirVec(const TCC::Position& newPos) {
     return;
 }
 
-void Aircraft::getImpactPoint() {
+void Aircraft::calcImpactPoint() {
     TCC::Position batteryLoc = { 37.5597, 126.9869, 10 };
     double vt = 1.0; // 항공기 속도 (km/s)
     double vm = 2.0; // 미사일 속도 (km/s)

@@ -33,7 +33,6 @@ bool TCC::TcpReceiver::init() {
 		std::cerr << "Listen Failed\n";
 		return false;
 	}
-
 	std::cout << "TCP Receiver initialized at " << ip_address_ << ":" << port_ << "\n";
 	return true;
 }

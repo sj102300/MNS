@@ -8,9 +8,9 @@ class Aircraft{
 public:
 	Aircraft(std::string id, TCC::Position pos_, bool isEnemy_);
 	const bool isEnemy() const;
-	void getImpactPoint();
+	void calcImpactPoint();
 	bool isIpInEngageRange(unsigned int engagementStatus, TCC::Position& iplocation);
-	//bool isEngagable();
+	void updatePosition(TCC::Position& newLocation);
 
 private:
 	void calcDirVec(const TCC::Position& newPos);

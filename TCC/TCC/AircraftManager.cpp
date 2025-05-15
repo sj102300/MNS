@@ -15,45 +15,56 @@ bool AircraftManager::isExistAircraft(std::string& aircraftId) {
 	return aircrafts_.find(aircraftId) != aircrafts_.end();
 }
 
-void AircraftManager::addAircraft(std::string& aircraftId, IAircraftReceiver::AircraftMSG &msg) {
-	aircrafts_[aircraftId] = new Aircraft(aircraftId, msg.location, msg.isEnemy);
+void AircraftManager::addAircraft(NewAircraft &newAircraft) {
+	aircrafts_[newAircraft.aircraftId_] = new Aircraft(newAircraft.aircraftId_, newAircraft.location_, newAircraft.isEnemy_);
+}
+
+void AircraftManager::pushNewAircraftQueue(NewAircraft& newAircraft) {
+	std::lock_guard<std::mutex> lock(mtx_);
+	newAircraftQueue_.push(newAircraft);
+}
+
+bool AircraftManager::popNewAircraftQueue(NewAircraft& newAircraft) {
+	std::lock_guard<std::mutex> lock(mtx_);
+	if (newAircraftQueue_.empty()) {
+		return false;
+	}
+	newAircraft = newAircraftQueue_.front();
+	newAircraftQueue_.pop();
+	return true;
 }
 
 void AircraftManager::judgeEngagable() {
 
-	IAircraftReceiver::AircraftMSG recvmsg;
+	NewAircraft newAircraft;
+	IAircraftSender::NewAircraftWithIP newAircraftWithIp;
 
 	while (true) {
-		if (receiver_->popRecvQueue(recvmsg)) {
+		if (popNewAircraftQueue(newAircraft)) {
 
-			std::string aircraftId = std::string(recvmsg.aircraftId, 8);
-
-			if (!isExistAircraft(aircraftId)) {
-				addAircraft(aircraftId, recvmsg);
+			if (!isExistAircraft(newAircraft.aircraftId_)) {
+				addAircraft(newAircraft);
 			}
 
-			Aircraft* targetAircraft = aircrafts_[aircraftId];
-			IAircraftSender::AircraftMSG sendmsg;
-			memcpy(&sendmsg, reinterpret_cast<const char*>(&recvmsg), 32);
+			Aircraft* targetAircraft = aircrafts_[newAircraft.aircraftId_];
+			targetAircraft->updatePosition(newAircraft.location_);
+			
+			newAircraftWithIp.aircraftId_ = newAircraft.aircraftId_;
+			newAircraftWithIp.location_ = newAircraft.location_;
+			newAircraftWithIp.isEnemy_ = newAircraft.isEnemy_;
 
 			if (!targetAircraft->isEnemy()) {	//아군 항공기
-				sendmsg.isEnemy_ = 0;
-				sender_->pushSendQueue(sendmsg);
+				sender_->pushSendQueue(newAircraftWithIp);
 				return;
 			}
-
-			sendmsg.isEnemy_ = 1;
-			if (targetAircraft->isIpInEngageRange(sendmsg.engagementStatus_, sendmsg.impactPoint_)) {	//적군 항공기 중 교전 가능 범위 아님
-				sender_->pushSendQueue(sendmsg);
-				return;
-			}
-
-			sender_->pushSendQueue(sendmsg);	//적군 항공기 중 교전 가능한 항공기
-
-			//EngagementManager의 큐에 넣기
 			
+			if (targetAircraft->isIpInEngageRange(newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_)) {	//적군 항공기 중 교전 가능 범위 아님
+				sender_->pushSendQueue(newAircraftWithIp);
+				return;
+			}
 
-
+			sender_->pushSendQueue(newAircraftWithIp);	//적군 항공기 중 교전 가능한 항공기
+			//engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftId_);
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}

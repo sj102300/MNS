@@ -29,33 +29,36 @@ void AircraftSender::sendAircraftData() {
 	sendThread_ = std::thread(&AircraftSender::sendAircraftMessage, this);
 }
 
+
+void AircraftSender::pushSendQueue(NewAircraftWithIP& newAircraftWithIp) {
+	std::lock_guard<std::mutex> lock(mtx_);
+	sendQueue.push(newAircraftWithIp);
+}
+bool AircraftSender::popSendQueue(NewAircraftWithIP& newAircraftWithIp) {
+	std::lock_guard<std::mutex> lock(mtx_);
+	if (sendQueue.empty())
+		return false;
+	newAircraftWithIp = sendQueue.front();
+	sendQueue.pop();
+	return true;
+}
+
 void AircraftSender::sendAircraftMessage() {
 
-	IAircraftSender::AircraftMSG msg;
+	NewAircraftWithIP newAircraftWithIp;
 	while (true) {
-		if (popSendQueue(msg)) {
-			writeToBuffer(msg);
+		if (popSendQueue(newAircraftWithIp)) {
+			writeToBuffer(newAircraftWithIp);
 			sendByteData(buffer, len);
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}
 }
 
-void AircraftSender::writeToBuffer(IAircraftSender::AircraftMSG& msg) {
-	memcpy(buffer, reinterpret_cast<const void*>(&msg), len);
-}
-
-void AircraftSender::pushSendQueue(IAircraftSender::AircraftMSG & msg) {
-	std::lock_guard<std::mutex> lock(mtx_);
-	sendQueue.push(msg);
-}
-
-bool AircraftSender::popSendQueue(IAircraftSender::AircraftMSG& msg) {
-	std::lock_guard<std::mutex> lock(mtx_);
-	if (sendQueue.empty()) {
-		return false;
-	}
-	msg = sendQueue.front();
-	sendQueue.pop();
-	return true;
+void AircraftSender::writeToBuffer(NewAircraftWithIP& msg) {
+	memcpy(buffer, msg.aircraftId_.c_str(), 8);
+	memcpy(buffer+8, static_cast<void*>(&(msg.location_)), sizeof(TCC::Position));
+	*(unsigned int*)(buffer + 32) = msg.isEnemy_;
+	*(unsigned int*)(buffer + 36) = msg.engagementStatus_;
+	memcpy(buffer + 40, static_cast<void*>(&(msg.impactPoint_)), sizeof(TCC::Position));
 }
