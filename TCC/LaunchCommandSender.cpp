@@ -1,12 +1,28 @@
 #include "LaunchCommandSender.h"
+#pragma warning(disable: 4996)
 
 LaunchCommandSender::LaunchCommandSender(std::string ip_address, int port) : TcpSender(ip_address, port) {
 
 }
 
-//void LaunchCommandSender::makePacket(LaunchCommandPacket& packet, const char* buffer, int length) {
-//	// 패킷 생성
-//}
+void makePacket(char* buffer, const std::string& fireCommand, const std::string& aircraftId) {
+    // 버퍼 초기화
+    memset(buffer, 0, 28);
+
+    // 발사명령 식별자 (20 bytes)
+    strncpy(buffer, fireCommand.c_str(), 20);
+
+    // 항공기 식별자 (8 bytes)
+    strncpy(buffer + 20, aircraftId.c_str(), 8);
+
+    // 디버깅용 데이터 확인
+    std::cout << "Packet Data: ";
+    for (int i = 0; i < 28; ++i) {
+        std::cout << buffer[i];
+    }
+    std::cout << std::endl;
+}
+
 
 void LaunchCommandSender::sendLoop() {
 
