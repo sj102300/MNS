@@ -1,7 +1,6 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
 #include "ScenarioService.h"
-#include "Utils.h"  // to_utf8
 
 #include <cpprest/json.h>
 #include <fstream>
@@ -98,7 +97,7 @@ void ScenarioService::handlePostInfo(http_request request) {
             std::cout << u8"[시나리오 요청 ID]: " << scenario_id << std::endl;
             std::cout << u8"[JSON 파싱 성공]\n";
 
-            std::string utf8_json = utils::to_utf8(scenario_data.serialize());
+            std::string utf8_json = utility::conversions::to_utf8string(scenario_data.serialize());
             std::cout << u8"[응답 내용]\n" << utf8_json << std::endl;
 
             request.reply(status_codes::OK, scenario_data);
@@ -135,7 +134,7 @@ void ScenarioService::handlePostSave(http_request request) {
                 return;
             }
 
-            file << utils::to_utf8(body.serialize());
+            file << utility::conversions::to_utf8string(body.serialize());
             file.close();
 
             // reload

@@ -28,19 +28,19 @@ int main() {
     std::unique_lock<std::mutex> lock(mtx);
     cv.wait(lock, [] { return ready; });
 
-    ScenarioInfo info = scenarioRunner.getScenarioInfo();
+    //ScenarioInfo info = scenarioRunner.getScenarioInfo();
     Coordinate battery = scenarioRunner.getBatteryLocation();
-    std::vector<AircraftInfo> aircrafts = scenarioRunner.getAircraftList();
+    //std::vector<AircraftInfo> aircrafts = scenarioRunner.getAircraftList();
 
     //////////////////////////////////  출력 확인  ///////////////////////////////////
     std::cout << "\n" << u8"===============================================" << "\n";
-    std::cout << u8"시나리오 ID는: " << info.scenario_id << std::endl;
+    //std::cout << u8"시나리오 ID는: " << info.scenario_id << std::endl;
     std::cout << u8"[포대 위치] 위도: " << battery.latitude
         << u8", 경도: " << battery.longitude
         << u8", 고도: " << battery.altitude << std::endl;
-    for (const auto& ac : aircrafts) {
-        std::cout << u8"[항공기] ID: " << ac.aircraft_id << u8", 피아: " << ac.friend_or_foe << std::endl;
-    }
+    //for (const auto& ac : aircrafts) {
+    //    std::cout << u8"[항공기] ID: " << ac.aircraft_id << u8", 피아: " << ac.friend_or_foe << std::endl;
+    //}
     //////////////////////////////////////////////////////////////////////////////////
 
 
