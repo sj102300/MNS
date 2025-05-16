@@ -85,43 +85,40 @@ namespace OCC.ViewModels
                 ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-06", ScenarioTitle = "더미 시나리오 6" });
             });
 
-            //try
-            //{
-            //    // 백그라운드에서 네트워크 요청 및 파싱
-            //    var scenarios = await Task.Run(async () =>
-            //    {
-            //        using var client = new HttpClient();
+            try
+            {
+                // 백그라운드에서 네트워크 요청 및 파싱
+                var scenarios = await Task.Run(async () =>
+                {
+                    using var client = new HttpClient();
 
-            //        var response = await client.GetAsync(serverUrl);
+                    var response = await client.GetAsync(serverUrl);
 
-            //        if (!response.IsSuccessStatusCode)
-            //            throw new Exception($"서버 응답 오류: {(int)response.StatusCode}");
+                    if (!response.IsSuccessStatusCode)
+                        throw new Exception($"서버 응답 오류: {(int)response.StatusCode}");
 
-            //        string jsonString = await response.Content.ReadAsStringAsync();
+                    string jsonString = await response.Content.ReadAsStringAsync();
 
-            //        var parsed = JsonConvert.DeserializeObject<List<ScenarioGet>>(jsonString);
+                    var parsed = JsonConvert.DeserializeObject<List<ScenarioGet>>(jsonString);
 
-            //        return parsed ?? new List<ScenarioGet>();
-            //    });
+                    return parsed ?? new List<ScenarioGet>();
+                });
 
-            //    // UI 쓰레드에서 ObservableCollection 업데이트
-            //    Application.Current.Dispatcher.Invoke(() =>
-            //    {
-            //        ScenarioCollection.Clear();
-            //        foreach (var scenario in scenarios)
-            //        {
-            //            ScenarioCollection.Add(scenario);
-            //        }
+                // UI 쓰레드에서 ObservableCollection 업데이트
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ScenarioCollection.Clear();
+                    foreach (var scenario in scenarios)
+                    {
+                        ScenarioCollection.Add(scenario);
+                    }
 
-            //        // 더미 데이터 추가
-            //        ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-01", ScenarioTitle = "더미 시나리오 1" });
-            //        ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-02", ScenarioTitle = "더미 시나리오 2" });
-            //    });
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show($"시나리오 목록 불러오기 실패: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"시나리오 목록 불러오기 실패: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void Start()
