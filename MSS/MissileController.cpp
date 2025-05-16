@@ -1,5 +1,8 @@
+
+#pragma once
 #include "MissileController.h"
 #include <cmath>
+#include <memory>
 #include <thread>
 
 MissileController::MissileController()

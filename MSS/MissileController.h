@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Packet.hpp"
-
 class MissileController {
 public:
 	MissileController();
@@ -18,12 +17,10 @@ public:
 
 	void updatePosition(float speed = 5.0f);
 
-
 private:
 	Location impact_point;
 	bool hasTarget_;
 	std::shared_ptr<Missile> missile_;
-	//Missile* missile_ = nullptr;
 	bool running_ = false;
 	std::thread updateThread_;
 };

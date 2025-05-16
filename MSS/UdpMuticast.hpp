@@ -6,8 +6,10 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <memory>
 
 #pragma comment(lib, "ws2_32.lib")
+
 
 class UdpSender1 {
 public:
@@ -63,6 +65,15 @@ public:
         missile_ = m;
     }
 
+    MissilePacket serializeMissile(const Missile& missile) {
+        MissilePacket packet;
+        memset(packet.MissileId, 0, sizeof(packet.MissileId));
+        strncpy(packet.MissileId, missile.MissileId.c_str(), sizeof(packet.MissileId) - 1);
+        packet.MissileState = missile.MissileState;
+        packet.MissileLoc = missile.MissileLoc;
+        return packet;
+    }
+
     // 전송 루프: 주기적으로 데이터를 보내는 예시
     void start() {
         running_ = true;
@@ -73,20 +84,24 @@ public:
     void run() {
         while (running_) {
             if (missile_) {
-                int sent = sendto(sock_, (char*)&missile_, sizeof(Missile), 0,
+                MissilePacket packet = serializeMissile(*missile_);
+                int sent = sendto(sock_, reinterpret_cast<const char*>(&packet), sizeof(packet), 0,
                     (sockaddr*)&destAddr_, sizeof(destAddr_));
+                //int sent = sendto(sock_, (char*)&missile_, sizeof(Missile), 0,
+                //    (sockaddr*)&destAddr_, sizeof(destAddr_));
                 if (sent == SOCKET_ERROR) {
                     std::cerr << "sendto failed: " << WSAGetLastError() << "\n";
                 }
                 else {
                     std::cout << " <Udp Multicast success> \n\n";
-                    std::cout << "Altitude: " << missile_->MissileLoc.altitude << "\n"
+                    std::cout << "MSS-ID: "<< missile_->MissileId <<"\n"
+                        << "Altitude: " << missile_->MissileLoc.altitude << "\n"
                         << "Latitude: " << missile_->MissileLoc.latitude << "\n"
                         << "Longitude: " << missile_->MissileLoc.longitude << "\n\n";
 
                 }
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
     }
 

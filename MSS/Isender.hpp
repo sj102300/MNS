@@ -15,5 +15,6 @@ public:
     virtual bool send(const char* data, int length) = 0;
 
     virtual void close() = 0;
+
 };
 

@@ -69,6 +69,8 @@ public:
         return true;
     }
 
+
+
     void close() override {
         running_ = false;
         if (senderThread_.joinable()) {
