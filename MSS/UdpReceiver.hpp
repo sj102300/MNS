@@ -3,6 +3,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Ireceiver.hpp"
 #include "UdpSender.hpp"
+#include "Missile.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <thread>

@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Missile.cpp" />
     <ClCompile Include="MissileController.cpp" />
     <ClCompile Include="Scene_Parser.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -143,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="Ireceiver.hpp" />
     <ClInclude Include="Isender.hpp" />
+    <ClInclude Include="Missile.h" />
     <ClInclude Include="MissileController.h" />
     <ClInclude Include="Packet.hpp" />
     <ClInclude Include="ScenarioParser.hpp" />

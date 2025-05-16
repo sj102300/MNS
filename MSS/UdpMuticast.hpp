@@ -1,5 +1,6 @@
 #pragma once
-#include "Packet.hpp"
+#define _CRT_SECURE_NO_WARNINGS
+#include "Missile.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
@@ -11,10 +12,10 @@
 #pragma comment(lib, "ws2_32.lib")
 
 
-class UdpSender1 {
+class UdpMulticast {
 public:
-    UdpSender1() : sock_(INVALID_SOCKET), port_(0), running_(false) ,missile_(nullptr) {}
-    ~UdpSender1() { close(); }
+    UdpMulticast() : sock_(INVALID_SOCKET), port_(0), running_(false) ,missile_(nullptr) {}
+    ~UdpMulticast() { close(); }
 
     // 멀티캐스트 대상 주소와 포트를 받아 초기화
     bool init(const std::string& multicast_address, int port) {
@@ -68,7 +69,8 @@ public:
     MissilePacket serializeMissile(const Missile& missile) {
         MissilePacket packet;
         memset(packet.MissileId, 0, sizeof(packet.MissileId));
-        strncpy(packet.MissileId, missile.MissileId.c_str(), sizeof(packet.MissileId) - 1);
+        strncpy_s(packet.MissileId, sizeof(packet.MissileId), missile.MissileId.c_str(), _TRUNCATE);
+        //strncpy(packet.MissileId, missile.MissileId.c_str(), sizeof(packet.MissileId) - 1);
         packet.MissileState = missile.MissileState;
         packet.MissileLoc = missile.MissileLoc;
         return packet;
@@ -77,7 +79,7 @@ public:
     // 전송 루프: 주기적으로 데이터를 보내는 예시
     void start() {
         running_ = true;
-        sendThread_ = std::thread(&UdpSender1::run, this);
+        sendThread_ = std::thread(&UdpMulticast::run, this);
     }
 
     // 전송 루프 내용: 2.5초마다 데이터 전송

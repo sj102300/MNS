@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma once
 #include "Isender.hpp"
+#include "Missile.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>

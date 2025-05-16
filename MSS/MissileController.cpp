@@ -4,6 +4,7 @@
 #include <cmath>
 #include <memory>
 #include <thread>
+#include <iostream>
 
 MissileController::MissileController()
 	:impact_point({0, 0, 10}),hasTarget_(false){}
@@ -37,7 +38,6 @@ void MissileController::stop() {
 
 void MissileController::updatePosition(float speed ) {
 	if (!hasTarget_ || missile_->MissileState != 1) return;
-
 	double dx = impact_point.altitude - missile_->MissileLoc.altitude;
 	double dy = impact_point.latitude - missile_->MissileLoc.latitude;
 	double dz = impact_point.longitude - missile_->MissileLoc.longitude;

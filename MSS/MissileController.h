@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Packet.hpp"
+#include "Missile.h"
+
 class MissileController {
 public:
 	MissileController();
