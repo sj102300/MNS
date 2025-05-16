@@ -1,5 +1,5 @@
 #include "ScenarioInit.h"
-#include "StartSignalReceiver.h"
+#include "ScenarioCommandReceiver.h"
 #include <windows.h>
 #include <iostream>
 
@@ -14,11 +14,14 @@ namespace sm {
     void ScenarioInit::run() {
         SetConsoleOutputCP(CP_UTF8);
 
-        setup_start_signal_listener(
+        setup_scenario_command_listener(
             listen_address_,
             client_id_,
             [this](const std::string& scenario_id) {
                 handleStartSignal(scenario_id);
+            },
+            [this]() {
+                handleQuitSignal();  // 종료 콜백 등록
             }
         );
 
@@ -26,7 +29,7 @@ namespace sm {
     }
 
     void ScenarioInit::setOnReadyCallback(std::function<void()> cb) {
-        on_ready_cb_ = std::move(cb);
+        on_start_cb_ = std::move(cb);
     }
 
     void ScenarioInit::handleStartSignal(const std::string& scenario_id) {
@@ -41,11 +44,25 @@ namespace sm {
         printer_.printBattery(*scenario_manager_);
         printer_.printAircraftList(*scenario_manager_);
 
-        if (on_ready_cb_) {
-            on_ready_cb_();  // 외부에서 등록한 콜백 호출
+        if (on_start_cb_) {
+            on_start_cb_();  // 외부에서 등록한 콜백 호출
         }
     }
 
+    void ScenarioInit::setOnQuitCallback(std::function<void()> cb) {
+        on_quit_cb_ = std::move(cb);
+    }
+
+    void ScenarioInit::handleQuitSignal() {
+        std::cout << u8"[" << client_id_ << u8"] OCC 종료 신호 수신 → 시나리오 종료 처리\n";
+
+        if (on_quit_cb_) {
+            on_quit_cb_();  // 콜백 실행
+        }
+
+
+        // TODO: 시나리오 상태 리셋, 스레드 정리 등
+    }
 
     ScenarioInfo ScenarioInit::getScenarioInfo() const {
         return scenario_manager_->getScenarioInfo();

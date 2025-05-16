@@ -5,10 +5,23 @@
 
 using namespace sm;
 
+// === 글로벌 동기화 상태 ===
 std::mutex mtx;
 std::condition_variable cv;
 bool ready = false;
 
+// === 콜백 함수 정의 ===
+void handleStart() {
+    std::lock_guard<std::mutex> lock(mtx);
+    ready = true;
+    cv.notify_one();
+}
+
+void handleQuit(ScenarioInit& runner) {
+    runner.handleQuitSignal();
+}
+
+// === main 함수 정의 ===
 int main() {
     ScenarioInit scenarioRunner(
         "http://127.0.0.1:9015",  // 내 시나리오 수신 주소
@@ -16,11 +29,11 @@ int main() {
         "MFR"                     // 내 클라이언트 ID
     );
     
-    scenarioRunner.setOnReadyCallback([&]() {  // 콜백 등록
-        std::lock_guard<std::mutex> lock(mtx);
-        ready = true;
-        cv.notify_one();
-    });
+    scenarioRunner.setOnReadyCallback(handleStart);
+
+    scenarioRunner.setOnQuitCallback([&]() {
+        handleQuit(scenarioRunner);
+        });
 
     scenarioRunner.run();
 

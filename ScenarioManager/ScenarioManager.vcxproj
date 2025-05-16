@@ -146,13 +146,13 @@
     <ClInclude Include="ScenarioInfoPrinter.h" />
     <ClInclude Include="ScenarioInit.h" />
     <ClInclude Include="ScenarioManager.h" />
-    <ClInclude Include="StartSignalReceiver.h" />
+    <ClInclude Include="ScenarioCommandReceiver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScenarioInfoPrinter.cpp" />
     <ClCompile Include="ScenarioInit.cpp" />
     <ClCompile Include="ScenarioManager.cpp" />
-    <ClCompile Include="StartSignalReceiver.cpp" />
+    <ClCompile Include="ScenarioCommandReceiver.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

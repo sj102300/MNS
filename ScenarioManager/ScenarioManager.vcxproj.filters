@@ -24,7 +24,7 @@
     <ClInclude Include="ScenarioInfoPrinter.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="StartSignalReceiver.h">
+    <ClInclude Include="ScenarioCommandReceiver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ScenarioInit.h">
@@ -35,7 +35,7 @@
     <ClCompile Include="ScenarioManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="StartSignalReceiver.cpp">
+    <ClCompile Include="ScenarioCommandReceiver.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ScenarioInfoPrinter.cpp">
