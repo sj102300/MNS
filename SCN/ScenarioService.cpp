@@ -1,13 +1,15 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
 #include "ScenarioService.h"
-#include "Utils.h"  // to_utf8 함수 포함
+#include "Utils.h"  // to_utf8
 
 #include <cpprest/json.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <filesystem>
+#include <regex>
+#include <set>
 
 using namespace web;
 using namespace web::http;
@@ -15,19 +17,13 @@ using namespace web::http::experimental::listener;
 
 ScenarioService::ScenarioService(const std::string& scenario_dir)
     : scenario_dir_(scenario_dir) {
-    std::filesystem::create_directories(scenario_dir_);  // 해당 디렉토리가 없으면 생성
+    std::filesystem::create_directories(scenario_dir_);  // create directory
     cached_json_response_ = web::json::value::array();
 }
 
-void ScenarioService::loadMetaCache() {
+void ScenarioService::loadMetaCache() { 
     std::lock_guard<std::mutex> lock(cache_mutex_);
     cached_json_response_ = web::json::value::array();
-
-    // 디렉터리 존재 여부 확인
-    if (!std::filesystem::exists(scenario_dir_)) {
-        std::cerr << u8"[오류] 시나리오 디렉터리 없음: " << scenario_dir_ << std::endl;
-        return;
-    }
 
     if (!std::filesystem::is_directory(scenario_dir_)) {
         std::cerr << u8"[오류] 경로가 디렉터리가 아님: " << scenario_dir_ << std::endl;
@@ -119,27 +115,22 @@ void ScenarioService::handlePostSave(http_request request) {
         try {
             auto body = task.get();
 
-            // 현재 보유 중인 시나리오 파일 개수 파악
-            size_t count = 0;
-            for (const auto& entry : std::filesystem::directory_iterator(scenario_dir_)) {
-                if (entry.is_regular_file() && entry.path().extension() == ".json") {
-                    ++count;
-                }
+            // generate new ID
+            std::string new_id = generateNextScenarioId();
+            if (new_id.empty()) {
+                std::cerr << u8"[오류] 시나리오 ID 한도 초과 (99개 초과 저장 시도)\n";
+                request.reply(status_codes::BadRequest, U("시나리오 ID 한도 초과 (99개 초과 저장 시도)"));
+                return;
             }
 
-            // 새 ID 생성 (SCENE-01, SCENE-02, ...)
-            std::ostringstream oss;
-            oss << "SCENE-" << std::setw(2) << std::setfill('0') << (count + 1);
-            std::string new_id = oss.str();
-
-            // ID와 제목 자동 설정
+            // set title same as ID
             body[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(new_id));
             body[U("scenario_title")] = json::value::string(utility::conversions::to_string_t(new_id));
 
-            // 저장 경로
+            // save directory and filename
             std::string filename = scenario_dir_ + "/" + new_id + ".json";
 
-            // 파일로 저장
+            // save
             std::ofstream file(filename);
             if (!file.is_open()) {
                 std::cerr << u8"[오류] 파일 저장 실패: " << filename << std::endl;
@@ -150,19 +141,9 @@ void ScenarioService::handlePostSave(http_request request) {
             file << utils::to_utf8(body.serialize());
             file.close();
 
-            // 캐시 갱신
-            if (body.has_field(U("scenario_id")) && body.has_field(U("scenario_title"))) {
-                std::lock_guard<std::mutex> lock(cache_mutex_);
-
-                // 새로운 항목 추가
-                web::json::value new_item;
-                new_item[U("scenario_id")] = body.at(U("scenario_id"));
-                new_item[U("scenario_title")] = body.at(U("scenario_title"));
-                
-                // 캐시 재로딩
-                loadMetaCache();
-                std::cout << u8"[SCN] 시나리오 저장 + 캐시 갱신 완료: " << filename << std::endl;
-            }
+            // reload
+            loadMetaCache();
+            std::cout << u8"[SCN] 시나리오 저장 완료: " << filename << std::endl;
 
             request.reply(status_codes::OK, U("시나리오 저장 완료"));
         }
@@ -171,4 +152,39 @@ void ScenarioService::handlePostSave(http_request request) {
             request.reply(status_codes::InternalError, utility::conversions::to_string_t(e.what()));
         }
         }).wait();
+}
+
+// Generates a new scenario ID by finding the smallest unused number in "SCENE-XX.json" format.
+std::string ScenarioService::generateNextScenarioId() {
+    std::set<int> used_numbers;  // Set of already used scenario numbers
+    std::regex pattern(R"(SCENE-(\d{2})\.json)");  // Regex pattern to match file name like SCENE-01.json
+
+    for (const auto& entry : std::filesystem::directory_iterator(scenario_dir_)) {
+        if (entry.is_regular_file()) {
+            std::smatch match;
+            std::string filename = entry.path().filename().string();
+
+            // If the filename matches the pattern, extract the number
+            if (std::regex_match(filename, match, pattern)) {
+                int num = std::stoi(match[1]);  // Convert "03" to 3
+                used_numbers.insert(num);       // Mark this number as used
+            }
+        }
+    }
+
+    // Find the smallest unused number starting from 1
+    int new_num = 1;
+    while (used_numbers.count(new_num)) {
+        ++new_num;
+    }
+
+    // LIMIT: maximum = 99
+    if (new_num > 99) {
+        return "";  // ID generation failed
+    }
+
+    // Format the new ID as "SCENE-XX"
+    std::ostringstream oss;
+    oss << "SCENE-" << std::setw(2) << std::setfill('0') << new_num;
+    return oss.str();  // 예: SCENE-03
 }
