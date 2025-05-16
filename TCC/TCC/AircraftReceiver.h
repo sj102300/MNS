@@ -14,21 +14,29 @@ public:
 		char friend_or_our;
 	} AircraftMSG;
 
-	//데이터 정보를 받아서 newAircraftQueue에 push해주어야함.
-	virtual void getAircraftData() = 0;
-};
+	typedef struct _new_aircraft_data {
+		std::string aircraftId_;
+		TCC::Position location_;
+		bool isEnemy_;
+	} NewAircraft;
 
-class AircraftManager;
+	//데이터 정보를 받아서 newAircraftQueue에 push해주어야함.
+	virtual void recvAircraftData() = 0;
+	virtual bool popRecvQueue(NewAircraft& newAircraft) = 0;
+};
 
 class AircraftReceiver : public TCC::UdpMulticastReceiver, public IAircraftReceiver {
 public:
 	AircraftReceiver(const std::string& multicastIp, int port);
-	void getAircraftData() override;
+	void recvAircraftData() override;
 	~AircraftReceiver();
+	bool popRecvQueue(NewAircraft& newAircraft) override;
 
 private:
 	bool parseMsg(AircraftMSG& msg, const char* buffer, const int length);
 	void receive() override;
+	void pushRecvQueue(NewAircraft& newAircraft);
 	std::thread recvThread_;
-	AircraftManager* aircraftmanager_;
+	std::mutex mtx_;
+	std::queue<NewAircraft> recvQueue_;
 };

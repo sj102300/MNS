@@ -1,12 +1,12 @@
 
 #include "AircraftManager.h"
 
-AircraftManager::AircraftManager(IAircraftReceiver* recv, IAircraftSender* sender) : receiver_(recv), sender_(sender) {
+AircraftManager::AircraftManager(IAircraftReceiver* recv, IAircraftSender* sender) : receiver_(recv), sender_(sender),  {
 
 }
 
-void AircraftManager::updateAircraftPosition() {
-	receiver_->getAircraftData();
+void AircraftManager::startAircraftSimulation() {
+	receiver_->recvAircraftData();
 	workThread_ = std::thread(&AircraftManager::judgeEngagable, this);
 	sender_->sendAircraftData();
 }
@@ -15,32 +15,17 @@ bool AircraftManager::isExistAircraft(std::string& aircraftId) {
 	return aircrafts_.find(aircraftId) != aircrafts_.end();
 }
 
-void AircraftManager::addAircraft(NewAircraft &newAircraft) {
+void AircraftManager::addAircraft(IAircraftReceiver::NewAircraft &newAircraft) {
 	aircrafts_[newAircraft.aircraftId_] = new Aircraft(newAircraft.aircraftId_, newAircraft.location_, newAircraft.isEnemy_);
-}
-
-void AircraftManager::pushNewAircraftQueue(NewAircraft& newAircraft) {
-	std::lock_guard<std::mutex> lock(mtx_);
-	newAircraftQueue_.push(newAircraft);
-}
-
-bool AircraftManager::popNewAircraftQueue(NewAircraft& newAircraft) {
-	std::lock_guard<std::mutex> lock(mtx_);
-	if (newAircraftQueue_.empty()) {
-		return false;
-	}
-	newAircraft = newAircraftQueue_.front();
-	newAircraftQueue_.pop();
-	return true;
 }
 
 void AircraftManager::judgeEngagable() {
 
-	NewAircraft newAircraft;
+	IAircraftReceiver::NewAircraft newAircraft;
 	IAircraftSender::NewAircraftWithIP newAircraftWithIp;
 
 	while (true) {
-		if (popNewAircraftQueue(newAircraft)) {
+		if (receiver_->popRecvQueue(newAircraft)) {
 
 			if (!isExistAircraft(newAircraft.aircraftId_)) {
 				addAircraft(newAircraft);

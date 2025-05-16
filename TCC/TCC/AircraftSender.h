@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TcpSender.h"
+#include "UdpSender.h"
 #include "share.h"
 #include <queue>
 #include <thread>
@@ -22,7 +22,7 @@ protected:
 	virtual bool popSendQueue(NewAircraftWithIP& newAircraftWithIp) = 0;
 };
 
-class AircraftSender : public TCC::TcpSender, public IAircraftSender {
+class AircraftSender : public TCC::UdpSender, public IAircraftSender {
 public:
     AircraftSender(const std::string& ip_address, int port);
     void sendAircraftData() override;

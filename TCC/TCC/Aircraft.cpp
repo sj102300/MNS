@@ -102,7 +102,7 @@ bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& i
         return false;
     }
 
-    getImpactPoint();
+    calcImpactPoint();
     impactPoint = impactPoint_;
 
     // 포대 위치

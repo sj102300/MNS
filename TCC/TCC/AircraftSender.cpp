@@ -1,7 +1,7 @@
 
 #include "AircraftSender.h"
 
-AircraftSender::AircraftSender(const std::string& ip_address, int port) : TcpSender(ip_address, port), len(64) {
+AircraftSender::AircraftSender(const std::string& ip_address, int port) : UdpSender(ip_address, port), len(64) {
 	memset(buffer, 0, sizeof(buffer));
 	std::cout << "AircraftSender created\n";
 }
@@ -9,20 +9,6 @@ AircraftSender::AircraftSender(const std::string& ip_address, int port) : TcpSen
 void AircraftSender::sendAircraftData() {
 	if (!init()) {
 		std::cout << "AircraftSender init() Failed\n";
-		return;
-	}
-
-	bool connected = false;
-	for (int _ = 0; _ < 5; ++_) {
-		if (connectToServer()) {
-			std::cout << "AircraftSender connectToServer() success\n";
-			connected = true;
-			break;
-		}
-		std::this_thread::sleep_for(std::chrono::seconds(1)); // 1ÃÊ ´ë±â
-	}
-	if (!connected) {
-		std::cerr << "AircraftSender connectToServer() failed after 5 attempts\n";
 		return;
 	}
 

@@ -9,22 +9,14 @@
 
 class AircraftManager {
 public:
-    typedef struct _new_aircraft_data {
-        std::string aircraftId_;
-        TCC::Position location_;
-        bool isEnemy_;
-    } NewAircraft;
-
     AircraftManager(IAircraftReceiver* recv, IAircraftSender* sender);
-    void updateAircraftPosition();
+    void startAircraftSimulation();
     void updateAircraftStatus();
-    void pushNewAircraftQueue(NewAircraft& newAircraft);
 
 private:
-    bool popNewAircraftQueue(NewAircraft& newAircraft);
     void judgeEngagable();
     bool isExistAircraft(std::string& aircraftId);
-    void addAircraft(NewAircraft &msg);
+    void addAircraft(IAircraftReceiver::NewAircraft &msg);
 
     IAircraftReceiver* receiver_;
     IAircraftSender* sender_;
@@ -32,5 +24,4 @@ private:
     std::unordered_map<std::string, Aircraft*> aircrafts_;
     std::thread workThread_;
     std::mutex mtx_;
-    std::queue<NewAircraft> newAircraftQueue_;
 };

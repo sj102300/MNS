@@ -1,12 +1,11 @@
 
 #include "AircraftReceiver.h"
-#include "AircraftManager.h"
 
 AircraftReceiver::AircraftReceiver(const std::string& multicastIp, int port) : UdpMulticastReceiver(multicastIp, port) {
 	std::cout << "AircraftReceiver created\n";
 }
 
-void AircraftReceiver::getAircraftData() {
+void AircraftReceiver::recvAircraftData() {
 	if (!init()) {
 		std::cout << "AircraftReceiver Init() Failed\n";
 		return;
@@ -21,7 +20,7 @@ void AircraftReceiver::receive() {
 	int addrLen = sizeof(senderAddr);
 
 	AircraftMSG msg;
-	AircraftManager::NewAircraft newAircraft;
+	NewAircraft newAircraft;
 	while (true) {
 		int bytesReceived = recvfrom(serverSocket_, buffer, sizeof(buffer), 0, (struct sockaddr*)&senderAddr, &addrLen);
 
@@ -39,7 +38,7 @@ void AircraftReceiver::receive() {
 		newAircraft.location_ = msg.location;
 		newAircraft.isEnemy_ = msg.friend_or_our == 'E';
 
-		aircraftmanager_->pushNewAircraftQueue(newAircraft);
+		pushRecvQueue(newAircraft);
 	}
 }
 
@@ -52,7 +51,7 @@ bool AircraftReceiver::parseMsg(AircraftMSG & msg, const char* buffer, const int
 	msg.location.latitude_ = *(double*)(buffer + 8);
 	msg.location.longitude_ = *(double*)(buffer + 16);
 	msg.location.altitude_ = *(double*)(buffer + 24);
-	if (msg.location.isValidPosition()) {
+	if (!msg.location.isValidPosition()) {
 		return false;
 	}
 
@@ -62,6 +61,23 @@ bool AircraftReceiver::parseMsg(AircraftMSG & msg, const char* buffer, const int
 
 	return true;
 }
+
+
+void AircraftReceiver::pushRecvQueue(NewAircraft& newAircraft) {
+	std::lock_guard<std::mutex> lock(mtx_);
+	recvQueue_.push(newAircraft);
+}
+
+bool AircraftReceiver::popRecvQueue(NewAircraft& newAircraft) {
+	std::lock_guard<std::mutex> lock(mtx_);
+	if (recvQueue_.empty()) {
+		return false;
+	}
+	newAircraft = recvQueue_.front();
+	recvQueue_.pop();
+	return true;
+}
+
 
 AircraftReceiver::~AircraftReceiver() {
 	if (recvThread_.joinable()) {

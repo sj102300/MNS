@@ -1,28 +1,17 @@
-﻿#include <iostream>
-
-#include "AircraftManager.h"
-
-#define RELEASE 0
-
-#if RELEASE
-#define AIRCRAFT_SENDER_IP "192.168.2.7"
-
-#else 
-#define AIRCRAFT_SENDER_IP "127.0.0.1"
-
-#endif
+﻿
+#include "ScenarioManager.h"
 
 int main() {
 
-    IAircraftReceiver* aircraftReceiver = new AircraftReceiver(std::string("239.0.0.2"), 9999);
-    IAircraftSender* aircraftSender = new AircraftSender(std::string(AIRCRAFT_SENDER_IP), 9000);
-    AircraftManager aircraftmanager(aircraftReceiver, aircraftSender);
-    
-    aircraftmanager.updateAircraftPosition();
+    ScenarioManager scenarioManager;
 
-    std::cout << "updateAircraftPosition() started" << std::endl;
+    while (true) {
+        //cv.wait(시나리오 시작 시그널 받기대기)
+        scenarioManager.startScenario();
 
-    while (1);
-    
+        //cv.wait(시나리오 종료 시그널 받기 대기)
+        scenarioManager.quitScenario();
+    }
+
     return 0;
 }

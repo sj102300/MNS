@@ -15,7 +15,6 @@ public:
 	void addEngagableAircraft(std::string& aircraftId);
 
 private:
-	ICommandReceiver* recv_;
 	std::unordered_map<std::string, std::string> missileToAircraft_;
 	unsigned int mode_;
 	std::queue<std::string> engagableAircrafts_;

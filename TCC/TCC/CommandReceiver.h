@@ -2,6 +2,7 @@
 
 #include "TcpReceiver.h"
 #include "share.h"
+#include "EngagementManager.h"
 
 class ICommandReceiver {
 protected:

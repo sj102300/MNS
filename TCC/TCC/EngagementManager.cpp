@@ -10,7 +10,6 @@ void EngagementManager::mappingMissileToAircraft(std::string& aircraftId) {
 bool EngagementManager::isHitTarget() {
 	//격추 성공 수신
 	//해당 미사일이 격추하던 항공기를 올바르게 격추했는지를 판단.
-
 	//만약 올바르게 격추했다면 항공기의 status를 EngagementStatus::Destroyed
 	//올바르게 격추되지 않았다면 항공기의 status를 EngagementStatus::NotEngagable
 }
