@@ -17,17 +17,6 @@ namespace TCC {
         // 클라이언트 연결 수락
         bool connectClient();
 
-        virtual void receive() = 0;
-
-        // 메인에서 한번만 호출. 스레드로 만들어서 대기
-        virtual void start() = 0;
-
-        // 응답 처리
-        virtual void response() = 0;
-
-        // 소켓 핸들링 관련 로직
-        //virtual void getSocket();
-
     protected:
         SOCKET serverSocket_;
         SOCKET clientSocket_;

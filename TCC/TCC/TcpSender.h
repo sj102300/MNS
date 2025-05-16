@@ -4,7 +4,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
-#include <thread>
 
 namespace TCC {
     class TcpSender {
@@ -18,16 +17,10 @@ namespace TCC {
         bool connectToServer();
 
         // 데이터 송신
-        virtual bool sendData(const char* data, int length) = 0;
-
-        // 요청 수신
-        virtual void getResponse() = 0;
-
-        // 쓰레드 생성. 클라이언트 생성
-        virtual void start() = 0;
+        bool sendByteData(const char* data, int length);
 
         // 연결 종료
-        virtual void disconnect() = 0;
+        void disconnect();
 
     protected:
         SOCKET clientSocket_;

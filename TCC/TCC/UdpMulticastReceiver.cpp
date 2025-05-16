@@ -1,8 +1,10 @@
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "UdpMulticastReceiver.h"
 
-TCC::UdpMulticastReceiver::UdpMulticastReceiver(std::string& multicastIp, int port) : multicastIp_(multicastIp), port_(port) {
-
+TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, int port) : multicastIp_(multicastIp), port_(port), serverSocket_(INVALID_SOCKET)
+{
+	std::cout << "udpmulticastReceiver created\n";
 }
 
 bool TCC::UdpMulticastReceiver::init() {
@@ -36,7 +38,7 @@ bool TCC::UdpMulticastReceiver::init() {
 
 	ip_mreq mreq = {};
 	mreq.imr_multiaddr.s_addr = inet_addr(multicastIp_.c_str());
-	mreq.imr_multiaddr.s_addr = htonl(INADDR_ANY);
+	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 
 	if (setsockopt(serverSocket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) < 0) {
 		std::cerr << "setsockopt(IPP_ADD_MEMBERSHIP) Failed\n";

@@ -1,7 +1,16 @@
 #include "TcpSender.h"
 #pragma comment(lib, "ws2_32.lib")
 
-TCC::TcpSender::TcpSender(std::string ip_address, int port) : ip_address_(ip_address), port_(port) {
+TCC::TcpSender::TcpSender(std::string ip_address, int port)
+    : ip_address_(ip_address),
+    port_(port),
+    serverSocket_(INVALID_SOCKET),
+    clientSocket_(INVALID_SOCKET),
+    clientAddrLen_(sizeof(clientAddr_))
+{
+    std::memset(&clientAddr_, 0, sizeof(clientAddr_));
+    std::memset(&serverAddr_, 0, sizeof(serverAddr_));
+    std::cout << "TcpSender created\n";
 }
 
 bool TCC::TcpSender::init() {
@@ -35,14 +44,13 @@ bool TCC::TcpSender::connectToServer() {
     return true;
 }
 
-bool TCC::TcpSender::sendData(const char* data, int length) {
+bool TCC::TcpSender::sendByteData(const char* data, int length) {
     int bytesSent = send(clientSocket_, data, length, 0);
     if (bytesSent == SOCKET_ERROR) {
         std::cerr << "send() Failed\n";
         return false;
     }
 
-    std::cout << "Data Sent: " << bytesSent << " bytes\n";
     return true;
 }
 

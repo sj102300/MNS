@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,26 +130,48 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Aircraft.cpp" />
-    <ClCompile Include="AircraftManager.h" />
-    <ClCompile Include="AircraftReceiver.cpp" />
     <ClCompile Include="AircraftManager.cpp" />
-    <ClCompile Include="LaunchCommandReceiver.cpp" />
-    <ClCompile Include="LaunchCommandSender.cpp" />
+    <ClCompile Include="AircraftReceiver.cpp" />
+    <ClCompile Include="AircraftSender.cpp" />
+    <ClCompile Include="EngagementManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CommandReceiver.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TcpReceiver.cpp" />
+    <ClCompile Include="ScenarioManager.cpp" />
+    <ClCompile Include="share.cpp" />
+    <ClCompile Include="TcpReceiver.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="TcpSender.cpp" />
     <ClCompile Include="UdpMulticastReceiver.cpp" />
+    <ClCompile Include="UdpMulticastSender.cpp" />
+    <ClCompile Include="UdpMulticastSender.h" />
+    <ClCompile Include="UdpSender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aircraft.h" />
+    <ClInclude Include="AircraftManager.h" />
     <ClInclude Include="AircraftReceiver.h" />
-    <ClInclude Include="LaunchCommandReceiver.h" />
-    <ClInclude Include="LaunchCommandSender.h" />
-    <ClInclude Include="Scenario.h" />
+    <ClInclude Include="AircraftSender.h" />
+    <ClInclude Include="EngagementManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="CommandReceiver.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="ScenarioManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="share.h" />
-    <ClInclude Include="TcpReceiver.h" />
+    <ClInclude Include="TcpReceiver.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="TcpSender.h" />
     <ClInclude Include="UdpMulticastReceiver.h" />
+    <ClInclude Include="UdpSender.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
