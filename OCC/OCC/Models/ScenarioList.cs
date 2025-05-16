@@ -10,6 +10,6 @@ namespace OCC.Models
     public class ScenarioListResponse
     {
         [JsonProperty("scenario_list")]
-        public List<ScenarioGet> ScenarioList { get; set; }
+        public List<ScenarioGet> scenario_list { get; set; }
     }
 }

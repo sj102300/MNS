@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,14 +36,22 @@ namespace OCC.Views
 
         private void ScenarioLoadPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (NavigationService != null)
+            Debug.WriteLine("code behind execute");
+            if (DataContext is ScenarioLoadViewModel vm && vm.LoadCommand.CanExecute(null))
             {
-                _viewModel.NavigationService = NavigationService;
-            }
-            else if (Parent is Frame frame && frame.NavigationService != null)
-            {
-                _viewModel.NavigationService = frame.NavigationService;
+                vm.LoadCommand.Execute(null);
             }
         }
+        //private void ScenarioLoadPage_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    if (NavigationService != null)
+        //    {
+        //        _viewModel.NavigationService = NavigationService;
+        //    }
+        //    else if (Parent is Frame frame && frame.NavigationService != null)
+        //    {
+        //        _viewModel.NavigationService = frame.NavigationService;
+        //    }
+        //}
     }
 }

@@ -10,12 +10,12 @@ namespace OCC.Models
     public class Coordinate
     {
         [JsonProperty("latitude")]
-        public double Latitude { get; set; }
+        public double latitude { get; set; }
 
         [JsonProperty("longitude")]
-        public double Longitude { get; set; }
+        public double longitude { get; set; }
 
         [JsonProperty("altitude")]
-        public double Altitude { get; set; }
+        public double altitude { get; set; }
     }
 }

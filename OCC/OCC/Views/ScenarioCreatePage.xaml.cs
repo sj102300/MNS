@@ -100,9 +100,9 @@ namespace OCC.Views
 
                 var coordinate = new Coordinate
                 {
-                    Latitude = position.Lat,
-                    Longitude = position.Lng,
-                    Altitude = 10.0
+                    latitude = position.Lat,
+                    longitude = position.Lng,
+                    altitude = 10.0
                 };
 
                 if (_viewModel.HandleMapClick(coordinate))
@@ -124,22 +124,22 @@ namespace OCC.Views
                     // 시작과 끝점 연결
                     if (_viewModel.StartPoint != null && _viewModel.EndPoint != null)
                     {
-                        Debug.WriteLine($"StartPoint: {_viewModel.StartPoint?.Latitude}, {_viewModel.StartPoint?.Longitude}");
-                        Debug.WriteLine($"EndPoint: {_viewModel.EndPoint?.Latitude}, {_viewModel.EndPoint?.Longitude}");
+                        Debug.WriteLine($"StartPoint: {_viewModel.StartPoint?.latitude}, {_viewModel.StartPoint?.longitude}");
+                        Debug.WriteLine($"EndPoint: {_viewModel.EndPoint?.latitude}, {_viewModel.EndPoint?.longitude}");
                         // WPF의 PathGeometry를 사용하여 선 생성
                         var pathGeometry = new PathGeometry();
                         var pathFigure = new PathFigure
                         {
-                            StartPoint = new Point(_viewModel.StartPoint.Longitude, _viewModel.StartPoint.Latitude),
+                            StartPoint = new Point(_viewModel.StartPoint.longitude, _viewModel.StartPoint.latitude),
                             Segments = new PathSegmentCollection
                             {
-                                new LineSegment(new Point(_viewModel.EndPoint.Longitude, _viewModel.EndPoint.Latitude), true)
+                                new LineSegment(new Point(_viewModel.EndPoint.longitude, _viewModel.EndPoint.latitude), true)
                             }
                         };
                         pathGeometry.Figures.Add(pathFigure);
 
                         // GMapMarker로 변환하여 추가
-                        GMapMarker routeMarker = new GMapMarker(new PointLatLng(_viewModel.StartPoint.Latitude, _viewModel.StartPoint.Longitude))
+                        GMapMarker routeMarker = new GMapMarker(new PointLatLng(_viewModel.StartPoint.latitude, _viewModel.StartPoint.longitude))
                         {
                             Shape = new Path
                             {

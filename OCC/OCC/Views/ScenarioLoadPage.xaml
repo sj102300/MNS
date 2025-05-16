@@ -35,9 +35,9 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="["/>
-                                <TextBlock Text="{Binding ScenarioId}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding scenario_id}" FontWeight="Bold"/>
                                 <TextBlock Text="] " />
-                                <TextBlock Text="{Binding ScenarioTitle}" />
+                                <TextBlock Text="{Binding scenario_title}" />
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -55,6 +55,13 @@
             <Border Grid.Row="1" Grid.Column="1">
                 <Button Content="시작" 
                 Command="{Binding StartCommand}" 
+                Margin="10"  />
+            </Border>
+
+            <!-- 시나리오 종료 버튼 -->
+            <Border Grid.Row="2" Grid.Column="1">
+                <Button Content="종료" 
+                Command="{Binding QuitCommand}" 
                 Margin="10"  />
             </Border>
         </Grid>

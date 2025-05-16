@@ -10,9 +10,9 @@ namespace OCC.Models
     public class ScenarioGet
     {
         [JsonProperty("scenario_id")]
-        public string ScenarioId { get; set; }
+        public string scenario_id { get; set; }
 
         [JsonProperty("scenario_title")]
-        public string ScenarioTitle { get; set; }
+        public string scenario_title { get; set; }
     }
 }

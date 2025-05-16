@@ -30,10 +30,10 @@ namespace OCC.ViewModels
 
         public Coordinate? BatteryLocation
         {
-            get => ScenarioData.BatteryLocation;
+            get => ScenarioData.battery_location;
             set
             {
-                ScenarioData.BatteryLocation = value;
+                ScenarioData.battery_location = value;
                 OnPropertyChanged();
             }
         }
@@ -97,10 +97,10 @@ namespace OCC.ViewModels
             // 시나리오 데이터 초기화
             ScenarioData = new ScenarioPost
             {
-                ScenarioId = Guid.NewGuid().ToString(),
-                ScenarioTitle = "새 시나리오",
-                AircraftList = new List<Aircraft>(),
-                BatteryLocation = null
+                scenario_id = Guid.NewGuid().ToString(),
+                scenario_title = "새 시나리오",
+                aircraft_list = new List<Aircraft>(),
+                battery_location = null
             };
 
             AircraftList = new ObservableCollection<Aircraft>();
@@ -143,12 +143,12 @@ namespace OCC.ViewModels
                 if (_startPoint == null)
                 {
                     _startPoint = point;
-                    Debug.WriteLine($"시작점 설정: {_startPoint.Latitude}, {_startPoint.Longitude}");
+                    Debug.WriteLine($"시작점 설정: {_startPoint.latitude}, {_startPoint.longitude}");
                 }
                 else if (_endPoint == null)
                 {
                     _endPoint = point;
-                    Debug.WriteLine($"끝점 설정: {_endPoint.Latitude}, {_endPoint.Longitude}");
+                    Debug.WriteLine($"끝점 설정: {_endPoint.latitude}, {_endPoint.longitude}");
 
                     // 사이클 완료
                     _aircraftCycleCount++;
@@ -157,13 +157,13 @@ namespace OCC.ViewModels
                     // 항공기 데이터 추가
                     var aircraft = new Aircraft
                     {
-                        Id = "ATS-" + _aircraftCycleCount.ToString("D4"),
-                        FriendOrFoe = SelectedItem == "아군" ? "O" : "E",
-                        StartPoint = _startPoint,
-                        EndPoint = _endPoint
+                        aircraft_id = "ATS-" + _aircraftCycleCount.ToString("D4"),
+                        friend_or_foe = SelectedItem == "아군" ? "O" : "E",
+                        start_point = _startPoint,
+                        end_point = _endPoint
                     };
 
-                    ScenarioData.AircraftList.Add(aircraft);
+                    ScenarioData.aircraft_list.Add(aircraft);
                     AircraftList.Add(aircraft);
 
                     // 시작점과 끝점 초기화
@@ -182,7 +182,7 @@ namespace OCC.ViewModels
 
                 BatteryLocation = point;
                 _batteryCount++;
-                Debug.WriteLine($"포대 위치 설정: {BatteryLocation.Latitude}, {BatteryLocation.Longitude}");
+                Debug.WriteLine($"포대 위치 설정: {BatteryLocation.latitude}, {BatteryLocation.longitude}");
             }
 
             return true; // 점을 찍음
@@ -212,10 +212,10 @@ namespace OCC.ViewModels
                 }
 
                 // 시나리오 제목 설정
-                ScenarioData.ScenarioTitle = scenarioTitle;
+                ScenarioData.scenario_title = scenarioTitle;
 
                 // AircraftCount 업데이트
-                ScenarioData.AircraftCount = ScenarioData.AircraftList.Count;
+                ScenarioData.aircraft_count = ScenarioData.aircraft_list.Count;
 
                 // JSON 변환
                 string json = JsonSerializer.Serialize(ScenarioData, new JsonSerializerOptions
@@ -228,16 +228,18 @@ namespace OCC.ViewModels
                 Debug.WriteLine(json);
 
                 // 서버에 POST 요청
+                Debug.WriteLine("저장 요청");
                 using var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // 서버 URL 설정 (예: "https://your-server-endpoint/api/scenario")
-                string serverUrl = "https://your-server-endpoint/api/scenario";
+                string serverUrl = "http://192.168.15.30:8080/scenario/save";
                 var response = await client.PostAsync(serverUrl, content);
-
+                Debug.WriteLine("저장 응답");
                 if (response.IsSuccessStatusCode)
                 {
                     MessageBox.Show("시나리오가 성공적으로 저장되었습니다.", "정보", MessageBoxButton.OK, MessageBoxImage.Information);
+                    GoBack();
                 }
                 else
                 {

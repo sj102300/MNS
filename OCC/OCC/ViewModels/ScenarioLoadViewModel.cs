@@ -31,6 +31,7 @@ namespace OCC.ViewModels
         public ICommand GoBackCommand { get; }
         public ICommand LoadCommand { get; }
         public ICommand StartCommand { get; }
+        public ICommand QuitCommand { get; }
 
         // 서브시스템 정보
         private readonly List<(string url, string id)> subsystems = new()
@@ -39,7 +40,7 @@ namespace OCC.ViewModels
             //("http://127.0.0.1:9012", "MSS"),
             //("http://127.0.0.1:9013", "ATS"),
             //("http://127.0.0.1:9014", "LCH"),
-            ("http://127.0.0.1:9015", "MFR")
+            ("http://192.168.15.3:8080", "MFR")
         };
 
         public ScenarioLoadViewModel()
@@ -62,27 +63,36 @@ namespace OCC.ViewModels
                  canExecute: _ => SelectedScenario != null
             );
 
+            // 종료 버튼 초기화
+            QuitCommand = new RelayCommand<object>(
+                 execute: _ => Quit(),
+                 canExecute: _ => SelectedScenario != null
+            );
+
             ScenarioCollection = new ObservableCollection<ScenarioGet>();
 
+            // 페이지 진입 시 자동으로 불러오기
+            Debug.WriteLine("loadcommand viewmodel execute");
+            LoadCommand.Execute(null);
         }
 
 
         private async void Load()
         {
-            string serverUrl = "http://127.0.0.1:8000/scenario/list"; // 시나리오 서버 주소로 교체
-
+            string serverUrl = "http://192.168.15.30:8080/scenario/list"; // 시나리오 서버 주소로 교체
+            Debug.WriteLine("불러오기 요청");
             // UI 쓰레드에서 ObservableCollection 업데이트
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ScenarioCollection.Clear();
 
-                // 더미 데이터 추가
-                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-01", ScenarioTitle = "더미 시나리오 1" });
-                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-02", ScenarioTitle = "더미 시나리오 2" });
-                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-03", ScenarioTitle = "더미 시나리오 3" });
-                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-04", ScenarioTitle = "더미 시나리오 4" });
-                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-05", ScenarioTitle = "더미 시나리오 5" });
-                ScenarioCollection.Add(new ScenarioGet { ScenarioId = "SCENE-06", ScenarioTitle = "더미 시나리오 6" });
+                //// 더미 데이터 추가
+                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-01", scenario_title = "더미 시나리오 1" });
+                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-02", scenario_title = "더미 시나리오 2" });
+                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-03", scenario_title = "더미 시나리오 3" });
+                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-04", scenario_title = "더미 시나리오 4" });
+                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-05", scenario_title = "더미 시나리오 5" });
+                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-06", scenario_title = "더미 시나리오 6" });
             });
 
             try
@@ -91,7 +101,7 @@ namespace OCC.ViewModels
                 var scenarios = await Task.Run(async () =>
                 {
                     using var client = new HttpClient();
-
+                    client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
                     var response = await client.GetAsync(serverUrl);
 
                     if (!response.IsSuccessStatusCode)
@@ -129,10 +139,11 @@ namespace OCC.ViewModels
                 return;
             }
 
-            string scenarioId = SelectedScenario.ScenarioId;
+            string scenarioId = SelectedScenario.scenario_id;
 
             foreach (var (url, id) in subsystems)
             {
+                Debug.WriteLine("시작 요청");
                 await SendStartSignalAsync(url, id, scenarioId);
             }
         }
@@ -140,7 +151,7 @@ namespace OCC.ViewModels
         private async Task SendStartSignalAsync(string targetUrl, string subsystemId, string scenarioId)
         {
             using var client = new HttpClient();
-
+            client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
             var postData = new
             {
                 command = "start",
@@ -154,9 +165,57 @@ namespace OCC.ViewModels
             try
             {
                 var response = await client.PostAsync($"{targetUrl}/start", content);
+                Debug.WriteLine($"response : {response.ToString()}");
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"[OCC] {subsystemId} → {scenarioId} 전송 성공");
+                    MessageBox.Show($"[OCC] {subsystemId} → {scenarioId} 시작 성공");
+                }
+                else
+                {
+                    MessageBox.Show($"[OCC] {subsystemId} → 응답 오류: {(int)response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"[OCC] 예외 발생: {ex.Message}");
+            }
+        }
+
+        private async void Quit()
+        {
+            if (SelectedScenario == null)
+            {
+                MessageBox.Show("시작할 시나리오를 먼저 선택하세요.", "선택 필요", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            string scenarioId = SelectedScenario.scenario_id;
+
+            foreach (var (url, id) in subsystems)
+            {
+                Debug.WriteLine("종료 요청");
+                await SendQuitSignalAsync(url, id, scenarioId);
+            }
+        }
+
+        private async Task SendQuitSignalAsync(string targetUrl, string subsystemId, string scenarioId)
+        {
+            using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
+            var postData = new
+            {
+                command = "quit",
+                subsystem_id = subsystemId,
+                scenario_id = scenarioId
+            };
+
+            try
+            {
+                var response = await client.GetAsync($"{targetUrl}/quit");
+                Debug.WriteLine($"response : {response.ToString()}");
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show($"[OCC] {subsystemId} → {scenarioId} 종료 성공");
                 }
                 else
                 {

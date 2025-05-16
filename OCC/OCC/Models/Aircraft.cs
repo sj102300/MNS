@@ -10,15 +10,15 @@ namespace OCC.Models
     public class Aircraft
     {
         [JsonProperty("aircraft_id")]
-        public string Id { get; set; }
+        public string aircraft_id { get; set; }
 
         [JsonProperty("start_point")]
-        public Coordinate StartPoint { get; set; }
+        public Coordinate start_point { get; set; }
 
         [JsonProperty("end_point")]
-        public Coordinate EndPoint { get; set; }
+        public Coordinate end_point { get; set; }
 
         [JsonProperty("friend_or_foe")]
-        public string FriendOrFoe { get; set; }
+        public string friend_or_foe { get; set; }
     }
 }
