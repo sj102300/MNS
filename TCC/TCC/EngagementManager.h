@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CommandReceiver.h"
+//#include "CommandReceiver.h"
 #include <unordered_map>
 #include <string>
 #include <queue>
@@ -16,7 +16,7 @@ public:
 	void addEngagableAircraft(std::string& aircraftId);
 
 private:
-	ICommandReceiver* commandReceiver_;
+	//ICommandReceiver* commandReceiver_;
 	//ISuccessReceiver* successReceiver_;
 	//ICommandSender* commandSender_;
 	std::unordered_map<std::string, std::string> missileToAircraft_;

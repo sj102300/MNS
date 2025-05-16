@@ -56,6 +56,6 @@ void AircraftManager::judgeEngagable() {
 
 }
 
-void AircraftManager::updateAircraftStatus() {
-
-}
+//void AircraftManager::updateAircraftStatus() {
+//
+//}

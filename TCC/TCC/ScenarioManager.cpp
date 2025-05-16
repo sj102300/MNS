@@ -8,6 +8,8 @@
 #define AIRCRAFT_SENDER_IP "127.0.0.1"
 #endif
 
+ScenarioManager::ScenarioManager() {}
+
 void ScenarioManager::startScenario() {
     createAircraftManager();
     createEngagementManager();
@@ -23,10 +25,10 @@ void ScenarioManager::createAircraftManager() {
 
 void ScenarioManager::createEngagementManager() {
 
-    ICommandReceiver* commandReceiver = new CommandReceiver(std::string("192.168.2.7"), 9000);
+    //ICommandReceiver* commandReceiver = new CommandReceiver(std::string("192.168.2.7"), 9000);
     //ISuccessReceiver* successReceiver_;
     //ICommandSender* commandSender_;
-    engagementManager_->startEngagementSimulation();
+    //engagementManager_->startEngagementSimulation();
 }
 
 void ScenarioManager::quitScenario() {

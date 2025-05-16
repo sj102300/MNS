@@ -17,10 +17,12 @@ bool EngagementManager::isHitTarget() {
 	//해당 미사일이 격추하던 항공기를 올바르게 격추했는지를 판단.
 	//만약 올바르게 격추했다면 항공기의 status를 EngagementStatus::Destroyed
 	//올바르게 격추되지 않았다면 항공기의 status를 EngagementStatus::NotEngagable
+	return true;
 }
 
 bool EngagementManager::changeMode() {
 	//모드 전환 하기..
+	return true;
 }
 
 void EngagementManager::launchMissile(std::string& aircraftId) {
