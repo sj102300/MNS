@@ -122,11 +122,8 @@ void ScenarioService::handlePostSave(http_request request) {
                 request.reply(status_codes::BadRequest, U("시나리오 ID 한도 초과 (99개 초과 저장 시도)"));
                 return;
             }
-
-            // set title same as ID
             body[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(new_id));
-            body[U("scenario_title")] = json::value::string(utility::conversions::to_string_t(new_id));
-
+            
             // save directory and filename
             std::string filename = scenario_dir_ + "/" + new_id + ".json";
 
