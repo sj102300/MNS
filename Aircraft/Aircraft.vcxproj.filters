@@ -27,22 +27,16 @@
     <ClCompile Include="ShootDownCheck.h">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ShootDownCheck_Sender.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ShootDownCheck_Reciever.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ShootDownCheck_ShootDown.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\MFR.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\StartSignalReceiver.cpp">
+    <ClCompile Include="ShootDownCheck_Sender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,25 +44,10 @@
     <ClInclude Include="CoordinateGeneration.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AircraftCoordinate.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="ShootDownChecker.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\GlobalState.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\JsonParser.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\MFR.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\ScenarioInfoPrinter.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\MNS-LSY\MNS-LSY\MFR\StartSignalReceiver.h">
+    <ClInclude Include="AircraftCoordinate.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

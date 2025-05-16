@@ -1,4 +1,6 @@
 #include "AircraftCoordinate.h"
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -7,15 +9,6 @@
 #define y second
 
 std::mutex mtx;
-
-AircraftCoordinate::AircraftCoordinate() {
-    initializeMultiSocket();
-}
-
-AircraftCoordinate::~AircraftCoordinate() {
-    closesocket(udpSocket);
-    WSACleanup();
-}
 
 void AircraftCoordinate::initializeMultiSocket() {
     WSADATA wsaData;
@@ -50,25 +43,22 @@ void AircraftCoordinate::initializeMultiSocket() {
 }
 
 void AircraftCoordinate::sendAircraftInfo(std::pair<double, double> currentPoint, std::string id, char IFF) {
-    while (true) {
-        char buffer[sizeof(char) * 8 + sizeof(double) * 2 + sizeof(char)];
-        {
-            std::lock_guard<std::mutex> lock(mtx);
+    char buffer[sizeof(char) * 8 + sizeof(double) * 2 + sizeof(char)];
+    {
+        std::lock_guard<std::mutex> lock(mtx);
 
-            uint64_t xBits = *reinterpret_cast<uint64_t*>(&currentPoint.x);
-            uint64_t yBits = *reinterpret_cast<uint64_t*>(&currentPoint.y);
+        uint64_t xBits = *reinterpret_cast<uint64_t*>(&currentPoint.x);
+        uint64_t yBits = *reinterpret_cast<uint64_t*>(&currentPoint.y);
 
-            memcpy(buffer, id.c_str(), 8);
-            memcpy(buffer + 8, &xBits, sizeof(uint64_t));
-            memcpy(buffer + 8 + sizeof(uint64_t), &yBits, sizeof(uint64_t));
-            buffer[8 + sizeof(uint64_t) * 2] = IFF;
-        }
-
-        int sendSize = sendto(udpSocket, buffer, sizeof(buffer), 0, (SOCKADDR*)&multicastAddr, sizeof(multicastAddr));
-        if (sendSize < 0) {
-            std::cerr << "Failed to send data. Error: " << WSAGetLastError() << std::endl;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        std::cout << "통신 성공" << std::endl;
+        memcpy(buffer, id.c_str(), 8);
+        memcpy(buffer + 8, &xBits, sizeof(uint64_t));
+        memcpy(buffer + 8 + sizeof(uint64_t), &yBits, sizeof(uint64_t));
+        buffer[8 + sizeof(uint64_t) * 2] = IFF;
     }
+
+    int sendSize = sendto(udpSocket, buffer, sizeof(buffer), 0, (SOCKADDR*)&multicastAddr, sizeof(multicastAddr));
+    if (sendSize < 0) {
+        std::cerr << "Failed to send data. Error: " << WSAGetLastError() << std::endl;
+    }
+    std::cout << "통신 성공" << std::endl;
 }

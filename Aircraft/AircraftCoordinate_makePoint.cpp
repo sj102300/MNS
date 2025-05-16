@@ -1,6 +1,7 @@
 #include "AircraftCoordinate.h"
 #include <cmath>
 #include <thread>
+// #include <iostream>
 
 #define pi 3.14159265358979
 #define EarthR 6356.784
@@ -29,22 +30,25 @@ double AircraftCoordinate::haversine(double lat1, double lon1, double lat2, doub
     return EarthR * c;
 }
 
-void AircraftCoordinate::makePoint(std::pair<double, double> startPoint, std::pair<double, double> finishPoint) {
-    std::pair<double, double> currentPoint;
+vector<double> AircraftCoordinate::makeStartOpt(std::pair<double, double> startPoint, std::pair<double, double> finishPoint) {
+    vector<double> startOpt;
     double total_distance = haversine(startPoint.x, startPoint.y, finishPoint.x, finishPoint.y);
     double unit_distance = 1.0 / 100.0;
     double count = total_distance / unit_distance;
     double dx = (finishPoint.x - startPoint.x) / count;
     double dy = (finishPoint.y - startPoint.y) / count;
-    currentPoint.x = startPoint.x;
-    currentPoint.y = startPoint.y;
+    startOpt.push_back(dx);
+    startOpt.push_back(dy);
 
-    while (true) {
-        currentPoint.x += dx;
-        currentPoint.y += dy;
+    return startOpt;
+}
 
-        double checkDistance = haversine(currentPoint.x, currentPoint.y, finishPoint.x, finishPoint.y);
-        if (checkDistance <= unit_distance) break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+pair<double, double> AircraftCoordinate::makePoint(double dx, double dy, pair<double, double> currentPoint) {
+    /* 점검 코드
+    std::cout << "dx : " << dx << " " << "dy : " << dy << std::endl;
+    */
+    currentPoint.x += dx;
+    currentPoint.y += dy;
+
+    return currentPoint;
 }

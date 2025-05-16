@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ATS", "ATS.vcxproj", "{D8B6
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aircraft", "..\Aircraft\Aircraft.vcxproj", "{A8D11CC9-88CF-4453-AB51-A6AE1BC9C024}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReiceveTest", "..\ReiceveTest\ReiceveTest.vcxproj", "{2A72EA23-9E1A-4AA7-B8CD-72AA1B90BA6D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReiceveTest", "..\..\ReiceveTest\ReiceveTest.vcxproj", "{2A72EA23-9E1A-4AA7-B8CD-72AA1B90BA6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,6 @@
 #include <iostream>
-#include <string>
-#include <cstdlib>
 #include <vector>
+#include <string>
 #include <windows.h>
 using namespace std;
 
@@ -24,7 +23,7 @@ void makeCommand(const string& command) {
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    //명령어를 유니코드로 변환
+    // 명령어를 유니코드로 변환
     wstring wcommand = stringToWString(command);
 
     // 프로세스 생성
@@ -70,17 +69,17 @@ int main(void) {
     id.push_back("ATS-0001");
 
     // 더미데이터2
-    s_x.push_back(0);
-    s_y.push_back(0);
-    z.push_back(10);
-    f_x.push_back(-90);
-    f_y.push_back(-180);
-    IFF.push_back('E');
-    id.push_back("ATS-0002");
-    
+    //s_x.push_back(0);
+    //s_y.push_back(0);
+    //z.push_back(10);
+    //f_x.push_back(-90);
+    //f_y.push_back(-180);
+    //IFF.push_back('E');
+    //id.push_back("ATS-0002");
+
     for (int i = 0; i < id.size(); i++) {
         string command = "\"C:\\Users\\user\\Desktop\\MNS\\ATS\\x64\\Debug\\Aircraft.exe\" "
-            + id[i] + " " + to_string(s_x[i]) + " " + to_string(s_y[i]) + " " 
+            + id[i] + " " + to_string(s_x[i]) + " " + to_string(s_y[i]) + " "
             + to_string(z[i]) + " " + to_string(f_x[i]) + " " + to_string(f_y[i]) + " " + IFF[i];
 
         // 각 명령을 별도의 프로세스로 실행
