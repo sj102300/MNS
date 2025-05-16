@@ -7,6 +7,7 @@
 
 class EngagementManager {
 public:
+	void startEngagementSimulation();
 	void mappingMissileToAircraft(std::string& aircraftId);
 	bool isHitTarget();
 	bool changeMode();
@@ -15,6 +16,9 @@ public:
 	void addEngagableAircraft(std::string& aircraftId);
 
 private:
+	ICommandReceiver* commandReceiver_;
+	//ISuccessReceiver* successReceiver_;
+	//ICommandSender* commandSender_;
 	std::unordered_map<std::string, std::string> missileToAircraft_;
 	unsigned int mode_;
 	std::queue<std::string> engagableAircrafts_;

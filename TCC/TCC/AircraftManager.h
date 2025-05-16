@@ -11,7 +11,6 @@ class AircraftManager {
 public:
     AircraftManager(IAircraftReceiver* recv, IAircraftSender* sender);
     void startAircraftSimulation();
-    void updateAircraftStatus();
 
 private:
     void judgeEngagable();

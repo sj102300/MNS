@@ -1,7 +1,7 @@
 
 #include "AircraftManager.h"
 
-AircraftManager::AircraftManager(IAircraftReceiver* recv, IAircraftSender* sender) : receiver_(recv), sender_(sender),  {
+AircraftManager::AircraftManager(IAircraftReceiver* recv, IAircraftSender* sender) : receiver_(recv), sender_(sender) {
 
 }
 

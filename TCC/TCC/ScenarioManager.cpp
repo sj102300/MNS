@@ -23,6 +23,10 @@ void ScenarioManager::createAircraftManager() {
 
 void ScenarioManager::createEngagementManager() {
 
+    ICommandReceiver* commandReceiver = new CommandReceiver(std::string("192.168.2.7"), 9000);
+    //ISuccessReceiver* successReceiver_;
+    //ICommandSender* commandSender_;
+    engagementManager_->startEngagementSimulation();
 }
 
 void ScenarioManager::quitScenario() {

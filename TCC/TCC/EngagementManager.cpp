@@ -2,6 +2,11 @@
 
 #include "EngagementManager.h"
 
+void EngagementManager::startEngagementSimulation() {
+	//commandreceiver_시작
+	//successreceiver_시작
+}
+
 void EngagementManager::mappingMissileToAircraft(std::string& aircraftId) {
 	//missilemanager로부터 selected된 missile을 받아서
 	//missileToAircraft_  map에 저장 key가 missileId, value가 aircraftId;

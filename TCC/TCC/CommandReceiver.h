@@ -28,7 +28,7 @@ protected:
 	virtual void recvEmergencyDestroyCommand() = 0;
 };
 
-class CommandReceiver : public TCC::TcpReceiver, ICommandReceiver {
+class CommandReceiver : public TCC::TcpReceiver, public ICommandReceiver {
 public:
 	CommandReceiver(std::string ip_address, int port);
 
