@@ -1,6 +1,8 @@
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "UdpMulticastReceiver.h"
+//#define AIRCRAFT_MULTICAST_GROUP "239.0.0.2"
+//#define PORT 9999
 
 TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, int port) : multicastIp_(multicastIp), port_(port), serverSocket_(INVALID_SOCKET)
 {
@@ -31,14 +33,14 @@ bool TCC::UdpMulticastReceiver::init() {
 	localAddr.sin_port = htons(port_);
 	localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	if (bind(serverSocket_, (struct sockaddr*)&localAddr, sizeof(localAddr)) < 0) {
+	if (bind(serverSocket_, (sockaddr*)&localAddr, sizeof(localAddr)) < 0) {
 		std::cerr << "Bind Failed\n";
 		return false;
 	}
 
 	ip_mreq mreq = {};
 	mreq.imr_multiaddr.s_addr = inet_addr(multicastIp_.c_str());
-	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+	mreq.imr_interface.s_addr = inet_addr("192.168.15.7"); // ← 수신에 사용할 NIC의 실제 IP로 지정
 
 	if (setsockopt(serverSocket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) < 0) {
 		std::cerr << "setsockopt(IPP_ADD_MEMBERSHIP) Failed\n";

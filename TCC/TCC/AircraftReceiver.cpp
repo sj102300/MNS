@@ -19,6 +19,8 @@ void AircraftReceiver::receive() {
 	sockaddr_in senderAddr;
 	int addrLen = sizeof(senderAddr);
 
+	std::cout << "AircraftReceiver receive() start" << std::endl;
+
 	AircraftMSG msg;
 	NewAircraft newAircraft;
 	while (true) {
@@ -33,6 +35,9 @@ void AircraftReceiver::receive() {
 			std::cout << "AircraftReceiver received bad packet\n";
 			continue;
 		}
+		std::cout << newAircraft.aircraftId_ << std::endl;
+		std::cout << newAircraft.location_.latitude_ << std::endl;
+		std::cout << newAircraft.location_.longitude_ << std::endl;
 
 		newAircraft.aircraftId_ = std::string(msg.aircraftId, 8);
 		newAircraft.location_ = msg.location;
