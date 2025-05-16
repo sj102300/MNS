@@ -2,25 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace OCC.Models
 {
-    class Aircraft
+    public class Aircraft
     {
-        [JsonPropertyName("aircraft_id")]
+        [JsonProperty("aircraft_id")]
         public string Id { get; set; }
 
-        [JsonPropertyName("friend_or_foe")]
-        public string FriendOrFoe { get; set; }
-
-        [JsonPropertyName("start_point")]
+        [JsonProperty("start_point")]
         public Coordinate StartPoint { get; set; }
 
-        [JsonPropertyName("end_point")]
+        [JsonProperty("end_point")]
         public Coordinate EndPoint { get; set; }
+
+        [JsonProperty("friend_or_foe")]
+        public string FriendOrFoe { get; set; }
     }
 }

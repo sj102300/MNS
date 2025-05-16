@@ -1,7 +1,9 @@
 
 #pragma once
-#include <WinSock2.h>
-#include <WS2tcpip.h>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <iostream>
 #include <thread>
 

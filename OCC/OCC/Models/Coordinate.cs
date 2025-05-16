@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace OCC.Models
 {
-    class Coordinate
+    public class Coordinate
     {
-        [JsonPropertyName("latitude")]
+        [JsonProperty("latitude")]
         public double Latitude { get; set; }
 
-        [JsonPropertyName("longitude")]
+        [JsonProperty("longitude")]
         public double Longitude { get; set; }
 
-        [JsonPropertyName("altitude")]
+        [JsonProperty("altitude")]
         public double Altitude { get; set; }
     }
 }
