@@ -5,6 +5,7 @@
 #include "share.h"
 #include "AircraftManager.h"
 #include "EngagementManager.h"
+#include "MissileManager.h"
 
 //class IScenarioReceiver {
 //public:
@@ -27,6 +28,7 @@ private:
 
 	void createAircraftManager();
 	void createEngagementManager();
+	void createMissileManager();
 
 	std::string scenarioId_;
 	TCC::Position batterLoc_;
@@ -34,5 +36,7 @@ private:
 
 	AircraftManager* aircraftManager_;
 	EngagementManager* engagementManager_;
+	MissileManager* missileManager_;
+
 	//MissileManager* missileManager_;
 };

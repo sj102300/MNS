@@ -1,5 +1,6 @@
 
 #include "ScenarioManager.h"
+#include "MissileReceiver.h"
 
 #define RELEASE 0
 #if RELEASE
@@ -13,6 +14,7 @@ ScenarioManager::ScenarioManager() {}
 void ScenarioManager::startScenario() {
     createAircraftManager();
     createEngagementManager();
+    createMissileManager();
 }
 
 void ScenarioManager::createAircraftManager() {
@@ -29,6 +31,10 @@ void ScenarioManager::createEngagementManager() {
     //ISuccessReceiver* successReceiver_;
     //ICommandSender* commandSender_;
     //engagementManager_->startEngagementSimulation();
+}
+
+void ScenarioManager::createMissileManager() {
+    IMissileReceiver* missileReceiver = new MissileReceiver(std)
 }
 
 void ScenarioManager::quitScenario() {
