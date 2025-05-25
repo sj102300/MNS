@@ -3,19 +3,21 @@
 #include "ScenarioManager.h"
 #include "ScenarioInfoPrinter.h"
 #include <functional>
+#include <mutex>
 
 namespace sm {
     class ScenarioInit {
     public:
         ScenarioInit(const std::string& listen_address,
-            const std::string& server_url,
-            const std::string& client_id);
+                     const std::string& server_url,
+                     const std::string& client_id);
 
         void run();
-
+        void handleStartSignal(const std::string& scenario_id);
+        void handleQuitSignal();
+        
         void setOnReadyCallback(std::function<void()> cb);  // 콜백 등록 함수
         void setOnQuitCallback(std::function<void()> cb);  // 종료 콜백 등록
-        void handleQuitSignal();
 
         ScenarioInfo getScenarioInfo() const;
         Coordinate getBatteryLocation() const;
@@ -29,8 +31,7 @@ namespace sm {
 
         std::function<void()> on_start_cb_;  // 시작 콜백 저장
         std::function<void()> on_quit_cb_;  // 종료 콜백 저장
-
-        void handleStartSignal(const std::string& scenario_id);
-        
+        bool is_running_ = false;
+        std::mutex mutex_;
     };
 }

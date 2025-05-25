@@ -18,12 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="RadorDetector.cpp">
+    <ClCompile Include="RadarDetector.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RadorDetector.h">
+    <ClInclude Include="RadarDetector.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

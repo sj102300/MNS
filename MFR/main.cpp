@@ -8,57 +8,53 @@ using namespace sm;
 // === 글로벌 동기화 상태 ===
 std::mutex mtx;
 std::condition_variable cv;
-bool ready = false;
+bool started = false;  // 상태 관리가 아니라 '시작됨' 알림용 플래그
 
 // === 콜백 함수 정의 ===
 void handleStart() {
     std::lock_guard<std::mutex> lock(mtx);
-    ready = true;
-    cv.notify_one();
+    std::cout << u8"[MFR] 시작 신호 수신\n";
+    started = true;
+    cv.notify_one();  // 메인 스레드 깨우기
 }
 
 void handleQuit(ScenarioInit& runner) {
-    runner.handleQuitSignal();
+    std::cout << u8"[MFR] 종료 신호 수신\n";
+    runner.handleQuitSignal();  // 내부에서 상태 초기화 및 reset 처리
 }
 
 // === main 함수 정의 ===
 int main() {
+    //ScenarioInit scenarioRunner(
+    //    "http://192.168.15.3:8080",   // 수신 주소
+    //    "http://192.168.15.30:8080",  // SCN 서버 주소
+    //    "MFR"                         // 클라이언트 ID
+    //);
     ScenarioInit scenarioRunner(
-        "http://127.0.0.1:9015",  // 내 시나리오 수신 주소
-        "http://127.0.0.1:8000",  // 요청할 SCN 서버 주소
-        "MFR"                     // 내 클라이언트 ID
+        "http://localhost:8080",   // 수신 주소
+        "http://localhost:8000",  // SCN 서버 주소
+        "MFR"                         // 클라이언트 ID
     );
-    
+
     scenarioRunner.setOnReadyCallback(handleStart);
+    scenarioRunner.setOnQuitCallback(nullptr);
 
-    scenarioRunner.setOnQuitCallback([&]() {
-        handleQuit(scenarioRunner);
-        });
+    scenarioRunner.run();  // 리스닝 루프 진입 (blocking)
 
-    scenarioRunner.run();
+    // 반복적으로 start 신호 대기
+    while (true) {
 
-    // 메인 스레드에서 대기
-    std::unique_lock<std::mutex> lock(mtx);
-    cv.wait(lock, [] { return ready; });
+        // 메인 스레드는 "시작됨" 알림 올 때까지 대기
+        {
+            std::unique_lock<std::mutex> lock(mtx);
+            cv.wait(lock, [] { return started; });
+            started = false;  // 다음 대기를 위해 초기화
+        }
 
-    //ScenarioInfo info = scenarioRunner.getScenarioInfo();
-    Coordinate battery = scenarioRunner.getBatteryLocation();
-    //std::vector<AircraftInfo> aircrafts = scenarioRunner.getAircraftList();
+        // === 시나리오 정보 출력 ===
+        Coordinate battery = scenarioRunner.getBatteryLocation();
+        std::vector<AircraftInfo> aircrafts = scenarioRunner.getAircraftList();
+    }
 
-    //////////////////////////////////  출력 확인  ///////////////////////////////////
-    std::cout << "\n" << u8"===============================================" << "\n";
-    //std::cout << u8"시나리오 ID는: " << info.scenario_id << std::endl;
-    std::cout << u8"[포대 위치] 위도: " << battery.latitude
-        << u8", 경도: " << battery.longitude
-        << u8", 고도: " << battery.altitude << std::endl;
-    //for (const auto& ac : aircrafts) {
-    //    std::cout << u8"[항공기] ID: " << ac.aircraft_id << u8", 피아: " << ac.friend_or_foe << std::endl;
-    //}
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-    std::cin.get(); // 프로그램 종료 임시 방지
     return 0;
 }

@@ -131,10 +131,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RadorDetector.cpp" />
+    <ClCompile Include="RadarDetector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RadorDetector.h" />
+    <ClInclude Include="RadarDetector.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ScenarioManager\ScenarioManager.vcxproj">

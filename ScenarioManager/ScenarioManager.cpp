@@ -22,6 +22,7 @@ namespace sm {
             http_request req(methods::POST);
             req.set_request_uri(U("/scenario/info"));
             req.headers().set_content_type(U("application/json"));
+            std::cout << u8"[ScenarioManager] SCN에게 시나리오(" << scenario_id << u8") 요청 중...\n";
 
             json::value postData;
             postData[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(scenario_id));
@@ -50,6 +51,13 @@ namespace sm {
             std::cerr << u8"[ScenarioManager] 예외 발생: " << e.what() << std::endl;
             return false;
         }
+    }
+
+    void ScenarioManager::clearState() {
+        scenario_info_ = ScenarioInfo{};
+        battery_location_ = Coordinate{};
+        aircraft_list_.clear();
+        std::cout << u8"[ScenarioManager] 시나리오 정보 초기화...\n";
     }
 
     ScenarioInfo ScenarioManager::getScenarioInfo() const { return scenario_info_; }

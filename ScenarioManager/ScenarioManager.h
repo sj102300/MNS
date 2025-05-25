@@ -7,9 +7,10 @@
 namespace sm {
     class ScenarioManager {
     public:
-        explicit ScenarioManager(const std::string& server_url);
+        explicit ScenarioManager(const std::string& server_url);  // 형 변환 금지
 
         bool requestScenario(const std::string& scenario_id);
+        void clearState();
 
         ScenarioInfo getScenarioInfo() const;
         Coordinate getBatteryLocation() const;
