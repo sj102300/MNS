@@ -21,24 +21,30 @@ namespace sm {
 
         // POST 요청 처리: 시작 신호
         listener.support(methods::POST, [=](http_request request) {
-            request.extract_json().then([=](json::value body) {
-                try {
-                    if (body.has_field(U("command"))) {
-                        auto cmd = utility::conversions::to_utf8string(body[U("command")].as_string());
-                        auto scenario_id = utility::conversions::to_utf8string(body[U("scenario_id")].as_string());
+            try {
+                request.extract_json().then([=](json::value body) {
+                    try {
+                        if (body.has_field(U("command"))) {
+                            auto cmd = utility::conversions::to_utf8string(body[U("command")].as_string());
+                            auto scenario_id = utility::conversions::to_utf8string(body[U("scenario_id")].as_string());
 
-                        if (cmd == "start") {
-                            std::cout << u8"[" << client_id << u8"] 시작 신호 수신! 시나리오 ID: " << scenario_id << "\n";
-                            on_start_callback(scenario_id);
+                            if (cmd == "start") {
+                                std::cout << u8"[" << client_id << u8"] 시작 신호 수신! 시나리오 ID: " << scenario_id << "\n";
+                                on_start_callback(scenario_id);
+                            }
                         }
                     }
-                }
-                catch (const std::exception& e) {
-                    std::cerr << u8"[SCN] POST 파싱 오류: " << e.what() << "\n";
-                }
-            }).wait();
-            
-            request.reply(status_codes::OK, U("START_ACK"));
+                    catch (const std::exception& e) {
+                        std::cerr << u8"[SCN] POST 내부 파싱 오류: " << e.what() << "\n";
+                    }
+                    }).wait();
+
+                request.reply(status_codes::OK, U("START_ACK"));
+            }
+            catch (const std::exception& e) {
+                std::cerr << u8"[SCN] POST wait 중 예외: " << e.what() << "\n";
+                request.reply(status_codes::BadRequest, U("JSON 파싱 오류"));
+            }
         });
 
         // GET 요청 처리: 종료 신호
