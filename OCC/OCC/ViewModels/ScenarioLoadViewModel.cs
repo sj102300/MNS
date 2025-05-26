@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using Newtonsoft.Json;
 using OCC.Commands;
 using OCC.Models;
-using static OCC.MainWindow;
+using OCC.Utils;
 
 namespace OCC.ViewModels
 {
@@ -40,7 +40,7 @@ namespace OCC.ViewModels
             //("http://127.0.0.1:9012", "MSS"),
             //("http://127.0.0.1:9013", "ATS"),
             //("http://127.0.0.1:9014", "LCH"),
-            ("http://192.168.15.3:8080", "MFR")
+            ("http://192.168.2.31:8080", "MFR")
         };
 
         public ScenarioLoadViewModel()
@@ -79,7 +79,7 @@ namespace OCC.ViewModels
 
         private async void Load()
         {
-            string serverUrl = "http://192.168.15.30:8080/scenario/list"; // 시나리오 서버 주소로 교체
+            string serverUrl = $"{Network.SCN}/scenario/list"; // 시나리오 서버 주소로 교체
             Debug.WriteLine("불러오기 요청");
             // UI 쓰레드에서 ObservableCollection 업데이트
             Application.Current.Dispatcher.Invoke(() =>
@@ -162,6 +162,7 @@ namespace OCC.ViewModels
             var json = JsonConvert.SerializeObject(postData);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+            Debug.WriteLine($"post data : {json}");
             try
             {
                 var response = await client.PostAsync($"{targetUrl}/start", content);
@@ -202,12 +203,6 @@ namespace OCC.ViewModels
         {
             using var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
-            var postData = new
-            {
-                command = "quit",
-                subsystem_id = subsystemId,
-                scenario_id = scenarioId
-            };
 
             try
             {

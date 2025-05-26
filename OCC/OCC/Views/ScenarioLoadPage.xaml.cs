@@ -36,12 +36,24 @@ namespace OCC.Views
 
         private void ScenarioLoadPage_Loaded(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("code behind execute");
-            if (DataContext is ScenarioLoadViewModel vm && vm.LoadCommand.CanExecute(null))
+            if (NavigationService != null)
             {
-                vm.LoadCommand.Execute(null);
+                _viewModel.NavigationService = NavigationService;
+            }
+            else if (Parent is Frame frame && frame.NavigationService != null)
+            {
+                _viewModel.NavigationService = frame.NavigationService;
             }
         }
+
+        //private void ScenarioLoadPage_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    Debug.WriteLine("code behind execute");
+        //    if (DataContext is ScenarioLoadViewModel vm && vm.LoadCommand.CanExecute(null))
+        //    {
+        //        vm.LoadCommand.Execute(null);
+        //    }
+        //}
         //private void ScenarioLoadPage_Loaded(object sender, RoutedEventArgs e)
         //{
         //    if (NavigationService != null)
