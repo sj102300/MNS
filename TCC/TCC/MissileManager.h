@@ -11,14 +11,14 @@ private:
     TCC::UdpSender* udpSender_;
 
     void addMissile(Missile* missile);
-    Missile* selectMissile(const std::string& id);
     void updateMissileStatus(const std::string& id, Missile::MissileStatus newStatus);
     void checkMissileStatus();
     bool isExistMissile(std::string& missileId);
     
 public:
 	MissileManager(TCC::UdpSender* udpSender); // »ý¼ºÀÚ
-	void echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& data); 
+	void echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& data);
+    Missile* selectMissile(const std::string& id);
     std::string findAvailableMissile(); 
 
     ~MissileManager();

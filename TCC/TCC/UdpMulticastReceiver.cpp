@@ -83,28 +83,15 @@ void TCC::UdpMulticastReceiver::receive() {
 		std::cout << header.eventCode_ << std::endl;
 
 		switch (header.eventCode_) {
-		case 1001:
-			//ATS->MFR로 보내는데이터임 할일없음
-			break;
-		case 1002:
-			//MFR에서 보내는 데이터임
+		case EventCode::FindTargetEvent:
 			if (!parseReceivedAircraftMSG(buffer + 8, newAircraft, header.bodyLength_))
 				break;
 			aircraftManager_->handleReceivedAircraft(newAircraft);
 			break;
-		case 2001:
-			//발사 명령 요청
-			break;
-		case 2002:
-			//발사 수행 요청
-			break;
-		case 2003:
+		case EventCode::KillSuccess:
 			//격추 성공
-		case 2004:
-			//비상 폭파
-		case 3001:
+		case EventCode::MissileStatus:
 			//미사일 데이터
-			MissileMSG missileMsg;
 			memcpy(&missileMsg, buffer + 8, sizeof(MissileMSG));
 			//여기서 호출
 			if (missileManager_) {

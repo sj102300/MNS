@@ -34,14 +34,14 @@ void EngagementManager::work() {
 
 bool EngagementManager::mappingMissileToAircraft(std::string& aircraftId) {
 
-	//std::string missileId = missileManager->selectMissile();
+	std::string missileId = missileManager_->findAvailableMissile();
 	
-	//if (missileId.empty()) {
-	//	return false;		//사용가능한 미사일이 없음
-	//}
+	if (missileId.empty()) {
+		return false;		//사용가능한 미사일이 없음
+	}
 
 	//WDL기능 할거면 이미 있는 미사일인지 검사하기
-	//missileToAircraft_[missileId] = aircraftId;
+	missileToAircraft_[missileId] = aircraftId;
 	return true;
 }
 
@@ -83,10 +83,8 @@ bool EngagementManager::launchMissile(std::string& aircraftId) {
 }
 
 bool EngagementManager::emergencyDestroy(std::string commandId, std::string missileId) {
-	//비상폭파할 미사일에 대해서
 	//비상 폭파 명령 송신
-	
-	//Missile* missile = missileManager_->getMissile(missileId);
+	Missile* missile = missileManager_->selectMissile(missileId);
 
 	//sender_->sendEmergencyDestroy(missileId);
 

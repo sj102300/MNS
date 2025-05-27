@@ -37,6 +37,13 @@ namespace TCC {
 		void start();
 
 	private:
+
+		enum EventCode {
+			FindTargetEvent = 1002,
+			KillSuccess = 2003,
+			MissileStatus = 3001
+		};
+
 		AircraftManager* aircraftManager_;		//포인터에 널값 넣어주고 체크해줘야됨.
 		MissileManager* missileManager_;		//포인터에 널값 넣어주고 체크해줘야됨.
 		//ISuccessReceiver* successRecv_;
