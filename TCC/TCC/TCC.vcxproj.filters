@@ -54,6 +54,18 @@
     <ClCompile Include="UdpMulticastSender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Missile.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MissileSender.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MissileReceiver.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MissileManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aircraft.h">
@@ -84,6 +96,18 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="UdpSender.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Missile.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileReceiver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileSender.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

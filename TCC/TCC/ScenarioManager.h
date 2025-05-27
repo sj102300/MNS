@@ -7,6 +7,7 @@
 #include "EngagementManager.h"
 #include "UdpMulticastReceiver.h"
 #include "UdpSender.h"
+#include "MissileManager.h"
 
 //class IScenarioReceiver {
 //public:
@@ -36,6 +37,6 @@ private:
 	EngagementManager* engagementManager_;
 	TCC::UdpMulticastReceiver* multiReceiver_;
 	TCC::UdpSender* udpSender_;
+	MissileManager* missileManager_;
 
-	//MissileManager* missileManager_;
 };

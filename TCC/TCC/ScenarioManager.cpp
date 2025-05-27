@@ -1,6 +1,6 @@
 
 #include "ScenarioManager.h"
-#include "UdpMulticastReceiver.h"
+
 #define RELEASE 0
 #if RELEASE
 #define AIRCRAFT_SENDER_IP "192.168.2.7"
@@ -26,10 +26,10 @@ bool ScenarioManager::startScenario() {
 bool ScenarioManager::createObjects() {
 
     multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);
-    udpSender_ = new TCC::UdpSender("192.168.2.200", 9000); //OCC ÁÖ¼Ò
+    udpSender_ = new TCC::UdpSender("192.168.2.200", 9000); //OCC ï¿½Ö¼ï¿½
     aircraftManager_ = new AircraftManager();
     //engagementManager_ = new EngagementManager();
-    //¹Ì»çÀÏ ¸Å´ÏÀúµµ Ãß°¡
+    //ï¿½Ì»ï¿½ï¿½ï¿½ ï¿½Å´ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 
     if (!aircraftManager_->init(udpSender_, engagementManager_)) {
         std::cout << "aircraftManager init() Failed\n";
