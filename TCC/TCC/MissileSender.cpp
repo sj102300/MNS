@@ -5,7 +5,7 @@
 void MissileSender::sendMissileData() {
     std::cout << "[MissileSender] Sending missile data...\n";
     makeMissilePacket();
-    udpSender->sendData();
+    //udpSender->sendData();
 }
 
 void MissileSender::makeMissilePacket() {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UdpSender.h"
+
 class IMissileSender {
 public:
     virtual void sendMissileData() = 0;
@@ -12,5 +14,5 @@ public:
     void makeMissilePacket();
 
 private:
-    class UdpSender* udpSender;
+    class TCC::UdpSender* udpSender;
 };

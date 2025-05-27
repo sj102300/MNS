@@ -1,6 +1,6 @@
 #include "Missile.h"
 
-Missile::Missile(std::string id, TCC::Position pos_, int status, TCC::Position impact) : missileId_(id), position_(pos_), status_(static_cast<MissileStatus>(status)) {
+Missile::Missile(std::string id, TCC::Position pos_, int status, TCC::Position impact) : missileId_(id), position_(pos_), status_(static_cast<TCC::MissileStatus>(status)) {
 	// 초기화 코드
 	status_ = TCC::MissileStatus::Wait; // 대기 상태로 초기화
 }

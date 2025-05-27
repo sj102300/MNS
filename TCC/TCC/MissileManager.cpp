@@ -22,8 +22,8 @@ Missile* MissileManager::selectMissile(const std::string& id) {
 void MissileManager::updateMissile(const std::string& id, TCC::MissileStatus newStatus) {
     Missile* m = selectMissile(id);
     if (m) {
-        m->updateStatus(newStatus);
-        std::cout << "Updated missile " << id << " to status " << newStatus << "\n";
+        //m->updateStatus(newStatus);
+        std::cout << "Updated missile " << id << " to status " << (unsigned int)newStatus << "\n";
     }
     else {
         std::cout << "Missile " << id << " not found\n";
@@ -32,7 +32,7 @@ void MissileManager::updateMissile(const std::string& id, TCC::MissileStatus new
 
 void MissileManager::checkMissileStatus() {
     for (auto* m : missiles_) {
-        std::cout << "Missile ID: " << m->getId()
-            << ", Status: " << m->getStatus() << "\n";
+        //std::cout << "Missile ID: " << m->getId()/*
+        //    << ", Status: " << m->getStatus() << "\n";*/
     }
 }

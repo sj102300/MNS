@@ -1,5 +1,7 @@
 #pragma once
 #include "share.h"
+#include <string>
+#include "UdpMulticastReceiver.h"
 
 class IMissileReceiver {
 private:
@@ -16,10 +18,10 @@ public:
 };
 
 
-class MissileReceiver : TCC::UdpMulticastReceiver, public IMissileReceiver {
+class MissileReceiver : public TCC::UdpMulticastReceiver, public IMissileReceiver {
 public:
     MissileReceiver(const std::string& multicastIp, int port);
-    void receive() override;
+    //void receive() override;
 	~MissileReceiver();
     void parseMissileMessage();
 
