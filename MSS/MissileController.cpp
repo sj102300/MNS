@@ -25,7 +25,7 @@ void MissileController::start(float speed) {
 void MissileController::updateLoop(float speed) {
 	while (running_) {
 		updatePosition(speed); // 위치 갱신
-		std::this_thread::sleep_for(std::chrono::seconds(1)); // 1초 주기
+		std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 1초 주기
 	}
 }
 

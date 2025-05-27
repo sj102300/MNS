@@ -18,22 +18,22 @@
     <ClCompile Include="Scene_Parser.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="sim.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="UdpReceiver.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="UdpSender.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="UdpMuticast.hpp">
+    <ClCompile Include="UdpMuticast.h">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="MissileController.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Missile.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpMulticast.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpReceiver.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,22 +43,25 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ScenarioParser.hpp">
+    <ClInclude Include="ScenarioParser.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Isender.hpp">
+    <ClInclude Include="Isender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Ireceiver.hpp">
+    <ClInclude Include="Ireceiver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Packet.hpp">
+    <ClInclude Include="Packet.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MissileController.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Missile.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpReceiver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

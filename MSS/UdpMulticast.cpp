@@ -1,6 +1,9 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "Missile.h"
+#include "UdpMuticast.h"
+#include "Isender.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
@@ -12,13 +15,11 @@
 #pragma comment(lib, "ws2_32.lib")
 
 
-class UdpMulticast {
-public:
-    UdpMulticast() : sock_(INVALID_SOCKET), port_(0), running_(false) ,missile_(nullptr) {}
-    ~UdpMulticast() { close(); }
+UdpMulticast::UdpMulticast() : sock_(INVALID_SOCKET), port_(0), running_(false), missile_(nullptr) {}
+//UdpMulticast::~UdpMulticast() { close(); }
 
     // 멀티캐스트 대상 주소와 포트를 받아 초기화
-    bool init(const std::string& multicast_address, int port) {
+bool UdpMulticast::init(const std::string& multicast_address, int port) {
         port_ = port;
 
         WSADATA wsaData;
@@ -28,15 +29,26 @@ public:
         }
 
         // 소켓 생성 (UDP)
-        sock_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        sock_ = socket(AF_INET, SOCK_DGRAM, 0);
         if (sock_ == INVALID_SOCKET) {
             std::cerr << "Failed to create socket\n";
             return false;
         }
- 
 
+        // 대상 주소 설정
+       // memset(&destAddr_, 0, sizeof(destAddr_));
+        destAddr_.sin_family = AF_INET;
+        destAddr_.sin_port = htons(port_);
+
+
+        if (inet_pton(AF_INET, "239.0.0.1", &destAddr_.sin_addr) <= 0) { // destAddr을 이제 멀티캐스트 주소로
+            std::cerr << "Invalid multicast address format\n";
+            closesocket(sock_);
+            WSACleanup();
+            return false;
+        }
         // 멀티캐스트 전송 시 TTL(Time-To-Live) 옵션 설정 (기본 1: 로컬 네트워크)
-        int ttl = 1;
+        int ttl = 4;
         if (setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl)) < 0) {
             std::cerr << "setsockopt(IP_MULTICAST_TTL) failed\n";
             closesocket(sock_);
@@ -44,17 +56,6 @@ public:
             return false;
         }
 
-        // 대상 주소 설정
-        memset(&destAddr_, 0, sizeof(destAddr_));
-        destAddr_.sin_family = AF_INET;
-        destAddr_.sin_port = htons(port_);
-        // 멀티캐스트 주소 변환: InetPtonA 사용 (멀티바이트 문자열)
-        if (InetPtonA(AF_INET, multicast_address.c_str(), &destAddr_.sin_addr) != 1) { // destAddr을 이제 멀티캐스트 주소로
-            std::cerr << "Invalid multicast address format\n";
-            closesocket(sock_);
-            WSACleanup();
-            return false;
-        }
 
         std::cout << "UDP Sender initialized for multicast group " << multicast_address
             << " on port " << port_ << "\n";
@@ -62,54 +63,51 @@ public:
     }
 
     // 객체의 맞는 정보를 전달하기 위함
-    void setMissile(std::shared_ptr<Missile> m) {
+void UdpMulticast::setMissile(std::shared_ptr<Missile> m) {
         missile_ = m;
     }
 
-    MissilePacket serializeMissile(const Missile& missile) {
+MissilePacket UdpMulticast::serializeMissile(const Missile& missile) {
         MissilePacket packet;
         memset(packet.MissileId, 0, sizeof(packet.MissileId));
         strncpy_s(packet.MissileId, sizeof(packet.MissileId), missile.MissileId.c_str(), _TRUNCATE);
-        //strncpy(packet.MissileId, missile.MissileId.c_str(), sizeof(packet.MissileId) - 1);
         packet.MissileState = missile.MissileState;
         packet.MissileLoc = missile.MissileLoc;
         return packet;
     }
 
     // 전송 루프: 주기적으로 데이터를 보내는 예시
-    void start() {
+void UdpMulticast::start() {
         running_ = true;
         sendThread_ = std::thread(&UdpMulticast::run, this);
     }
 
     // 전송 루프 내용: 2.5초마다 데이터 전송
-    void run() {
+void UdpMulticast::run() {
         while (running_) {
             if (missile_) {
                 MissilePacket packet = serializeMissile(*missile_);
                 int sent = sendto(sock_, reinterpret_cast<const char*>(&packet), sizeof(packet), 0,
                     (sockaddr*)&destAddr_, sizeof(destAddr_));
-                //int sent = sendto(sock_, (char*)&missile_, sizeof(Missile), 0,
-                //    (sockaddr*)&destAddr_, sizeof(destAddr_));
                 if (sent == SOCKET_ERROR) {
                     std::cerr << "sendto failed: " << WSAGetLastError() << "\n";
                 }
                 else {
                     std::cout << " <Udp Multicast success> \n\n";
-                    std::cout << "MSS-ID: "<< missile_->MissileId <<"\n"
+                    std::cout << "MSS-ID: " << missile_->MissileId << "\n"
                         << "Altitude: " << missile_->MissileLoc.altitude << "\n"
                         << "Latitude: " << missile_->MissileLoc.latitude << "\n"
                         << "Longitude: " << missile_->MissileLoc.longitude << "\n\n";
-
                 }
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         }
     }
 
 
     // 종료 및 자원 해제
-    void close() {
+void UdpMulticast::close() {
         running_ = false;
         if (sendThread_.joinable()) {
             sendThread_.join();
@@ -121,11 +119,3 @@ public:
         WSACleanup();
     }
 
-private:
-    SOCKET sock_;
-    sockaddr_in destAddr_;  // 멀티캐스트 대상 주소 저장
-    int port_;
-    bool running_;
-    std::thread sendThread_;
-    std::shared_ptr<Missile> missile_;
-};

@@ -133,21 +133,22 @@
     <ClCompile Include="Scene_Parser.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="sim.cpp" />
-    <ClCompile Include="UdpMuticast.hpp" />
-    <ClCompile Include="UdpReceiver.hpp" />
-    <ClCompile Include="UdpSender.hpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="UdpMulticast.cpp" />
+    <ClCompile Include="UdpMuticast.h" />
+    <ClCompile Include="UdpReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="example.json" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Ireceiver.hpp" />
-    <ClInclude Include="Isender.hpp" />
+    <ClInclude Include="Ireceiver.h" />
+    <ClInclude Include="Isender.h" />
     <ClInclude Include="Missile.h" />
     <ClInclude Include="MissileController.h" />
-    <ClInclude Include="Packet.hpp" />
-    <ClInclude Include="ScenarioParser.hpp" />
+    <ClInclude Include="Packet.h" />
+    <ClInclude Include="ScenarioParser.h" />
+    <ClInclude Include="UdpReceiver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

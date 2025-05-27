@@ -1,10 +1,11 @@
 #pragma once
-#include "Packet.hpp"
+#include "Packet.h"
 #include <string>
 
-class Isender{
+class IReceiver {
 public:
-    virtual ~Isender() = default;
+
+    virtual ~IReceiver() = default;
 
     virtual bool init(const std::string& address, int port) = 0;
 
@@ -12,9 +13,5 @@ public:
 
     virtual void run() = 0;
 
-    virtual bool send(const char* data, int length) = 0;
-
     virtual void close() = 0;
-
 };
-

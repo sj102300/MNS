@@ -1,15 +1,15 @@
 #pragma once
-#include "ScenarioParser.hpp"
+#include "ScenarioParser.h"
 
 struct MissilePacket {
     char MissileId[8];        
-    uint32_t MissileState;
+    unsigned int MissileState;
     Location MissileLoc;
 };
 
 #pragma pack(push, 1)
 struct LaunchPacket {
-    uint32_t EvenetCode;
+    unsigned int EvenetCode;
     char EventId[20];
     char MissileId[8];
     char AirCraftId[8];
@@ -19,7 +19,8 @@ struct LaunchPacket {
 
 #pragma pack(push, 1)
 struct InterceptResultPacket{
-    uint32_t EvenetCode;
+    unsigned int EvenetCode;
+    unsigned int BodyLength;
     char EventId[20];
     char MissileId[8];
     char AirCraftId[8];
@@ -28,8 +29,20 @@ struct InterceptResultPacket{
 
 #pragma pack(push,1)
 struct EDPacket {
-    uint32_t EventCode;
+    unsigned int EventCode;
+    unsigned int BodyLength;
     char EventId[20];
     char MissileId[8];
+};
+#pragma pack(pop)
+
+#pragma pack(push,1)
+struct OrderPacket {
+    unsigned int EventCode;
+    unsigned int BodyLength;
+    char EventId[20];
+    char AtsId[8];
+    char MissileId[8];
+    Location ImpactPoint;
 };
 #pragma pack(pop)

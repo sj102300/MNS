@@ -1,4 +1,4 @@
-#include "ScenarioParser.hpp"
+#include "ScenarioParser.h"
 #include <fstream>
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
