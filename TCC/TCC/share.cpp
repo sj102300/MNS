@@ -50,7 +50,7 @@ namespace TCC {
         return std::regex_match(tmp, pattern);
     }
 
-    bool isValidCommand(const char* input) {
+    bool isValidCommandId(const char* input) {
         char tmp[21];
         std::memcpy(tmp, input, 20);
         tmp[20] = '\0'; 

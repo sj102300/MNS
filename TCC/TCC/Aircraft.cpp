@@ -135,3 +135,11 @@ bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& i
     engagementStatus = (unsigned int)status_;
     return false;
 }
+
+bool Aircraft::isEngagable() {
+    return status_ == EngagementStatus::Engageable || status_ == EngagementStatus::Engaging;
+}
+
+unsigned int Aircraft::updateStatus(unsigned int engagementStatus) {
+    return status_ = engagementStatus;
+}

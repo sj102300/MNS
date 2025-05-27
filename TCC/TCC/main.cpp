@@ -17,7 +17,5 @@ int main() {
         //scenarioManager.quitScenario();
     }
 
-    while (1);
-
     return 0;
 }

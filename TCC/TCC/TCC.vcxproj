@@ -151,6 +151,7 @@
     <ClCompile Include="UdpMulticastReceiver.cpp" />
     <ClCompile Include="UdpMulticastSender.cpp" />
     <ClCompile Include="UdpMulticastSender.h" />
+    <ClCompile Include="UdpReceiver.cpp" />
     <ClCompile Include="UdpSender.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +176,7 @@
     </ClInclude>
     <ClInclude Include="TcpSender.h" />
     <ClInclude Include="UdpMulticastReceiver.h" />
+    <ClInclude Include="UdpReceiver.h" />
     <ClInclude Include="UdpSender.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
