@@ -16,6 +16,6 @@ namespace TCC {
     } Position;
 
     bool isValidAircraftId(const char* input);
-    bool isValidMissile(const char* input);
+    bool isValidMissileId(const char* input);
     bool isValidCommand(const char* input);
 }

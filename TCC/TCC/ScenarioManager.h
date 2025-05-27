@@ -5,6 +5,8 @@
 #include "share.h"
 #include "AircraftManager.h"
 #include "EngagementManager.h"
+#include "UdpMulticastReceiver.h"
+#include "UdpSender.h"
 
 //class IScenarioReceiver {
 //public:
@@ -20,13 +22,11 @@
 class ScenarioManager{
 public:
 	ScenarioManager();
-	void startScenario();
+	bool startScenario();
 	void quitScenario();
 
 private:
-
-	void createAircraftManager();
-	void createEngagementManager();
+	bool createObjects();
 
 	std::string scenarioId_;
 	TCC::Position batterLoc_;
@@ -34,5 +34,8 @@ private:
 
 	AircraftManager* aircraftManager_;
 	EngagementManager* engagementManager_;
+	TCC::UdpMulticastReceiver* multiReceiver_;
+	TCC::UdpSender* udpSender_;
+
 	//MissileManager* missileManager_;
 };
