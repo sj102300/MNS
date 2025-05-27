@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ScenarioManager.h">
+    <ClInclude Include="HttpClient.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="JsonParser.h">
@@ -24,24 +24,24 @@
     <ClInclude Include="ScenarioInfoPrinter.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ScenarioCommandReceiver.h">
+    <ClInclude Include="HttpServer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ScenarioInit.h">
+    <ClInclude Include="ScenarioManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ScenarioManager.cpp">
+    <ClCompile Include="HttpClient.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ScenarioCommandReceiver.cpp">
+    <ClCompile Include="HttpServer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ScenarioInfoPrinter.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ScenarioInit.cpp">
+    <ClCompile Include="ScenarioManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

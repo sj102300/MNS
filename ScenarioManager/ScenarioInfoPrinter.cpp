@@ -2,23 +2,23 @@
 #include <iostream>
 
 namespace sm {
-    void ScenarioInfoPrinter::printInfo(const ScenarioManager& manager) const {
-        const auto& info = manager.getScenarioInfo();
+    void ScenarioInfoPrinter::printInfo(const HttpClient& client) const {
+        const auto& info = client.getScenarioInfo();
         std::cout << u8"\n[시나리오 정보]\n";
         std::cout << u8"식별자: " << info.scenario_id << "\n";
         std::cout << u8"제목: " << info.scenario_title << "\n";
     }
 
-    void ScenarioInfoPrinter::printBattery(const ScenarioManager& manager) const {
-        const auto& battery = manager.getBatteryLocation();
+    void ScenarioInfoPrinter::printBattery(const HttpClient& client) const {
+        const auto& battery = client.getBatteryLocation();
         std::cout << u8"\n[포대 위치]\n";
         std::cout << u8"위도: " << battery.latitude << "\n";
         std::cout << u8"경도: " << battery.longitude << "\n";
         std::cout << u8"고도: " << battery.altitude << "\n";
     }
 
-    void ScenarioInfoPrinter::printAircraftList(const ScenarioManager& manager) const {
-        const auto& aircrafts = manager.getAircraftList();
+    void ScenarioInfoPrinter::printAircraftList(const HttpClient& client) const {
+        const auto& aircrafts = client.getAircraftList();
         std::cout << u8"\n[항공기 목록]\n";
         for (size_t i = 0; i < aircrafts.size(); ++i) {
             const auto& ac = aircrafts[i];
@@ -34,10 +34,9 @@ namespace sm {
         }
     }
 
-    // 전체 출력 함수 (선택적 사용)
-    void ScenarioInfoPrinter::printAll(const ScenarioManager& manager) const {
-        printInfo(manager);
-        printBattery(manager);
-        printAircraftList(manager);
+    void ScenarioInfoPrinter::printAll(const HttpClient& client) const {
+        printInfo(client);
+        printBattery(client);
+        printAircraftList(client);
     }
 }

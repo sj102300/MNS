@@ -1,106 +1,105 @@
-ï»¿#define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
-
 #include "ScenarioManager.h"
-
-#include <cpprest/http_client.h>
 #include <windows.h>
 #include <iostream>
 
-using namespace web;
-using namespace web::http;
-using namespace web::http::client;
-
 namespace sm {
-    ScenarioManager::ScenarioManager(const std::string& url)
-        : server_url_(url) {
+    ScenarioManager::ScenarioManager(const std::string& listen_address,
+        const std::string& server_url,
+        const std::string& client_id)
+        : http_server_(listen_address, client_id),
+        http_client_(server_url),
+        client_id_(client_id) {
     }
 
-    bool ScenarioManager::requestScenario(const std::string& scenario_id) {
-        http_client client(utility::conversions::to_string_t(server_url_));
+    void ScenarioManager::run() {
+        SetConsoleOutputCP(CP_UTF8);
 
-        try {
-            http_request req(methods::POST);
-            req.set_request_uri(U("/scenario/info"));
-            req.headers().set_content_type(U("application/json"));
-            std::cout << u8"[ScenarioManager] SCNì—ê²Œ ì‹œë‚˜ë¦¬ì˜¤(" << scenario_id << u8") ìš”ì²­ ì¤‘...\n";
+        http_server_.setOnStartCallback([this](const std::string& scenario_id) {
+            handleStartSignal(scenario_id);
+            });
 
-            json::value postData;
-            postData[U("scenario_id")] = json::value::string(utility::conversions::to_string_t(scenario_id));
-            req.set_body(postData);
+        http_server_.setOnQuitCallback([this]() {
+            handleQuitSignal();
+            });
 
-            http_response response = client.request(req).get();
-            if (response.status_code() != status_codes::OK) {
-                std::cerr << u8"[ScenarioManager] ìš”ì²­ ì‹¤íŒ¨ - HTTP " << response.status_code() << std::endl;
-                return false;
+        http_server_.start();
+
+        std::cout << u8"[" << client_id_ << u8"] OCC ½ÃÀÛ½ÅÈ£¸¦ ±â´Ù¸³´Ï´Ù.\n";
+    }
+
+    void ScenarioManager::setOnReadyCallback(std::function<void()> cb) {
+        on_start_cb_ = std::move(cb);
+    }
+
+    void ScenarioManager::setOnQuitCallback(std::function<void()> cb) {
+        on_quit_cb_ = std::move(cb);
+    }
+
+    void ScenarioManager::handleStartSignal(const std::string& scenario_id) {
+        bool loaded = false;
+
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+
+            std::cout << u8"[" << client_id_ << u8"] ½Ã³ª¸®¿À ¿äÃ» ½ÃÀÛ\n";
+            if (is_running_) {
+                std::cout << u8"[" << client_id_ << u8"] ÀÌ¹Ì ½ÇÇà Áß - ½ÃÀÛ ½ÅÈ£ ¹«½Ã\n";
+                return;
             }
 
-            auto root = response.extract_json().get();
-            if (!root.has_field(U("scenario_id")) || !root.has_field(U("battery_location")) || !root.has_field(U("aircraft_list"))) {
-                std::cerr << u8"[ScenarioManager] ì‘ë‹µ JSON êµ¬ì¡° ì˜¤ë¥˜\n";
-                return false;
+            if (!http_client_.requestScenario(scenario_id)) {
+                std::cerr << u8"[" << client_id_ << u8"] ½Ã³ª¸®¿À ¿äÃ» ½ÇÆÐ\n";
+                return;
             }
 
-            // í•„ìš”í•œ ë¶€ë¶„ë§Œ on/off
-            scenario_info_ = parseScenarioInfo(root);
-            battery_location_ = parseBatteryLocation(root);
-            aircraft_list_ = parseAircraftList(root);
-
-            return true;
+            is_running_ = true;
+            loaded = true;
+            std::cout << u8"[" << client_id_ << u8"] ½Ã³ª¸®¿À ½ÃÀÛ\n";
         }
-        catch (const std::exception& e) {
-            std::cerr << u8"[ScenarioManager] ì˜ˆì™¸ ë°œìƒ: " << e.what() << std::endl;
-            return false;
+
+        if (loaded && on_start_cb_) {
+            on_start_cb_();
+        }
+
+        printer_.printInfo(http_client_);
+        printer_.printBattery(http_client_);
+        printer_.printAircraftList(http_client_);
+    }
+
+    void ScenarioManager::handleQuitSignal() {
+        bool was_running = false;
+
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            std::cout << u8"[" << client_id_ << u8"] OCC Á¾·á ½ÅÈ£ ¼ö½Å ¡æ ½Ã³ª¸®¿À Á¾·á Ã³¸®\n";
+            std::cout << u8"[DEBUG] ÇöÀç »óÅÂ is_running_: " << (is_running_ ? u8"true" : u8"false") << "\n";
+
+            if (!is_running_) {
+                std::cout << u8"[" << client_id_ << u8"] ½ÇÇà ÁßÀÌ ¾Æ´Ô - Á¾·á ½ÅÈ£ ¹«½Ã\n";
+                return;
+            }
+
+            http_client_.clearState();
+            is_running_ = false;
+            was_running = true;
+
+            std::cout << u8"[" << client_id_ << u8"] ½Ã³ª¸®¿À Á¾·á ¹× »óÅÂ ÃÊ±âÈ­ ¿Ï·á\n";
+        }
+
+        if (was_running && on_quit_cb_) {
+            on_quit_cb_();
         }
     }
 
-    void ScenarioManager::clearState() {
-        scenario_info_ = ScenarioInfo{};
-        battery_location_ = Coordinate{};
-        aircraft_list_.clear();
-        std::cout << u8"[ScenarioManager] ì‹œë‚˜ë¦¬ì˜¤ ì •ë³´ ì´ˆê¸°í™”...\n";
+    ScenarioInfo ScenarioManager::getScenarioInfo() const {
+        return http_client_.getScenarioInfo();
     }
 
-    ScenarioInfo ScenarioManager::getScenarioInfo() const { return scenario_info_; }
-    Coordinate ScenarioManager::getBatteryLocation() const { return battery_location_; }
-    std::vector<AircraftInfo> ScenarioManager::getAircraftList() const { return aircraft_list_; }
-
-    std::string ScenarioManager::to_utf8(const std::wstring& wstr) {
-        if (wstr.empty()) return {};
-        int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
-        std::string result(size_needed, 0);
-        WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), &result[0], size_needed, nullptr, nullptr);
-        return result;
+    Coordinate ScenarioManager::getBatteryLocation() const {
+        return http_client_.getBatteryLocation();
     }
 
-    ScenarioInfo ScenarioManager::parseScenarioInfo(const json::value& root) {
-        return ScenarioInfo(
-            to_utf8(root.at(U("scenario_id")).as_string()),
-            to_utf8(root.at(U("scenario_title")).as_string())
-        );
-    }
-
-    Coordinate ScenarioManager::parseBatteryLocation(const json::value& root) {
-        auto obj = root.at(U("battery_location")).as_object();
-        return Coordinate(
-            obj.at(U("latitude")).as_double(),
-            obj.at(U("longitude")).as_double(),
-            obj.at(U("altitude")).as_double()
-        );
-    }
-
-    std::vector<AircraftInfo> ScenarioManager::parseAircraftList(const json::value& root) {
-        std::vector<AircraftInfo> result;
-        for (const auto& item : root.at(U("aircraft_list")).as_array()) {
-            auto a = item.as_object();
-            auto sp = a.at(U("start_point")).as_object();
-            auto ep = a.at(U("end_point")).as_object();
-            result.emplace_back(
-                to_utf8(a.at(U("aircraft_id")).as_string()),
-                to_utf8(a.at(U("friend_or_foe")).as_string()),
-                Coordinate(sp.at(U("latitude")).as_double(), sp.at(U("longitude")).as_double(), sp.at(U("altitude")).as_double()),
-                Coordinate(ep.at(U("latitude")).as_double(), ep.at(U("longitude")).as_double(), ep.at(U("altitude")).as_double())
-            );
-        }
-        return result;
+    std::vector<AircraftInfo> ScenarioManager::getAircraftList() const {
+        return http_client_.getAircraftList();
     }
 }

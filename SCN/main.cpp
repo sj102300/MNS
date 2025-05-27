@@ -13,8 +13,8 @@ int main() {
 
     // === 설정 상수 ===
     const std::string scenario_dir = "./Scenarios";
-    //const std::string base_address = "http://192.168.15.30:8080";
-    const std::string base_address = "http://localhost:8000";
+    const std::string base_address = "http://192.168.2.30:8080";
+    //const std::string base_address = "http://localhost:8000";
 
     // === 서비스 초기화 ===
     ScenarioService scenario_service(scenario_dir);

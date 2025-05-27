@@ -1,4 +1,4 @@
-#include "ScenarioInit.h"
+#include "ScenarioManager.h"
 #include <condition_variable>
 #include <mutex>
 #include <iostream>
@@ -11,33 +11,27 @@ std::condition_variable cv;
 bool started = false;  // 상태 관리가 아니라 '시작됨' 알림용 플래그
 
 // === 콜백 함수 정의 ===
-void handleStart() {
+void handleStart() { 
     std::lock_guard<std::mutex> lock(mtx);
     std::cout << u8"[MFR] 시작 신호 수신\n";
     started = true;
     cv.notify_one();  // 메인 스레드 깨우기
 }
 
-void handleQuit(ScenarioInit& runner) {
+void handleQuit() {
     std::cout << u8"[MFR] 종료 신호 수신\n";
-    runner.handleQuitSignal();  // 내부에서 상태 초기화 및 reset 처리
 }
 
 // === main 함수 정의 ===
 int main() {
-    //ScenarioInit scenarioRunner(
-    //    "http://192.168.15.3:8080",   // 수신 주소
-    //    "http://192.168.15.30:8080",  // SCN 서버 주소
-    //    "MFR"                         // 클라이언트 ID
-    //);
-    ScenarioInit scenarioRunner(
-        "http://localhost:8080",   // 수신 주소
-        "http://localhost:8000",  // SCN 서버 주소
+    ScenarioManager scenarioRunner(
+        "http://192.168.2.31:8080",   // 수신 주소
+        "http://192.168.2.30:8080",  // SCN 서버 주소
         "MFR"                         // 클라이언트 ID
     );
 
     scenarioRunner.setOnReadyCallback(handleStart);
-    scenarioRunner.setOnQuitCallback(nullptr);
+    scenarioRunner.setOnQuitCallback(handleQuit);
 
     scenarioRunner.run();  // 리스닝 루프 진입 (blocking)
 

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "ScenarioManager.h"
+#include "HttpClient.h"
 
 namespace sm {
     class ScenarioInfoPrinter {
     public:
-        void printInfo(const ScenarioManager& manager) const;
-        void printBattery(const ScenarioManager& manager) const;
-        void printAircraftList(const ScenarioManager& manager) const;
-        void printAll(const ScenarioManager& manager) const;  // 전체 출력
+        void printInfo(const HttpClient& client) const;
+        void printBattery(const HttpClient& client) const;
+        void printAircraftList(const HttpClient& client) const;
+        void printAll(const HttpClient& client) const;
     };
 }
