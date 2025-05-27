@@ -51,13 +51,13 @@ int main(int argc, char* argv[]) {
             aircraft.currentPoint = Aircraft.makePoint(startop[0], startop[1], aircraft.currentPoint);
             Aircraft.sendAircraftInfo(aircraft.currentPoint, aircraft.id, aircraft.IFF);
             
-            missile.MissilePoint = sDown.MissileReciever();
-            missile.id = sDown.MissileReciever(missile.id);
-            if(sDown.ShootDown(aircraft.currentPoint, missile.MissilePoint)){
-                sDown.sendSuccessInfo(aircraft.id, missile.id);
-                cout << "격추완료 exe. 종료";
-                break; //break 대시 exe파일 종료 코드 넣으면 될 듯
-            }
+            //missile.MissilePoint = sDown.MissileReciever();
+            //missile.id = sDown.MissileReciever(missile.id);
+            //if(sDown.ShootDown(aircraft.currentPoint, missile.MissilePoint)){
+            //    sDown.sendSuccessInfo(aircraft.id, missile.id);
+            //    cout << "격추완료 exe. 종료";
+            //    break; //break 대시 exe파일 종료 코드 넣으면 될 듯
+            //}
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 

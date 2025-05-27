@@ -43,17 +43,19 @@ void AircraftCoordinate::initializeMultiSocket() {
 }
 
 void AircraftCoordinate::sendAircraftInfo(std::pair<double, double> currentPoint, std::string id, char IFF) {
-    char buffer[sizeof(char) * 8 + sizeof(double) * 2 + sizeof(char)];
+    char buffer[sizeof(char) * 8 + sizeof(double) * 3 + sizeof(char)];
     {
         std::lock_guard<std::mutex> lock(mtx);
 
         uint64_t xBits = *reinterpret_cast<uint64_t*>(&currentPoint.x);
         uint64_t yBits = *reinterpret_cast<uint64_t*>(&currentPoint.y);
+        double altitude = 10.0;
 
         memcpy(buffer, id.c_str(), 8);
         memcpy(buffer + 8, &xBits, sizeof(uint64_t));
         memcpy(buffer + 8 + sizeof(uint64_t), &yBits, sizeof(uint64_t));
-        buffer[8 + sizeof(uint64_t) * 2] = IFF;
+        memcpy(buffer + 8 + sizeof(uint64_t) * 2, &altitude, sizeof(double));
+        buffer[8 + sizeof(uint64_t) * 3] = IFF;
     }
 
     int sendSize = sendto(udpSocket, buffer, sizeof(buffer), 0, (SOCKADDR*)&multicastAddr, sizeof(multicastAddr));

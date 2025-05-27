@@ -2,7 +2,25 @@
 #include <vector>
 #include <string>
 #include <windows.h>
+#include "ScenarioManager.h"
 using namespace std;
+
+//*****************************************************
+std::mutex mtx;
+std::condition_variable cv;
+std::atomic<bool> running = false;
+
+void handleStart() {
+    std::lock_guard<std::mutex> lock(mtx);
+    std::cout << u8"[MFR] 시작 신호 수신\n";
+    running = true;
+    cv.notify_one();  // 메인 스레드 깨우기
+}
+
+void handleQuit() {
+    std::cout << u8"[MFR] 종료 신호 수신\n";
+}
+//*******************************************************
 
 wstring stringToWString(const string& s) {
     int len;
@@ -49,9 +67,38 @@ void makeCommand(const string& command) {
 }
 
 int main(void) {
-    vector<double> s_x;
+
+    //*******************************************************
+    ScenarioManager scenarioRunner(
+        "http://192.168.2.31:8080",   // 수신 주소
+        "http://192.168.2.30:8080",  // SCN 서버 주소
+        "MFR"                         // 클라이언트 ID
+    );
+
+    scenarioRunner.setOnReadyCallback(handleStart);
+    scenarioRunner.setOnQuitCallback(handleQuit);
+
+    scenarioRunner.run();  // 리스닝 루프 진입 (blocking)
+
+    // 반복적으로 start 신호 대기
+    while (true) {
+
+        // 메인 스레드는 "시작됨" 알림 올 때까지 대기
+        {
+            std::unique_lock<std::mutex> lock(mtx);
+            cv.wait(lock, [] { return running.load(); });
+            running = false;  // 다음 대기를 위해 초기화
+        }
+
+        // === 시나리오 정보 출력 ===
+        Coordinate battery = scenarioRunner.getBatteryLocation();
+        std::vector<AircraftInfo> aircrafts = scenarioRunner.getAircraftList();
+    }
+    //**********************************************************************
+
     vector<double> s_y;
     vector<double> z;
+    vector<double> s_x;
     vector<double> f_x;
     vector<double> f_y;
     vector<string> id;
