@@ -21,11 +21,6 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\withSCN\ScenarioManager\ScenarioManager.vcxproj">
-      <Project>{80eabadd-04ad-4208-83c7-dcdd30b5f0a9}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
