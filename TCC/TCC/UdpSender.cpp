@@ -3,6 +3,7 @@
 TCC::UdpSender::UdpSender(const std::string& ip, int port)
     : ip_(ip), port_(port), sock_(INVALID_SOCKET) {
     ZeroMemory(&targetAddr_, sizeof(targetAddr_));
+    std::cout << "UdpSender created\n";
 }
 
 TCC::UdpSender::~UdpSender() {
@@ -34,27 +35,44 @@ bool TCC::UdpSender::init() {
     return true;
 }
 
-void TCC::UdpSender::sendByteData(const char* data, int length) {
+int TCC::UdpSender::sendByteData(const char* data, int length) {
     int bytesSent = sendto(sock_, data, length, 0,
         (sockaddr*)&targetAddr_, sizeof(targetAddr_));
     if (bytesSent == SOCKET_ERROR) {
         std::cerr << "sendto() failed: " << WSAGetLastError() << "\n";
+        return -1;
     }
+    return bytesSent;
 }
 
-//
-//bool UdpSender::sendMessage(const std::string& message) {
-//    if (!initialized_) {
-//        std::cerr << "UdpSender not initialized\n";
-//        return false;
-//    }
-//
-//    int result = sendto(sock_, message.c_str(), message.size(), 0,
-//        (sockaddr*)&targetAddr_, sizeof(targetAddr_));
-//    if (result == SOCKET_ERROR) {
-//        std::cerr << "sendto() failed: " << WSAGetLastError() << "\n";
-//        return false;
-//    }
-//
-//    return true;
-//}
+bool TCC::UdpSender::sendAircraftData(AircraftManager::NewAircraftWithIP& data){
+
+    char buffer[72];
+    //헤더 붙이기
+    int headerSize = serializeHeader(buffer, 100, 64);
+    int bodySize = serializeAircraftSender(buffer, data);
+
+    if (sendByteData(buffer, headerSize + bodySize) < 0) {
+        return false;
+    }
+    return true;
+}
+
+const int TCC::UdpSender::serializeHeader(char* buffer, const int commandCode, int bodyLength) {
+    memcpy(buffer, &commandCode, sizeof(unsigned int));
+    memcpy(buffer + 4, &bodyLength, sizeof(int));
+    return 8;
+}
+
+const int TCC::UdpSender::serializeAircraftSender(char* buffer, AircraftManager::NewAircraftWithIP& data){
+    std::memset(buffer + 0, 0, 8);
+    std::memcpy(buffer + 0, data.aircraftData_.aircraftId_.c_str(), 8);
+
+    std::memcpy(buffer + 8, &data.aircraftData_.location_, sizeof(double) * 3);
+    std::memcpy(buffer + 32, &data.aircraftData_.isEnemy_, sizeof(unsigned int));
+    std::memcpy(buffer + 36, &data.engagementStatus_, sizeof(unsigned int));
+
+    std::memcpy(buffer + 40, &data.impactPoint_, sizeof(double)*3);
+
+    return 64; // 총 직렬화된 body바이트 수
+}

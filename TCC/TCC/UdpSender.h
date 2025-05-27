@@ -6,18 +6,22 @@
 #include <ws2tcpip.h>
 #include <iostream>
 #include <string>
-
+#include "AircraftManager.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
 namespace TCC{
-    class UdpSender {
+    class UdpSender{
     public:
         UdpSender(const std::string& ip, int port);
         ~UdpSender();
 
         bool init();
-        void sendByteData(const char * buffer, int length);
+        int sendByteData(const char * buffer, int length);
+        const int serializeHeader(char* buffer, const int commandCode, int bodyLength);
+        
+        bool sendAircraftData(AircraftManager::NewAircraftWithIP& data);
+        const int serializeAircraftSender(char* buffer, AircraftManager::NewAircraftWithIP& data);
 
     private:
         std::string ip_;

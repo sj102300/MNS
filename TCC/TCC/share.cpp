@@ -42,7 +42,7 @@ namespace TCC {
         return std::regex_match(tmp, pattern);
     }
 
-    bool isValidMissile(const char* input) {
+    bool isValidMissileId(const char* input) {
         char tmp[9];
         std::memcpy(tmp, input, 8);
         tmp[8] = '\0';

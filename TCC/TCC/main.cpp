@@ -5,8 +5,9 @@ int main() {
 
     ScenarioManager scenarioManager;
 
-    scenarioManager.startScenario();
-
+    if (scenarioManager.startScenario()) {
+        std::cout << "startScenario() 성공"<<std::endl;
+    }
 
     while (true) {
         //cv.wait(시나리오 시작 시그널 받기대기)

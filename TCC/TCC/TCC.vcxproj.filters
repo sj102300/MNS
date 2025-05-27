@@ -30,13 +30,7 @@
     <ClCompile Include="UdpMulticastReceiver.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="AircraftReceiver.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="AircraftManager.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="AircraftSender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="TcpSender.cpp">
@@ -92,13 +86,7 @@
     <ClInclude Include="CommandReceiver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AircraftReceiver.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="AircraftManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="AircraftSender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="TcpSender.h">

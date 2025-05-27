@@ -1,6 +1,5 @@
 
 #include "ScenarioManager.h"
-#include "MissileReceiver.h"
 
 #define RELEASE 0
 #if RELEASE
@@ -11,32 +10,46 @@
 
 ScenarioManager::ScenarioManager() {}
 
-void ScenarioManager::startScenario() {
-    createAircraftManager();
-    createEngagementManager();
-    createMissileManager();
+bool ScenarioManager::startScenario() {
+
+    if (!createObjects()) {
+        std::cout << "startScenario() Failed\n";
+        return false;
+    }
+
+    multiReceiver_->start();
+    aircraftManager_->start();
+
+    return true;
 }
 
-void ScenarioManager::createAircraftManager() {
-    IAircraftReceiver* aircraftReceiver = new AircraftReceiver(std::string("239.0.0.2"), 9999);
-    IAircraftSender* aircraftSender = new AircraftSender(std::string(AIRCRAFT_SENDER_IP), 9000);
-    aircraftManager_ = new AircraftManager(aircraftReceiver, aircraftSender);
-    aircraftManager_->startAircraftSimulation();
-    return;
-}
+bool ScenarioManager::createObjects() {
 
-void ScenarioManager::createEngagementManager() {
+    multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);
+    udpSender_ = new TCC::UdpSender("192.168.2.200", 9000); //OCC �ּ�
+    aircraftManager_ = new AircraftManager();
+    //engagementManager_ = new EngagementManager();
+    //�̻��� �Ŵ����� �߰�
 
-    //ICommandReceiver* commandReceiver = new CommandReceiver(std::string("192.168.2.7"), 9000);
-    //ISuccessReceiver* successReceiver_;
-    //ICommandSender* commandSender_;
-    //engagementManager_->startEngagementSimulation();
-}
+    if (!aircraftManager_->init(udpSender_, engagementManager_)) {
+        std::cout << "aircraftManager init() Failed\n";
+        return false;
+    }
+    if (!multiReceiver_->init(aircraftManager_)) {
+        std::cout << "multiReceiver init() Failed\n";
+        return false;
+    }
+    if (!udpSender_->init()) {
+        std::cout << "udpSender init() Failed\n";
+        return false;
+    }
 
-void ScenarioManager::createMissileManager() {
-    IMissileReceiver* missileReceiver = new MissileReceiver(std)
+    return true;
 }
 
 void ScenarioManager::quitScenario() {
-
+    delete aircraftManager_;
+    delete engagementManager_;
+    delete udpSender_;
+    delete multiReceiver_;
 }

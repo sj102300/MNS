@@ -131,8 +131,6 @@
   <ItemGroup>
     <ClCompile Include="Aircraft.cpp" />
     <ClCompile Include="AircraftManager.cpp" />
-    <ClCompile Include="AircraftReceiver.cpp" />
-    <ClCompile Include="AircraftSender.cpp" />
     <ClCompile Include="EngagementManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -158,8 +156,6 @@
   <ItemGroup>
     <ClInclude Include="Aircraft.h" />
     <ClInclude Include="AircraftManager.h" />
-    <ClInclude Include="AircraftReceiver.h" />
-    <ClInclude Include="AircraftSender.h" />
     <ClInclude Include="EngagementManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
