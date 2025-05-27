@@ -2,19 +2,20 @@
 #include <condition_variable>
 #include <mutex>
 #include <iostream>
+#include <atomic>
 
 using namespace sm;
 
 // === 글로벌 동기화 상태 ===
 std::mutex mtx;
 std::condition_variable cv;
-bool started = false;  // 상태 관리가 아니라 '시작됨' 알림용 플래그
+std::atomic<bool> running = false;
 
 // === 콜백 함수 정의 ===
 void handleStart() { 
     std::lock_guard<std::mutex> lock(mtx);
     std::cout << u8"[MFR] 시작 신호 수신\n";
-    started = true;
+    running = true;
     cv.notify_one();  // 메인 스레드 깨우기
 }
 
@@ -41,8 +42,8 @@ int main() {
         // 메인 스레드는 "시작됨" 알림 올 때까지 대기
         {
             std::unique_lock<std::mutex> lock(mtx);
-            cv.wait(lock, [] { return started; });
-            started = false;  // 다음 대기를 위해 초기화
+            cv.wait(lock, [] { return running.load(); });
+            running = false;  // 다음 대기를 위해 초기화
         }
 
         // === 시나리오 정보 출력 ===
