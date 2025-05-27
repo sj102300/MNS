@@ -7,6 +7,8 @@
 #include "share.h"
 #include "AircraftManager.h"
 
+class MissileManager;
+
 namespace TCC {
 	class UdpMulticastReceiver {
 	public:
@@ -23,11 +25,20 @@ namespace TCC {
 			char ourOrEnemy_;
 		}AircraftMSG;
 
-		bool init(AircraftManager* aircraftManager);
+		typedef struct _missile_message {
+			unsigned int eventCode_;
+			unsigned int bodyLength_;
+			char missileId[8];
+			unsigned int status_;
+			Position location_;
+		} MissileMSG;
+
+		bool init(AircraftManager* aircraftManager, MissileManager* missileManager);
 		void start();
 
 	private:
 		AircraftManager* aircraftManager_;		//포인터에 널값 넣어주고 체크해줘야됨.
+		MissileManager* missileManager_;		//포인터에 널값 넣어주고 체크해줘야됨.
 		//ISuccessReceiver* successRecv_;
 		//IMissileReceiver* missileRecv_;
 		std::thread recvThread_;
@@ -39,5 +50,6 @@ namespace TCC {
 		void receive();
 		void parseHeader(Header& header);
 		bool parseReceivedAircraftMSG(const char* buffer, AircraftManager::NewAircraft& newAircraft, int length);
+		bool parseReceivedMissileMSG(const char* buffer, MissileMSG& data, int length);
 	};
 }

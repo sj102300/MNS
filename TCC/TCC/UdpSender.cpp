@@ -1,4 +1,5 @@
 #include "UdpSender.h"
+#include "UdpMulticastReceiver.h"
 
 TCC::UdpSender::UdpSender(const std::string& ip, int port)
     : ip_(ip), port_(port), sock_(INVALID_SOCKET) {
@@ -50,7 +51,7 @@ bool TCC::UdpSender::sendAircraftData(AircraftManager::NewAircraftWithIP& data){
     char buffer[72];
     //헤더 붙이기
     int headerSize = serializeHeader(buffer, 100, 64);
-    int bodySize = serializeAircraftSender(buffer, data);
+    int bodySize = serializeAircraftSender(buffer+headerSize, data);
 
     if (sendByteData(buffer, headerSize + bodySize) < 0) {
         return false;
@@ -75,4 +76,26 @@ const int TCC::UdpSender::serializeAircraftSender(char* buffer, AircraftManager:
     std::memcpy(buffer + 40, &data.impactPoint_, sizeof(double)*3);
 
     return 64; // 총 직렬화된 body바이트 수
+}
+
+bool TCC::UdpSender::sendMissileData(UdpMulticastReceiver::MissileMSG& data) {
+
+    char buffer[44];
+    //헤더 붙이기
+    int headerSize = serializeHeader(buffer, 300, 36);
+    int bodySize = serializeMissileSender(buffer + headerSize, data);
+
+    if (sendByteData(buffer, headerSize + bodySize) < 0) {
+        return false;
+    }
+    return true;
+}
+
+const int TCC::UdpSender::serializeMissileSender(char* buffer, UdpMulticastReceiver::MissileMSG& data) {
+    std::memset(buffer + 0, 0, 8);
+    std::memcpy(buffer + 0, data.missileId, 8);
+    std::memcpy(buffer + 8, &data.status_, sizeof(unsigned int));
+    std::memcpy(buffer + 12, &data.location_, sizeof(double)*3);
+   
+    return 36; // 총 직렬화된 body바이트 수
 }

@@ -1,6 +1,7 @@
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "UdpMulticastReceiver.h"
+#include "MissileManager.h"
 
 TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, int port) 
 	: multicastIp_(multicastIp), port_(port), serverSocket_(INVALID_SOCKET), aircraftManager_(nullptr)
@@ -9,13 +10,15 @@ TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, 
 	std::cout << "UdpMulticastReceiver created\n";
 }
 
-bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager) {
+bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileManager* missileManager) {
 
 	//여기서 포인터 연결 먼저 하기
-	if (aircraftManager == nullptr) {
+	if (aircraftManager == nullptr || missileManager == nullptr) {
 		return false;
 	}
+
 	aircraftManager_ = aircraftManager;
+	missileManager_ = missileManager;
 
 	WSADATA wsaData;
 
@@ -66,6 +69,7 @@ void TCC::UdpMulticastReceiver::receive() {
 	sockaddr_in senderAddr;
 	int addrLen = sizeof(senderAddr);
 	AircraftManager::NewAircraft newAircraft;
+	MissileMSG missileMsg;
 
 	while (true) {
 		int bytesReceived = recvfrom(serverSocket_, buffer, sizeof(buffer), 0, (struct sockaddr*)&senderAddr, &addrLen);
@@ -100,7 +104,13 @@ void TCC::UdpMulticastReceiver::receive() {
 			//비상 폭파
 		case 3001:
 			//미사일 데이터
+			MissileMSG missileMsg;
+			memcpy(&missileMsg, buffer + 8, sizeof(MissileMSG));
 			//여기서 호출
+			if (missileManager_) {
+				missileManager_->echoMissileData(missileMsg);
+			}
+			break;
 		default:
 			break;
 		}
@@ -130,6 +140,22 @@ bool TCC::UdpMulticastReceiver::parseReceivedAircraftMSG(const char * buffer, Ai
 	newAircraft.aircraftId_ = std::string(msg.aircraftId_, 8);
 	newAircraft.isEnemy_ = msg.ourOrEnemy_ == 'E';
 	newAircraft.location_ = msg.location_;
+
+	return true;
+}
+
+bool TCC::UdpMulticastReceiver::parseReceivedMissileMSG(const char* buffer, MissileMSG& data, int length) {
+
+	MissileMSG msg;
+	memcpy((void*)&msg, buffer, length);
+
+	if (!TCC::isValidMissileId(msg.missileId))
+		return false;
+
+	if (!data.location_.isValidPosition())
+		return false;
+
+	data = msg;
 
 	return true;
 }

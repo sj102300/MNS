@@ -7,6 +7,8 @@
 #include <iostream>
 #include <string>
 #include "AircraftManager.h"
+#include "MissileManager.h"
+#include "UdpMulticastReceiver.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -22,6 +24,9 @@ namespace TCC{
         
         bool sendAircraftData(AircraftManager::NewAircraftWithIP& data);
         const int serializeAircraftSender(char* buffer, AircraftManager::NewAircraftWithIP& data);
+
+        bool sendMissileData(UdpMulticastReceiver::MissileMSG& data);
+        const int serializeMissileSender(char* buffer, UdpMulticastReceiver::MissileMSG& data);
 
     private:
         std::string ip_;
