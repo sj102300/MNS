@@ -9,8 +9,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Navigation;
 using OCC.Commands;
 using OCC.Models;
+using OCC.Utils;
 
 namespace OCC.ViewModels
 {
@@ -233,7 +235,7 @@ namespace OCC.ViewModels
                 client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                string serverUrl = "http://192.168.15.30:8080/scenario/save";
+                string serverUrl = $"{Network.SCN}/scenario/save";
                 var response = await client.PostAsync(serverUrl, content);
                 Debug.WriteLine("저장 응답");
                 if (response.IsSuccessStatusCode)
