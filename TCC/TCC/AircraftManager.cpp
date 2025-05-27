@@ -1,6 +1,7 @@
 
 #include "AircraftManager.h"
 #include "UdpSender.h"
+#include "EngagementManager.h"
 
 AircraftManager::AircraftManager() {
 
@@ -27,7 +28,7 @@ void AircraftManager::start() {
 }
 
 void AircraftManager::handleReceivedAircraft(NewAircraft& newAircraft) {
-	std::cout << newAircraft.aircraftId_ << std::endl;
+	//std::cout << newAircraft.aircraftId_ << std::endl;
 	pushNewAircraftQueue(newAircraft);
 }
 
@@ -52,6 +53,10 @@ bool AircraftManager::isExistAircraft(std::string& aircraftId) {
 
 void AircraftManager::addAircraft(NewAircraft& newAircraft) {
 	aircrafts_[newAircraft.aircraftId_] = new Aircraft(newAircraft.aircraftId_, newAircraft.location_, newAircraft.isEnemy_);
+}
+
+Aircraft* AircraftManager::getAircraft(std::string& aircraftId) {
+	return aircrafts_[aircraftId];
 }
 
 void AircraftManager::judgeEngagable() {
@@ -79,10 +84,10 @@ void AircraftManager::judgeEngagable() {
 			}
 
 			sender_->sendAircraftData(newAircraftWithIp);
+			engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}
-
 }
 
 //void AircraftManager::updateAircraftStatus() {

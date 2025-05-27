@@ -5,8 +5,9 @@
 #include <mutex>
 #include <thread>
 
-#include "EngagementManager.h"
 #include "Aircraft.h"
+
+class EngagementManager;
 
 namespace TCC {
     class UdpSender;
@@ -30,6 +31,7 @@ public:
     bool init(TCC::UdpSender* sender, EngagementManager* engagementManager);
     void start();
     void handleReceivedAircraft(NewAircraft& newAircraft);
+    Aircraft* getAircraft(std::string& aircraftId);
     ~AircraftManager();
 
 private:
