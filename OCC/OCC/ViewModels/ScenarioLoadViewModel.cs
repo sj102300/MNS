@@ -36,11 +36,11 @@ namespace OCC.ViewModels
         // 서브시스템 정보
         private readonly List<(string url, string id)> subsystems = new()
         {
-            //("http://127.0.0.1:9011", "TCC"),
-            //("http://127.0.0.1:9012", "MSS"),
-            //("http://127.0.0.1:9013", "ATS"),
+            ($"{Network.TCC}", "TCC"),
+            //($"{Network.MSS}", "MSS"),
+            //($"{Network.ATS}", "ATS"),
             //("http://127.0.0.1:9014", "LCH"),
-            ("http://192.168.2.31:8080", "MFR")
+            //($"{Network.MFR}", "MFR")
         };
 
         public ScenarioLoadViewModel()
@@ -145,6 +145,8 @@ namespace OCC.ViewModels
             {
                 Debug.WriteLine("시작 요청");
                 await SendStartSignalAsync(url, id, scenarioId);
+
+                // sendStartStignalAsync 
             }
         }
 
