@@ -37,6 +37,9 @@ SimulationManager::SimulationManager() {
 
 void SimulationManager::startSimulation() {
 
+	//startScenario();
+	//while (1);
+
 	//http서버 시작
 	std::thread scenarioThread([&]() {
 		scenarioManager_->run();
@@ -60,15 +63,22 @@ void SimulationManager::startSimulation() {
 
 bool SimulationManager::startScenario() {
 
+	//sm::Coordinate batterylocation = scenarioManager_->getBatteryLocation();
+
 	if (!createObjects()) {
 		std::cout << "startScenario() Failed\n";
 		return false;
 	}
-
 	std::cout << "startScenario()" << std::endl;
 
 	multiReceiver_->start();
+	std::cout << "multiReceiver start()" << std::endl;
 	aircraftManager_->start();
+	std::cout << "aircraftManager_ start()" << std::endl;
+	udpReceiver_->start();
+	std::cout << "udpReceiver_ start()" << std::endl;
+	engagementManager_->start();
+	std::cout << "engagementManager_ start()" << std::endl;
 
 	return true;
 }
@@ -76,9 +86,21 @@ bool SimulationManager::startScenario() {
 bool SimulationManager::quitScenario() {
 
 	std::cout << "quitScenario()" << std::endl;
+
+	aircraftManager_->stop();
+	std::cout << "aircraftManager stop()" << std::endl;
+	engagementManager_->stop();
+	std::cout << "engagementManager stop()" << std::endl;
+	multiReceiver_->stop();
+	std::cout << "multiReceiver stop()" << std::endl;
+	udpReceiver_->stop();
+	std::cout << "udpReceiver stop()" << std::endl;
+
 	delete aircraftManager_;
 	delete engagementManager_;
+	delete missileManager_;
 	delete udpSender_;
+	delete udpReceiver_;
 	delete multiReceiver_;
 
 	return true;
@@ -87,9 +109,12 @@ bool SimulationManager::quitScenario() {
 bool SimulationManager::createObjects() {
 	multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);
 	udpSender_ = new TCC::UdpSender("192.168.2.200", 9000); //OCC  ּ 
+	multiSender_ = new TCC::UdpMulticastSender("239.0.0.1", 9000);
 	aircraftManager_ = new AircraftManager();
 	engagementManager_ = new EngagementManager();
 	missileManager_ = new MissileManager(udpSender_, engagementManager_);
+	udpReceiver_ = new TCC::UdpReceiver("192.168.2.100", 9000);
+	
 
 	if (!aircraftManager_->init(udpSender_, engagementManager_)) {
 		std::cout << "aircraftManager init() Failed\n";
@@ -103,8 +128,16 @@ bool SimulationManager::createObjects() {
 		std::cout << "udpSender init() Failed\n";
 		return false;
 	}
-	if (!engagementManager_->init(udpSender_)) {
+	if (!engagementManager_->init(udpSender_, aircraftManager_, multiSender_, missileManager_)) {
 		std::cout << "engagement manager init() Failed\n";
+		return false;
+	}
+	if (!udpReceiver_->init(engagementManager_)) {
+		std::cout << "udpReceiver init() Failed\n";
+		return false;
+	}
+	if (!multiSender_->init()) {
+		std::cout << "multiSender init() Failed\n";
 		return false;
 	}
 
@@ -115,6 +148,7 @@ bool SimulationManager::createObjects() {
 void SimulationManager::quitSimulation() {
 
 	std::cout << "quitSimulation()" << std::endl;
+
 	//    // http서버 종료 처리
 	//    if (scenarioThread.joinable()) scenarioThread.join();
 	//    if (radarThread.joinable()) radarThread.join();

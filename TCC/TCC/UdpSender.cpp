@@ -30,15 +30,20 @@ bool TCC::UdpSender::init() {
     }
 
     targetAddr_.sin_family = AF_INET;
-    targetAddr_.sin_port = htons(port_);
-    targetAddr_.sin_addr.s_addr = inet_addr(ip_.c_str());
+    targetAddr_.sin_port = htons(9999);
+	targetAddr_.sin_addr.s_addr = inet_addr("192.168.2.195"); // occ의 서버 주소
 
     return true;
 }
 
 int TCC::UdpSender::sendByteData(const char* data, int length) {
-    int bytesSent = sendto(sock_, data, length, 0,
-        (sockaddr*)&targetAddr_, sizeof(targetAddr_));
+
+	if (sock_ == INVALID_SOCKET) {
+		std::cerr << "Socket is not initialized\n";
+		return -1;
+	}
+
+    int bytesSent = sendto(sock_, data, length, 0, (sockaddr*)&targetAddr_, sizeof(targetAddr_));
     if (bytesSent == SOCKET_ERROR) {
         std::cerr << "sendto() failed: " << WSAGetLastError() << "\n";
         return -1;
@@ -48,7 +53,7 @@ int TCC::UdpSender::sendByteData(const char* data, int length) {
 
 bool TCC::UdpSender::sendAircraftData(AircraftManager::NewAircraftWithIP& data){
 
-    char buffer[72];
+    char buffer[100];
     //헤더 붙이기
     int headerSize = serializeHeader(buffer, 100, 64);
     int bodySize = serializeAircraftSender(buffer+headerSize, data);
@@ -56,6 +61,7 @@ bool TCC::UdpSender::sendAircraftData(AircraftManager::NewAircraftWithIP& data){
     if (sendByteData(buffer, headerSize + bodySize) < 0) {
         return false;
     }
+
     return true;
 }
 

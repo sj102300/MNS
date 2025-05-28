@@ -2,8 +2,12 @@
 #include "UdpReceiver.h"
 #include "share.h"
 
-TCC::UdpReceiver::UdpReceiver(std::string& ip, int port) :ip_(ip), port_(port) {
+TCC::UdpReceiver::UdpReceiver(std::string ip, int port) :ip_(ip), port_(port) {
 
+}
+
+TCC::UdpReceiver::~UdpReceiver() {
+	WSACleanup();
 }
 
 bool TCC::UdpReceiver::init(EngagementManager * engagementManager) {
@@ -25,20 +29,33 @@ bool TCC::UdpReceiver::init(EngagementManager * engagementManager) {
 	}
 
 	recvAddr_.sin_family = AF_INET;
-	recvAddr_.sin_port = htons(port_);
-	recvAddr_.sin_addr.s_addr = inet_addr(ip_.c_str());
+	recvAddr_.sin_port = htons(9999);
+	recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.189");
 
 	if (bind(serverSocket_, (sockaddr*)&recvAddr_, sizeof(recvAddr_)) == SOCKET_ERROR) {
 		std::cout << "Bind failed: " << WSAGetLastError() << "\n";
 		return false;
 	}
+	isRunning_ = true;
 
 	std::cout << "Udpreceiver init() success\n";
+
 	return true;
 }
 
 void TCC::UdpReceiver::start() {
+	isRunning_ = true;
 	recvThread_ = std::thread(&TCC::UdpReceiver::receive, this);
+}
+
+void TCC::UdpReceiver::stop() {
+	isRunning_ = false;
+	closesocket(serverSocket_);
+
+	if (recvThread_.joinable()) {
+		recvThread_.join();
+	}
+	return;
 }
 
 void TCC::UdpReceiver::receive() {
@@ -49,11 +66,11 @@ void TCC::UdpReceiver::receive() {
 	EmergencyDestroyMSG emergencyDestroyMsg;
 	int addrLen = sizeof(senderAddr_);
 
-	while (true) {
+	while (isRunning_) {
 		int bytesReceived = recvfrom(serverSocket_, buffer, sizeof(buffer), 0, (struct sockaddr*)&senderAddr_, &addrLen);
 
 		if (bytesReceived < 0) {
-			std::cout << "recvfrom Failed. Error: " << WSAGetLastError() << "\n";
+			std::cout << "UdpReceiver: recvfrom Failed. Error: " << WSAGetLastError() << "\n";
 			break;
 		}
 
@@ -64,19 +81,24 @@ void TCC::UdpReceiver::receive() {
 		case CommandCode::ModeChangeRequest:
 			if (!parseModeChangeMSG(buffer + 8, modechangemsg)) 
 				break;
+			std::cout << "Modechanged: " << modechangemsg.mode_ << "\n";
+			//engagementManager_->changeMode(modechangemsg.mode_);
 			responseChangeModeAck(engagementManager_->changeMode(modechangemsg.mode_));
 			break;
 
 		case CommandCode::ManualFireRequest:
+			std::cout << "ManualFireRequest" << std::endl;
 			if (!parseManualFireMSG(buffer + 8, manualFireMsg))
 				break;
 			engagementManager_->manualFire(std::string(manualFireMsg.commandId_, 20), std::string(manualFireMsg.targetAircraftId_, 8));
 			break;
 
 		case CommandCode::EmergencyDestroyRequest:
+			std::cout << "EmergencyDestroyRequest" << std::endl;
 			if (!parseEmergencyDestroyMSG(buffer + 8, emergencyDestroyMsg))
 				break;
 			//ack º¸³»±â
+			std::cout << "EmergencyDestroyMSG: " << emergencyDestroyMsg.commandId_ << "\n";
 			engagementManager_->emergencyDestroy(std::string(emergencyDestroyMsg.commandId_, 20), std::string(emergencyDestroyMsg.targetMissileId_, 8));
 
 			break;
@@ -121,10 +143,13 @@ bool TCC::UdpReceiver::parseModeChangeMSG(const char* buffer, ModeChangeMSG& msg
 bool TCC::UdpReceiver::parseManualFireMSG(const char* buffer, ManualFireMSG& msg) {
 	memcpy(&msg, buffer, sizeof(ManualFireMSG));
 
-	if (!TCC::isValidCommandId(msg.commandId_))
-		return false;
-	if (!TCC::isValidAircraftId(msg.targetAircraftId_))
-		return false;
+	std::cout << std::string(msg.commandId_, 20) << std::endl;
+	std::cout << std::string(msg.targetAircraftId_, 8) << std::endl;
+
+	//if (!TCC::isValidCommandId(msg.commandId_))
+	//	return false;
+	//if (!TCC::isValidAircraftId(msg.targetAircraftId_))
+	//	return false;
 
 	return true;
 }
@@ -132,10 +157,13 @@ bool TCC::UdpReceiver::parseManualFireMSG(const char* buffer, ManualFireMSG& msg
 bool TCC::UdpReceiver::parseEmergencyDestroyMSG(const char* buffer, EmergencyDestroyMSG& msg) {
 	memcpy(&msg, buffer, sizeof(EmergencyDestroyMSG));
 
-	if (!TCC::isValidCommandId(msg.commandId_))
-		return false;
-	if (!TCC::isValidMissileId(msg.targetMissileId_))
-		return false;
+	std::cout << std::string(msg.commandId_, 20) << std::endl;
+	std::cout << std::string(msg.targetMissileId_, 8) << std::endl;
+
+	//if (!TCC::isValidCommandId(msg.commandId_))
+	//	return false;
+	//if (!TCC::isValidMissileId(msg.targetMissileId_))
+	//	return false;
 
 	return true;
 }

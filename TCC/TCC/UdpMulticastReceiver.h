@@ -13,7 +13,7 @@ namespace TCC {
 	class UdpMulticastReceiver {
 	public:
 		UdpMulticastReceiver(const std::string& multicastIp, int port);
-
+		~UdpMulticastReceiver();
 		typedef struct _header {
 			unsigned int eventCode_;
 			int bodyLength_;
@@ -35,10 +35,12 @@ namespace TCC {
 
 		bool init(AircraftManager* aircraftManager, MissileManager* missileManager);
 		void start();
+		void stop();
 
 	private:
 
 		enum EventCode {
+			AircraftData = 1001,
 			FindTargetEvent = 1002,
 			KillSuccess = 2003,
 			MissileStatus = 3001
@@ -53,6 +55,7 @@ namespace TCC {
 		int port_;
 		SOCKET serverSocket_;
 		char buffer[100];
+		std::atomic<bool> isRunning_;
 		
 		void receive();
 		void parseHeader(Header& header);

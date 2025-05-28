@@ -15,7 +15,7 @@ private:
     void addMissile(Missile* missile);
     void updateMissileStatus(const std::string& id, Missile::MissileStatus newStatus);
     void checkMissileStatus();
-    bool isExistMissile(std::string& missileId);
+    //bool isExistMissile(std::string& missileId);
     
 public:
 	MissileManager(TCC::UdpSender* udpSender, EngagementManager* engagementManager); // »ý¼ºÀÚ

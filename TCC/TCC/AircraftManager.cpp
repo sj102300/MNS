@@ -4,7 +4,6 @@
 #include "EngagementManager.h"
 
 AircraftManager::AircraftManager() {
-
 }
 
 AircraftManager::~AircraftManager() {
@@ -14,8 +13,7 @@ AircraftManager::~AircraftManager() {
 }
 
 bool AircraftManager::init(TCC::UdpSender* sender, EngagementManager* engagementManager) {
-	//engagementManager도 nullptr확인
-	if (sender == nullptr) {
+	if (sender == nullptr || engagementManager == nullptr) {
 		return false;
 	}
 	engagementManager_ = engagementManager;
@@ -24,11 +22,14 @@ bool AircraftManager::init(TCC::UdpSender* sender, EngagementManager* engagement
 }
 
 void AircraftManager::start() {
+	isRunning_ = true;
 	workThread_ = std::thread(&AircraftManager::judgeEngagable, this);
 }
 
 void AircraftManager::handleReceivedAircraft(NewAircraft& newAircraft) {
-	//std::cout << newAircraft.aircraftId_ << std::endl;
+	std::cout << "Aircraft ID: " << newAircraft.aircraftId_
+		<< ", Latitude: " << newAircraft.location_.latitude_
+		<< ", Longitude: " << newAircraft.location_.longitude_ << std::endl;
 	pushNewAircraftQueue(newAircraft);
 }
 
@@ -56,14 +57,19 @@ void AircraftManager::addAircraft(NewAircraft& newAircraft) {
 }
 
 Aircraft* AircraftManager::getAircraft(std::string& aircraftId) {
-	return aircrafts_[aircraftId];
+
+	auto it = aircrafts_.find(aircraftId);
+	if (it != aircrafts_.end()) {
+		return it->second;
+	}
+	return nullptr;
 }
 
 void AircraftManager::judgeEngagable() {
 
 	NewAircraftWithIP newAircraftWithIp;
 
-	while (true) {
+	while (isRunning_) {
 		if (popNewAircraftQueue(newAircraftWithIp.aircraftData_)) {
 
 			if (!isExistAircraft(newAircraftWithIp.aircraftData_.aircraftId_)) {
@@ -77,17 +83,28 @@ void AircraftManager::judgeEngagable() {
 				sender_->sendAircraftData(newAircraftWithIp);
 				continue;
 			}
-
-			if (targetAircraft->isIpInEngageRange(newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_)) {	//적군 항공기 중 교전 가능 범위 아님
+			bool isEngagementStatusChanged = false;
+			if (targetAircraft->isIpInEngageRange(newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_, isEngagementStatusChanged)) {	//적군 항공기 중 교전 가능 범위 아님
 				sender_->sendAircraftData(newAircraftWithIp);
-				continue;
 			}
 
-			sender_->sendAircraftData(newAircraftWithIp);
-			engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
+			//교전 불가능에서 교전 가능 상태로 바뀌었을때만 addEngagableAircraft호출해야함
+			if (isEngagementStatusChanged) {
+				engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
+			}
+
 		}
-		std::this_thread::sleep_for(std::chrono::microseconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
+}
+
+void AircraftManager::stop() {
+	isRunning_ = false;
+	//스레드 종료
+	if (workThread_.joinable()) {
+		workThread_.join();
+	}
+	return;
 }
 
 //void AircraftManager::updateAircraftStatus() {

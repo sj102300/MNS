@@ -17,13 +17,16 @@ public:
 	Aircraft(std::string id, TCC::Position pos_, bool isEnemy_);
 	const bool isEnemy() const;
 	void calcImpactPoint();
-	bool isIpInEngageRange(unsigned int engagementStatus, TCC::Position& iplocation);
+	bool isIpInEngageRange(unsigned int engagementStatus, TCC::Position& iplocation, bool &isEngagementStatusChanged);
 	void updatePosition(TCC::Position& newLocation);
 	bool isEngagable();
 	unsigned int updateStatus(unsigned int engagementStatus);
+	TCC::Position getImpactPoint();
+	~Aircraft();
 
 private:
 	void calcDirVec(const TCC::Position& newPos);
+	bool isStatusChanged(unsigned int a, unsigned int b);
 
 	typedef struct _direction_vector {
 		double dx_;

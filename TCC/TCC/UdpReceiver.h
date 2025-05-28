@@ -46,9 +46,10 @@ namespace TCC {
 			char targetMissileId_[8];
 		} EmergencyDestroyMSG;
 
-		UdpReceiver(std::string& ip, int port);
+		UdpReceiver(std::string ip, int port);
 		bool init(EngagementManager * engagementManager);
 		void start();
+		void stop();
 		~UdpReceiver();
 
 	private:
@@ -66,6 +67,7 @@ namespace TCC {
 		std::thread recvThread_;
 		char buffer[100];
 		sockaddr_in senderAddr_;
+		std::atomic<bool> isRunning_;
 
 		EngagementManager* engagementManager_;
 	};

@@ -11,6 +11,7 @@
 #include "UdpSender.h"
 #include "MissileManager.h"
 #include "ScenarioManager.h"
+#include "UdpMulticastSender.h"
 
 class SimulationManager{
 public:
@@ -33,11 +34,9 @@ private:
 	AircraftManager* aircraftManager_;
 	EngagementManager* engagementManager_;
 	TCC::UdpMulticastReceiver* multiReceiver_;
+	TCC::UdpMulticastSender* multiSender_;
 	TCC::UdpSender* udpSender_;
+	TCC::UdpReceiver* udpReceiver_;
 	MissileManager* missileManager_;
 	std::condition_variable cv_;
 };
-
-//const std::string SUBSYSTEM_ID = "MFR";
-//const std::string SCN_LOCAL_IP = "http://192.168.2.31:8080";  // 荐脚 林家
-//const std::string SCN_SERVER_IP = "http://192.168.2.30:8080";  // SCN 辑滚 林家

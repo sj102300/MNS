@@ -3,11 +3,16 @@
 Aircraft::Aircraft(std::string aircraftId, TCC::Position pos, bool isEnemy__) : aircraftId_(aircraftId), pos_(pos), 
     isEnemy_(isEnemy__), dirVec_({ 0,0 }), status_(EngagementStatus::NotEngageable), impactPoint_({ -200, -200, 10 }) {}
 
+#include <iostream>
+Aircraft::~Aircraft() {
+    std::cout<<"aircraft deleted"<<std::endl;
+}
 const bool Aircraft::isEnemy() const {
 	return isEnemy_;
 }
 
 void Aircraft::updatePosition(TCC::Position& newLocation) {
+	//std::cout << "Aircraft::updatePosition() called" << std::endl;
     pos_ = newLocation;
 }
 
@@ -49,6 +54,10 @@ void Aircraft::calcDirVec(const TCC::Position& newPos) {
     dirVec_.dx_ = dx / magnitude;
     dirVec_.dy_ = dy / magnitude;
     return;
+}
+
+TCC::Position Aircraft::getImpactPoint() {
+    return impactPoint_;
 }
 
 void Aircraft::calcImpactPoint() {
@@ -94,7 +103,7 @@ void Aircraft::calcImpactPoint() {
     impactPoint_ = xyToLatLon(batteryLoc, impact_x, impact_y, pos_.altitude_);
 }
 
-bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& impactPoint) {
+bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& impactPoint, bool &isEngagementStatusChanged) {
 
     engagementStatus = (unsigned int)status_;
 
@@ -106,7 +115,7 @@ bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& i
     impactPoint = impactPoint_;
 
     // 포대 위치
-    TCC::Position batteryLoc = { 37.5597, 126.9869, 10 };
+    TCC::Position batteryLoc = { 37.5432, 126.7321, 10 };
 
     // 위도와 경도를 라디안으로 변환
     double lat1 = batteryLoc.latitude_ * DEG_TO_RAD;
@@ -127,13 +136,21 @@ bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& i
 
     // 100km 이내, 교전 가능
     if (distanceKm <= 100.0) {
+        if (isStatusChanged(status_, EngagementStatus::Engageable)) {
+            isEngagementStatusChanged = true;
+        }
         status_ = EngagementStatus::Engageable;
         engagementStatus = (unsigned int) status_;
         return true;
     }
+
     status_ = EngagementStatus::NotEngageable;
     engagementStatus = (unsigned int)status_;
     return false;
+}
+
+bool Aircraft::isStatusChanged(unsigned int a, unsigned int b) {
+    return a == b;
 }
 
 bool Aircraft::isEngagable() {

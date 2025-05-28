@@ -3,6 +3,8 @@
 #include "UdpMulticastReceiver.h"
 #include "MissileManager.h"
 
+#define MULTICAST_GROUP "239.0.0.1"
+
 TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, int port) 
 	: multicastIp_(multicastIp), port_(port), serverSocket_(INVALID_SOCKET), aircraftManager_(nullptr)
 {
@@ -10,8 +12,13 @@ TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, 
 	std::cout << "UdpMulticastReceiver created\n";
 }
 
+TCC::UdpMulticastReceiver::~UdpMulticastReceiver() {
+	WSACleanup();
+}
+
 bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileManager* missileManager) {
 
+	isRunning_ = true;
 	//여기서 포인터 연결 먼저 하기
 	if (aircraftManager == nullptr || missileManager == nullptr) {
 		return false;
@@ -40,7 +47,7 @@ bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileMa
 
 	sockaddr_in localAddr = {};
 	localAddr.sin_family = AF_INET;
-	localAddr.sin_port = htons(port_);
+	localAddr.sin_port = htons(9000);
 	localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	if (bind(serverSocket_, (sockaddr*)&localAddr, sizeof(localAddr)) < 0) {
@@ -48,9 +55,9 @@ bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileMa
 		return false;
 	}
 
-	ip_mreq mreq = {};
-	mreq.imr_multiaddr.s_addr = inet_addr(multicastIp_.c_str());
-	mreq.imr_interface.s_addr = inet_addr("127.0.0.1"); // ← 수신에 사용할 NIC의 실제 IP로 지정
+	ip_mreq mreq;
+	mreq.imr_multiaddr.s_addr = inet_addr(MULTICAST_GROUP);
+	mreq.imr_interface.s_addr = inet_addr("192.168.2.190");  // <- 실제 유선 LAN IP 주소 지정
 
 	if (setsockopt(serverSocket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) < 0) {
 		std::cout << "setsockopt(IPP_ADD_MEMBERSHIP) Failed\n";
@@ -60,7 +67,17 @@ bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileMa
 }
 
 void TCC::UdpMulticastReceiver::start() {
+	isRunning_ = true;
 	recvThread_ = std::thread(&TCC::UdpMulticastReceiver::receive, this);
+}
+
+void TCC::UdpMulticastReceiver::stop() {
+	isRunning_ = false;
+	closesocket(serverSocket_);
+	if (recvThread_.joinable()) {
+		recvThread_.join();
+	}
+	return;
 }
 
 void TCC::UdpMulticastReceiver::receive() {
@@ -71,11 +88,11 @@ void TCC::UdpMulticastReceiver::receive() {
 	AircraftManager::NewAircraft newAircraft;
 	MissileMSG missileMsg;
 
-	while (true) {
+	while (isRunning_) {
 		int bytesReceived = recvfrom(serverSocket_, buffer, sizeof(buffer), 0, (struct sockaddr*)&senderAddr, &addrLen);
 		
 		if (bytesReceived < 0) {
-			std::cerr << "recvfrom Failed. Error: " << WSAGetLastError() << "\n";
+			std::cout << "UdpMulticastReceiver: recvfrom Failed. Error: " << WSAGetLastError() << "\n";
 			break;
 		}
 
@@ -120,14 +137,14 @@ bool TCC::UdpMulticastReceiver::parseReceivedAircraftMSG(const char * buffer, Ai
 	AircraftMSG msg;
 	memcpy((void*)&msg, buffer, length);
 
-	if (!TCC::isValidAircraftId(msg.aircraftId_))
-		return false;
+	//if (!TCC::isValidAircraftId(msg.aircraftId_))
+	//	return false;
 
-	if (!msg.location_.isValidPosition()) 		
-		return false;
+	//if (!msg.location_.isValidPosition()) 		
+	//	return false;
 
-	if (msg.ourOrEnemy_ != 'E' && msg.ourOrEnemy_ != 'O')
-		return false;
+	//if (msg.ourOrEnemy_ != 'E' && msg.ourOrEnemy_ != 'O')
+	//	return false;
 
 	newAircraft.aircraftId_ = std::string(msg.aircraftId_, 8);
 	newAircraft.isEnemy_ = msg.ourOrEnemy_ == 'E';
