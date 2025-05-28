@@ -76,7 +76,9 @@ void TCC::UdpReceiver::receive() {
 		case CommandCode::EmergencyDestroyRequest:
 			if (!parseEmergencyDestroyMSG(buffer + 8, emergencyDestroyMsg))
 				break;
+			//ack º¸³»±â
 			engagementManager_->emergencyDestroy(std::string(emergencyDestroyMsg.commandId_, 20), std::string(emergencyDestroyMsg.targetMissileId_, 8));
+
 			break;
 
 		default:

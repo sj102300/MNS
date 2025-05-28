@@ -28,8 +28,9 @@ bool ScenarioManager::createObjects() {
     multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);
     udpSender_ = new TCC::UdpSender("192.168.2.200", 9000); //OCC �ּ�
     aircraftManager_ = new AircraftManager();
-    missileManager_ = new MissileManager(udpSender_);
-    //engagementManager_ = new EngagementManager();
+    engagementManager_ = new EngagementManager();
+    missileManager_ = new MissileManager(udpSender_, engagementManager_);
+    
     //
 
     if (!aircraftManager_->init(udpSender_, engagementManager_)) {
@@ -42,6 +43,10 @@ bool ScenarioManager::createObjects() {
     }
     if (!udpSender_->init()) {
         std::cout << "udpSender init() Failed\n";
+        return false;
+    }
+    if (!engagementManager_->init(udpSender_)) {
+        std::cout << "engagement manager init() Failed\n";
         return false;
     }
 

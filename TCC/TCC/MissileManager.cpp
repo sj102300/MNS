@@ -6,7 +6,7 @@
 #include "UdpSender.h"
 #include "UdpMulticastReceiver.h"
 
-MissileManager::MissileManager(TCC::UdpSender* sender) : udpSender_(sender) {
+MissileManager::MissileManager(TCC::UdpSender* sender, EngagementManager* engagement) : udpSender_(sender), engagementManager_(engagement) {
     for (int i = 1; i <= 6; ++i) { // 6대 생성, 100대로 늘리려면 6 -> 100으로 변경
         std::ostringstream oss;
         oss << "MSS-" << std::setw(3) << std::setfill('0') << i;
@@ -54,7 +54,19 @@ void MissileManager::checkMissileStatus() {
 
 void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg) {
     if (udpSender_) {
-        udpSender_->sendMissileData(msg);
+        if (udpSender_->sendMissileData(msg)) {
+            std::cout << "미사일 데이터 전송 성공\n";
+        }
+        else {
+            std::cout << "미사일 데이터 전송 실패\n";
+        }
+    }
+    if (msg.status_ == 2) { // 2: 격추 성공
+		std::string missileId(msg.missileId, 8);
+        if (engagementManager_) {
+            engagementManager_->isHitTarget(missileId);
+
+        }
     }
 	updateMissileStatus(msg.missileId, Missile::MissileStatus(msg.status_));
 }
