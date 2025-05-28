@@ -101,7 +101,6 @@ void TCC::UdpMulticastReceiver::receive() {
 		default:
 			break;
 		}
-		
 	}
 }
 

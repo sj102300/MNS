@@ -120,12 +120,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\user\source\repos\MNS\TCC\3rd_party\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\user\source\repos\MNS\TCC\3rd_party\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ScenarioManager.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -142,7 +146,7 @@
     <ClCompile Include="MissileManager.cpp" />
     <ClCompile Include="MissileReceiver.cpp" />
     <ClCompile Include="MissileSender.cpp" />
-    <ClCompile Include="ScenarioManager.cpp" />
+    <ClCompile Include="SimulationManager.cpp" />
     <ClCompile Include="share.cpp" />
     <ClCompile Include="TcpReceiver.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -167,7 +171,7 @@
     <ClInclude Include="MissileManager.h" />
     <ClInclude Include="MissileReceiver.h" />
     <ClInclude Include="MissileSender.h" />
-    <ClInclude Include="ScenarioManager.h">
+    <ClInclude Include="SimulationManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="share.h" />
