@@ -1,5 +1,15 @@
 #pragma once
-#include "ScenarioParser.h"
+
+#include <string>
+#include <vector>
+
+#pragma pack(push, 1)
+struct Location {
+    double latitude;
+    double longitude;
+    double altitude;
+};
+#pragma pack(pop)
 
 struct MissilePacket {
     char MissileId[8];        

@@ -84,7 +84,7 @@ void UdpReceiver::run() {
             case 2002: { // 미사일 발사 명령 처리
                 if (bodyLength < sizeof(OrderPacket)-8) {
                     std::cerr << "미사일 패킷 길이 부족\n";
-                    cout << "packet size : " << sizeof(OrderPacket) << "\n";
+                    std::cout << "packet size : " << sizeof(OrderPacket) << "\n";
                     break;
                 }
 
@@ -97,7 +97,7 @@ void UdpReceiver::run() {
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    cout << " 미사일 업데이트 하는중 \n";
+                    std::cout << " 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(1);  // 예: 3 = 발사 후 비행 상태
@@ -112,7 +112,7 @@ void UdpReceiver::run() {
             case 2003: { // 격추 여부 
                 if (bodyLength < sizeof(InterceptResultPacket) - 8) {
                     std::cerr << "미사일 InterceptResultPacket 패킷 길이 부족\n";
-                    cout << "packet size : " << sizeof(InterceptResultPacket) << "\n";
+                    std::cout << "packet size : " << sizeof(InterceptResultPacket) << "\n";
                     break;
                 }
 
@@ -123,7 +123,7 @@ void UdpReceiver::run() {
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    cout << " 미사일 업데이트 하는중 \n";
+                    std::cout << " 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(2);  // 2번은 격추 상태!!
@@ -135,7 +135,7 @@ void UdpReceiver::run() {
             case 2004: { // 비상 폭파 명령 
                 if (bodyLength < sizeof(EDPacket) - 8) {
                     std::cerr << "미사일 ED 패킷 길이 부족\n";
-                    cout << "packet size : " << sizeof(EDPacket) << "\n";
+                    std::cout << "packet size : " << sizeof(EDPacket) << "\n";
                     break;
                 }
 
@@ -147,7 +147,7 @@ void UdpReceiver::run() {
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    cout << " 미사일 업데이트 하는중 \n";
+                    std::cout << " 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(3);  // 3번은 비상폭파 상태임

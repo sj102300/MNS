@@ -57,8 +57,8 @@ bool UdpMulticast::init(const std::string& multicast_address, int port) {
         }
 
 
-        std::cout << "UDP Sender initialized for multicast group " << multicast_address
-            << " on port " << port_ << "\n";
+        std::cout << u8"UDP Sender initialized for multicast group " << multicast_address
+            << u8" on port " << port_ << "\n";
         return true;
     }
 
@@ -101,11 +101,11 @@ void UdpMulticast::run() {
                     break;
                 }
                 else {
-                    std::cout << " <Udp Multicast success> \n\n";
-                    std::cout << "MSS-ID: " << missile_->MissileId << "\n"
-                        << "Latitude: " << missile_->MissileLoc.latitude << "\n"
-                        << "Longitude: " << missile_->MissileLoc.longitude << "\n"
-                        << "Altitude: " << missile_->MissileLoc.altitude << "\n\n";
+                    std::cout << u8" <Udp Multicast success> \n\n";
+                    std::cout << u8"MSS-ID: " << missile_->MissileId << "\n"
+                        << u8"Latitude: " << missile_->MissileLoc.latitude << "\n"
+                        << u8"Longitude: " << missile_->MissileLoc.longitude << "\n"
+                        << u8"Altitude: " << missile_->MissileLoc.altitude << "\n\n";
                 }
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
