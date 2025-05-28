@@ -17,7 +17,7 @@ public:
 
 	void start();
 	bool init(TCC::UdpSender* sender);
-	bool isHitTarget();
+	bool isHitTarget(std::string& missileId);
 	unsigned int changeMode(unsigned int mode);
 	bool launchMissile(std::string& aircraftId);
 	bool emergencyDestroy(std::string commandId, std::string missileId);
@@ -50,7 +50,7 @@ private:
 	//TCC::UdpMulticastSender* multisender_;
 	MissileManager* missileManager_;
 	AircraftManager* aircraftManager_;
-	std::unordered_map<std::string, std::string> missileToAircraft_;
+	std::unordered_map<std::string, std::string> missileToAircraft_; // 미사일 : 키 , 항공기 : value
 	std::thread workThread_;
 	std::atomic<unsigned int> mode_;
 	EngagableAircraftQueue engagableAircrafts_;

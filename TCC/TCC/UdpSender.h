@@ -9,6 +9,7 @@
 #include "AircraftManager.h"
 #include "MissileManager.h"
 #include "UdpMulticastReceiver.h"
+#include "UdpReceiver.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -28,10 +29,14 @@ namespace TCC{
         bool sendMissileData(UdpMulticastReceiver::MissileMSG& data);
         const int serializeMissileSender(char* buffer, UdpMulticastReceiver::MissileMSG& data);
 
+        bool sendEmergencyDestroy(std::string commnadId, std::string missileId);
+        const int serializeEmergencySender(char* buffer, std::string commnadId, std::string missileId);
+
     private:
         std::string ip_;
         int port_;
         SOCKET sock_;
         sockaddr_in targetAddr_;
+
     };
 }

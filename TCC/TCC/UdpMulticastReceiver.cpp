@@ -96,6 +96,12 @@ void TCC::UdpMulticastReceiver::receive() {
 			//여기서 호출
 			if (missileManager_) {
 				missileManager_->echoMissileData(missileMsg);
+				std::cout << "미사일 데이터 수신----------------------" << "\n";
+				std::cout << "ID : " << missileMsg.missileId << "\n";
+				std::cout << "Status : " << missileMsg.status_ << "\n";
+				std::cout << "위도 : " << missileMsg.location_.latitude_ << "\n";
+				std::cout << "경도 : " << missileMsg.location_.longitude_ << "\n";
+				std::cout << "고도 : " << missileMsg.location_.altitude_ << "\n";
 			}
 			break;
 		default:

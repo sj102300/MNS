@@ -1,5 +1,6 @@
-
+#include <iostream>
 #include "EngagementManager.h"
+#include "UdpReceiver.h"
 
 bool EngagementManager::init(TCC::UdpSender* sender) {
 	if (sender == nullptr)
@@ -45,11 +46,40 @@ bool EngagementManager::mappingMissileToAircraft(std::string& aircraftId) {
 	return true;
 }
 
-bool EngagementManager::isHitTarget() {
+// MissileManager에서 미사일의 상태가 격추 성공일 때 이 함수를 호출
+// 
+bool EngagementManager::isHitTarget(std::string& missileId) {
 	//격추 성공 수신
 	//해당 미사일이 격추하던 항공기를 올바르게 격추했는지를 판단.
 	//만약 올바르게 격추했다면 항공기의 status를 EngagementStatus::Destroyed
 	//올바르게 격추되지 않았다면 항공기의 status를 EngagementStatus::NotEngagable
+	// 
+	// 미사일-항공기 매핑 확인
+	auto it = missileToAircraft_.find(missileId);
+	if (it == missileToAircraft_.end()) {
+		// 매핑된 항공기가 없음
+		return false;
+	}
+
+	std::string& aircraftId = it->second;
+	Aircraft* aircraft = aircraftManager_->getAircraft(aircraftId);
+	if (!aircraft) {
+		// 항공기 객체가 존재하지 않음
+		missileToAircraft_.erase(it);
+		return false;
+	}
+
+	// 실제로 격추한 항공기가 내가 쫓던 항공기가 맞는지 확인하는 로직
+	
+	//내가 쫓던 항공기의 EngagementStatus를 Engagable or NotEngagable로 변경
+	//근데 두개의 미사일이 하나를 쫓다가 하나가	격추했다면 Engagable? NotEngagable?
+	//Todo : 내가 쫓던 항공기가 아닌 항공기를 격추 한 경우  
+	// 올바르게 격추했다고 판단
+	std::cout << aircraftId << " 미사일 격추 성공 " << "\n";
+
+	// 매핑 해제
+	missileToAircraft_.erase(it);
+
 	return true;
 }
 
@@ -82,15 +112,27 @@ bool EngagementManager::launchMissile(std::string& aircraftId) {
 	return true;
 }
 
+// OCC에서 비상폭파 패킷을 수신했을 때 비상폭파 명령을 멀티캐스트로 에코
+// 비상폭파 완료는 Ack(미사일에서 비상폭파 상태를 보냈을때)받았을 때 판단
 bool EngagementManager::emergencyDestroy(std::string commandId, std::string missileId) {
 	//비상 폭파 명령 송신
 	Missile* missile = missileManager_->selectMissile(missileId);
 
-	//sender_->sendEmergencyDestroy(missileId);
+	sender_->sendEmergencyDestroy(commandId, missileId);
 
 	missileToAircraft_.erase(missileId);
 
+	// OCC -> TCC 비상폭파 명령을 내린다
+	// TCC -> OCC 비상폭파 명령을 받았다는 Ack 보내기
+	// 
+	// OCC->TCC 비상폭파 ok, TCC -> MSS 이걸 못받아, OCC의 GUI 상태를 변경 ACk를 안쏘고
+	// TCC -> 시뮬레이션 망 비상폭파 명령을 뿌린다
+	// 
+	// TCC receiver 미사일의 데이터를 계속 수신 -> status == 비상폭파
+	// 이 비상폭파가 어느 미사일의 비상폭파인지 확인 -> Ack
+	//sender에서 미사일 상태를 가져와서 status 비상폭파 -> true -> 동기 처럼 cv
 	//return false?true/
+
 	return true;
 }
 
