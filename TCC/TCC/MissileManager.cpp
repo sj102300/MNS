@@ -41,7 +41,7 @@ void MissileManager::updateMissileStatus(const std::string& id, Missile::Missile
         std::cout << "Updated missile " << id << " to status " << (unsigned int)newStatus << "\n";
     }
     else {
-        std::cout << "Missile " << id << " not found\n";
+        //std::cout << "Missile " << id << " not found\n";
     }
 }
 
@@ -55,10 +55,10 @@ void MissileManager::checkMissileStatus() {
 void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg) {
     if (udpSender_) {
         if (udpSender_->sendMissileData(msg)) {
-            std::cout << "미사일 데이터 전송 성공\n";
+            std::cout << u8"미사일 데이터 전송 성공\n";
         }
         else {
-            std::cout << "미사일 데이터 전송 실패\n";
+            std::cout << u8"미사일 데이터 전송 실패\n";
         }
     }
     if (msg.status_ == 2) { // 2: 격추 성공

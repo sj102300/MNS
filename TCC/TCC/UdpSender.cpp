@@ -86,15 +86,16 @@ bool TCC::UdpSender::sendMissileData(UdpMulticastReceiver::MissileMSG& data) {
     int bodySize = serializeMissileSender(buffer + headerSize, data);
 
     if (sendByteData(buffer, headerSize + bodySize) < 0) {
+		std::cerr << "sendByteData() failed: " << WSAGetLastError() << "\n";
         return false;
     }
 
-    std::cout << "미사일 데이터 송신----------------------" << "\n";
-    std::cout << "ID : " << data.missileId << "\n";
-    std::cout << "Status : " << data.status_ << "\n";
-    std::cout << "위도 : " << data.location_.latitude_ << "\n";
-    std::cout << "경도 : " << data.location_.longitude_ << "\n";
-    std::cout << "고도 : " << data.location_.altitude_ << "\n";
+    std::cout << u8"--------------미사일 데이터 송신-----------" << "\n";
+    std::cout << u8"ID : " << data.missileId << "\n";
+    std::cout << u8"Status : " << data.status_ << "\n";
+    std::cout << u8"위도 : " << data.location_.latitude_ << "\n";
+    std::cout << u8"경도 : " << data.location_.longitude_ << "\n";
+    std::cout << u8"고도 : " << data.location_.altitude_ << "\n";
     return true;
 }
 
