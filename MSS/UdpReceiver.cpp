@@ -73,7 +73,7 @@ void UdpReceiver::run() {
             memcpy(&bodyLength, buffer + 4, sizeof(unsigned int));
 
             if (bytesReceived < 8 + static_cast<int>(bodyLength)) {
-                std::cerr << "잘못된 패킷 길이\n";
+                std::cerr << u8"잘못된 패킷 길이\n";
                 continue;
             }
 
@@ -83,8 +83,8 @@ void UdpReceiver::run() {
             switch (eventCode) {
             case 2002: { // 미사일 발사 명령 처리
                 if (bodyLength < sizeof(OrderPacket)-8) {
-                    std::cerr << "미사일 패킷 길이 부족\n";
-                    std::cout << "packet size : " << sizeof(OrderPacket) << "\n";
+                    std::cerr << u8"미사일 패킷 길이 부족\n";
+                    std::cout << u8"packet size : " << sizeof(OrderPacket) << "\n";
                     break;
                 }
 
@@ -93,26 +93,26 @@ void UdpReceiver::run() {
                 std::string missileId(orderpkg.MissileId, strnlen(orderpkg.MissileId, 8));
                 Location impactPoint = orderpkg.ImpactPoint;
 
-                std::cout << "수신한 미사일 ID: [" << missileId << "]\n";
+                std::cout << u8"수신한 미사일 ID: [" << missileId << "]\n";
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    std::cout << " 미사일 업데이트 하는중 \n";
+                    std::cout << u8" 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(1);  // 예: 3 = 발사 후 비행 상태
                     missile->setTargetLocation(impactPoint);
                 }
-                std::cout << "[업데이트됨] 미사일: " << missileId
-                    << " → 목표: (" << impactPoint.altitude << ", " << impactPoint.latitude << ")\n";
+                std::cout << u8"[업데이트됨] 미사일: " << missileId
+                    << u8" → 목표: (" << impactPoint.altitude << ", " << impactPoint.latitude << ")\n";
               
                 break;
             }
 
             case 2003: { // 격추 여부 
                 if (bodyLength < sizeof(InterceptResultPacket) - 8) {
-                    std::cerr << "미사일 InterceptResultPacket 패킷 길이 부족\n";
-                    std::cout << "packet size : " << sizeof(InterceptResultPacket) << "\n";
+                    std::cerr << u8"미사일 InterceptResultPacket 패킷 길이 부족\n";
+                    std::cout << u8"packet size : " << sizeof(InterceptResultPacket) << "\n";
                     break;
                 }
 
@@ -123,19 +123,19 @@ void UdpReceiver::run() {
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    std::cout << " 미사일 업데이트 하는중 \n";
+                    std::cout << u8" 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(2);  // 2번은 격추 상태!!
                 }
-                std::cout << "[업데이트됨] 미사일: " << missileId << "격추 상태로 변환\n";
+                std::cout << u8"[업데이트됨] 미사일: " << missileId << u8"격추 상태로 변환\n";
 
                 break;
             }
             case 2004: { // 비상 폭파 명령 
                 if (bodyLength < sizeof(EDPacket) - 8) {
-                    std::cerr << "미사일 ED 패킷 길이 부족\n";
-                    std::cout << "packet size : " << sizeof(EDPacket) << "\n";
+                    std::cerr << u8"미사일 ED 패킷 길이 부족\n";
+                    std::cout << u8"packet size : " << sizeof(EDPacket) << "\n";
                     break;
                 }
 
@@ -143,21 +143,21 @@ void UdpReceiver::run() {
                 memcpy(&EDpkg, bodyPtr, sizeof(EDpkg));
 
                 std::string missileId(EDpkg.MissileId, strnlen(EDpkg.MissileId, 8));
-                std::cout << "수신한 미사일 ID: [" << missileId << "]\n";
+                std::cout << u8"수신한 미사일 ID: [" << missileId << "]\n";
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    std::cout << " 미사일 업데이트 하는중 \n";
+                    std::cout << u8" 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(3);  // 3번은 비상폭파 상태임
                 }
-                std::cout << "[업데이트됨] 미사일: " << missileId << "비상폭파 상태로 변환\n";
+                std::cout << u8"[업데이트됨] 미사일: " << missileId << "비상폭파 상태로 변환\n";
 
                 break;
             }
             default:
-                std::cerr << "알 수 없는 이벤트 코드: " << eventCode << "\n";
+                //std::cerr << u8"알 수 없는 이벤트 코드: " << eventCode << "\n";
                 break;
             }
         }

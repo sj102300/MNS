@@ -142,6 +142,7 @@ int main() {
         if (running) {
             // 포대 위치 획득
             Coordinate battery = scenarioRunner.getBatteryLocation();
+            Location loca = { battery.latitude,battery.longitude,battery.altitude };
             std::cout << "[" << SUBSYSTEM_ID << "] 포대 위치: "
                 << battery.latitude << ", " << battery.longitude << ", " << battery.altitude << "\n";
 
@@ -155,13 +156,14 @@ int main() {
 
                 std::string id = "MSS-" + std::to_string(100 + i);
                 missile->setMissileId(id);
+                missile->setLoc(loca);
 
                 auto sender = std::make_shared<UdpMulticast>();
                 sender->init(UDP_IP, UDP_PORT);
 
                 auto controller = std::make_shared<MissileController>();
                 missile->init(sender, controller);
-                missile->start(2000.0f); // 초속 2km
+                missile->start(0.1); // 초속 2km
 
                 missileMap[id] = missile;
                 missiles.push_back(missile);
@@ -189,7 +191,7 @@ int main() {
 
     if (scenarioThread.joinable()) scenarioThread.join();
 
-    std::cout << "[" << SUBSYSTEM_ID << "] 프로그램 종료\n";
+    std::cout << u8"[" << SUBSYSTEM_ID << "] 프로그램 종료\n";
     return 0;
 }
 #endif

@@ -15,6 +15,11 @@ void Missile::init(std::shared_ptr<UdpMulticast> s, std::shared_ptr<MissileContr
     controller->setMissile(shared_from_this());
     controller->setTarget({0,0,0});
 }
+void Missile::setLoc(Location& loc) {
+    MissileLoc.altitude = loc.altitude;
+    MissileLoc.latitude = loc.latitude;
+    MissileLoc.longitude = loc.longitude;
+}
 
 void Missile::setMissileId(const std::string& id) {
     MissileId = id;

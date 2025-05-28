@@ -12,6 +12,8 @@ struct Location {
 #pragma pack(pop)
 
 struct MissilePacket {
+    unsigned int EventCode;
+    unsigned int BodyLength;
     char MissileId[8];        
     unsigned int MissileState;
     Location MissileLoc;

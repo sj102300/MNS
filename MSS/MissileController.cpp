@@ -16,7 +16,7 @@ void MissileController::setMissile(std::shared_ptr<Missile> m) {
 void MissileController::setTarget(Location pos) {
 	impact_point = pos;
 	hasTarget_ = true;
-	float speed = 2000.0f;
+	float speed = 0.1;
 
 	double dx = impact_point.latitude - missile_->MissileLoc.latitude;
 	double dy = impact_point.longitude - missile_->MissileLoc.longitude;
@@ -65,8 +65,8 @@ void MissileController::updatePosition(float speed) {
 	auto now = std::chrono::steady_clock::now();
 	double elapsed = std::chrono::duration<double>(now - launch_time_).count();
 
-	std::cout << "Estimated time to impact: " << estimatedTimeToImpact_ << "s" << std::endl;
-	std::cout << "Elapsed time since launch: " << elapsed << "s" << std::endl;
+	std::cout << u8"Estimated time to impact: " << estimatedTimeToImpact_ << "s" << std::endl;
+	std::cout << u8"Elapsed time since launch: " << elapsed << "s" << std::endl;
 
 	// 고정된 도달 시간 기준으로 자폭 조건 체크
 	if ((elapsed - estimatedTimeToImpact_) > 2.0) {

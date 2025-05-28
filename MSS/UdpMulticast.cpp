@@ -42,7 +42,22 @@ bool UdpMulticast::init(const std::string& multicast_address, int port) {
 
 
         if (inet_pton(AF_INET, "239.0.0.1", &destAddr_.sin_addr) <= 0) { // destAddr을 이제 멀티캐스트 주소로
-            std::cerr << "Invalid multicast address format\n";
+            std::cerr << u8"Invalid multicast address format\n";
+            closesocket(sock_);
+            WSACleanup();
+            return false;
+        }
+
+        in_addr localInterface{};
+        if (InetPton(AF_INET, L"192.168.2.22", &localInterface) != 1) {
+            std::cerr << u8"Failed to convert local interface IP\n";
+            closesocket(sock_);
+            WSACleanup();
+            return false;
+        }
+
+        if (setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_IF, (char*)&localInterface, sizeof(localInterface)) == SOCKET_ERROR) {
+            std::cerr << u8"setsockopt(IP_MULTICAST_IF) failed: " << WSAGetLastError() << "\n";
             closesocket(sock_);
             WSACleanup();
             return false;
@@ -50,7 +65,7 @@ bool UdpMulticast::init(const std::string& multicast_address, int port) {
         // 멀티캐스트 전송 시 TTL(Time-To-Live) 옵션 설정 (기본 1: 로컬 네트워크)
         int ttl = 4;
         if (setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl)) < 0) {
-            std::cerr << "setsockopt(IP_MULTICAST_TTL) failed\n";
+            std::cerr << u8"setsockopt(IP_MULTICAST_TTL) failed\n";
             closesocket(sock_);
             WSACleanup();
             return false;
@@ -69,6 +84,8 @@ void UdpMulticast::setMissile(std::shared_ptr<Missile> m) {
 
 MissilePacket UdpMulticast::serializeMissile(const Missile& missile) {
         MissilePacket packet;
+        packet.EventCode = 3001;
+        packet.BodyLength = 36;
         memset(packet.MissileId, 0, sizeof(packet.MissileId));
         strncpy_s(packet.MissileId, sizeof(packet.MissileId), missile.MissileId.c_str(), _TRUNCATE);
         packet.MissileState = missile.MissileState;
@@ -90,11 +107,11 @@ void UdpMulticast::run() {
                 int sent = sendto(sock_, reinterpret_cast<const char*>(&packet), sizeof(packet), 0,
                     (sockaddr*)&destAddr_, sizeof(destAddr_));
                 if (sent == SOCKET_ERROR) {
-                    std::cerr << "sendto failed: " << WSAGetLastError() << "\n";
+                    std::cerr << u8"sendto failed: " << WSAGetLastError() << "\n";
                 }
                 else if (missile_->MissileState == 3 || missile_->MissileState == 4) {
-                    std::cout << "Missile state is " << missile_->MissileState
-                        << " → stopping multicast.\n";
+                    std::cout << u8"Missile state is " << missile_->MissileState
+                        << u8" → stopping multicast.\n";
 
                     closesocket(sock_);
                     running_ = false;         

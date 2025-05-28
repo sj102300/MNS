@@ -18,6 +18,8 @@ public:
 
     void setState(unsigned int state);
 
+    void setLoc(Location& loc);
+
     void setTargetLocation(const Location& loc);
 
     // 초기화하는 모듈
