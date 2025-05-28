@@ -16,7 +16,21 @@ void MissileController::setMissile(std::shared_ptr<Missile> m) {
 void MissileController::setTarget(Location pos) {
 	impact_point = pos;
 	hasTarget_ = true;
+	float speed = 2000.0f;
+
+	double dx = impact_point.latitude - missile_->MissileLoc.latitude;
+	double dy = impact_point.longitude - missile_->MissileLoc.longitude;
+	double len = std::sqrt(dx * dx + dy * dy);
+
+	if (len != 0) {
+		dir_lat_ = dx / len;
+		dir_long_ = dy / len;
+	}
+	estimatedTimeToImpact_ = (speed > 0) ? (len / speed) : -1.0;
+	launch_time_ = std::chrono::steady_clock::now();
+	launch_time_recorded_ = true;
 }
+
 
 void MissileController::start(float speed) {
 	running_ = true;
@@ -36,16 +50,26 @@ void MissileController::stop() {
 		updateThread_.join();
 }
 
-void MissileController::updatePosition(float speed ) {
+void MissileController::updatePosition(float speed) {
+	if (missile_->MissileState == 2 || missile_->MissileState == 3 || missile_->MissileState == 4) {
+		running_ = false;
+		return;
+	}
 	if (!hasTarget_ || missile_->MissileState != 1) return;
-	double dx = impact_point.altitude - missile_->MissileLoc.altitude;
-	double dy = impact_point.latitude - missile_->MissileLoc.latitude;
-	double dz = impact_point.longitude - missile_->MissileLoc.longitude;
+	if (!launch_time_recorded_ || estimatedTimeToImpact_ < 0.0) return;
 
-	double dist = std::sqrt(dx * dx + dy * dy + dz * dz);
-	
-	double move = speed;
-	missile_->MissileLoc.altitude += (dx / dist) * move;
-	missile_->MissileLoc.latitude += (dy/ dist) * move;
-	missile_->MissileLoc.longitude += (dz / dist) * move;
+	missile_->MissileLoc.latitude += dir_lat_ * speed;
+	missile_->MissileLoc.longitude += dir_long_ * speed;
+
+
+	auto now = std::chrono::steady_clock::now();
+	double elapsed = std::chrono::duration<double>(now - launch_time_).count();
+
+	std::cout << "Estimated time to impact: " << estimatedTimeToImpact_ << "s" << std::endl;
+	std::cout << "Elapsed time since launch: " << elapsed << "s" << std::endl;
+
+	// 고정된 도달 시간 기준으로 자폭 조건 체크
+	if ((elapsed - estimatedTimeToImpact_) > 2.0) {
+		missile_->MissileState = 4;  // 자폭
+	}
 }

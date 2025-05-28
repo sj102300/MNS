@@ -7,13 +7,12 @@
 #include <thread>
 #include <vector>
 
-Location loc = { 0.0,0.0,0.0 };
 int main() {
 
     std::unordered_map<std::string, std::shared_ptr<Missile>> missileMap;
     std::vector<std::shared_ptr<Missile>> missiles;
 
-    for (int i = 0; i < 1; ++i) {
+    for (int i = 0; i < 6; ++i) {
         auto missile = std::make_shared<Missile>();
 
         // 고유 ID 부여
@@ -26,7 +25,7 @@ int main() {
         auto controller = std::make_shared<MissileController>();
 
         missile->init(sender, controller);
-        missile->start(5.0f);
+        missile->start(2000.0f);
 
         // map 및 vector에 저장
         missileMap[id] = missile;

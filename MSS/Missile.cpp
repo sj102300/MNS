@@ -5,7 +5,7 @@
 #include "MissileController.h"
 
 Missile::Missile()
-    : MissileId("MSS-000"), MissileState(0), MissileLoc({ 0.0, 0.0, 0.0 }) {
+    : MissileId("MSS-000"), MissileState(0), MissileLoc({ 0.0, 0.0, 10 }) {
 }
 
 void Missile::init(std::shared_ptr<UdpMulticast> s, std::shared_ptr<MissileController> c) {

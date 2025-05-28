@@ -92,16 +92,23 @@ void UdpMulticast::run() {
                 if (sent == SOCKET_ERROR) {
                     std::cerr << "sendto failed: " << WSAGetLastError() << "\n";
                 }
+                else if (missile_->MissileState == 3 || missile_->MissileState == 4) {
+                    std::cout << "Missile state is " << missile_->MissileState
+                        << " ¡æ stopping multicast.\n";
+
+                    closesocket(sock_);
+                    running_ = false;         
+                    break;
+                }
                 else {
                     std::cout << " <Udp Multicast success> \n\n";
                     std::cout << "MSS-ID: " << missile_->MissileId << "\n"
-                        << "Altitude: " << missile_->MissileLoc.altitude << "\n"
                         << "Latitude: " << missile_->MissileLoc.latitude << "\n"
-                        << "Longitude: " << missile_->MissileLoc.longitude << "\n\n";
+                        << "Longitude: " << missile_->MissileLoc.longitude << "\n"
+                        << "Altitude: " << missile_->MissileLoc.altitude << "\n\n";
                 }
             }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
     }
 
