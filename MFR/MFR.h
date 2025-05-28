@@ -11,16 +11,15 @@ namespace mfr {
 
 #pragma pack(push, 1)
     struct AircraftPacket {
-        uint32_t eventCode;
-        uint32_t bodyLength;
-        uint32_t aircraftId;
-        double latitude;
-        double longitude;
-        double altitude;
-        char aircraftType;
-        char detectionFlag;
+        uint32_t eventCode;   // 1001 or 1002
+        uint32_t bodyLength;  // fixed: 33
+        char aircraftId[8];   // e.g. "ATS-0001"
+        double latitude;      // -90 ~ 90
+        double longitude;     // -180 ~ 180
+        double altitude;      // 0 ~ 10 (km)
+        char fooFlag;         // 'E' or 'O'
     };
-#pragma pack(pop) // 정렬 없이 그대로 33바이트 구조체 생성
+#pragma pack(pop) // 정렬 없이 그대로 41바이트 구조체 생성
 
     class MFR {
     public:

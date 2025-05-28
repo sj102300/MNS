@@ -123,16 +123,15 @@ namespace mfr {
                 continue;
             }
 
-
             if (received == sizeof(packet)) {
                 // 수신 패킷 정보 출력
                 std::cout << u8"[MFR] 수신 패킷 ← "
-                    << u8"ID: " << packet.aircraftId
+                    << u8"ID: " << std::string(packet.aircraftId, 8)
                     << u8", 위도: " << packet.latitude
                     << u8", 경도: " << packet.longitude
                     << u8", 고도: " << packet.altitude
                     << u8", 이벤트: " << packet.eventCode << "\n";
-                std::cout << u8"====================================================\n";
+                std::cout << u8"\n====================================================\n";
 
                 if (packet.eventCode == 1001 &&
                     withinRange(packet.latitude, packet.longitude, packet.altitude,
@@ -142,12 +141,12 @@ namespace mfr {
 
                     // 전송 전 패킷 정보 출력
                     std::cout << u8"[MFR] 전송 패킷 → "
-                        << u8"ID: " << packet.aircraftId
+                        << u8"ID: " << std::string(packet.aircraftId, 8)
                         << u8", 위도: " << packet.latitude
                         << u8", 경도: " << packet.longitude
                         << u8", 고도: " << packet.altitude
                         << u8", 이벤트: " << packet.eventCode << "\n";
-                    std::cout << u8"====================================================\n";
+                    std::cout << u8"\n====================================================\n";
 
                     sendto(sock_, reinterpret_cast<char*>(&packet), sizeof(packet), 0,
                         (sockaddr*)&sendAddr_, sizeof(sendAddr_));

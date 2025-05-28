@@ -40,8 +40,9 @@ namespace sm {
 
                 if (path == U("/quit")) {
                     std::cout << u8"[" << client_id_ << u8"] 종료 신호 수신 (GET /quit)\n";
-                    if (on_quit_callback_) on_quit_callback_();
                     request.reply(status_codes::OK, U("QUIT_ACK"));
+
+                    if (on_quit_callback_) on_quit_callback_();         //handleQuitSignal();
                 }
                 else {
                     request.reply(status_codes::NotFound, U("Unknown path"));
@@ -63,7 +64,7 @@ namespace sm {
     }
 
     void HttpServer::setOnQuitCallback(std::function<void()> cb) {
-        on_quit_callback_ = std::move(cb);
+        on_quit_callback_ = std::move(cb);      //handleQuitSignal();
     }
 
     bool HttpServer::start() {

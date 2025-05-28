@@ -19,7 +19,7 @@ namespace sm {
             });
 
         http_server_.setOnQuitCallback([this]() {
-            handleQuitSignal();
+            handleQuitSignal(); 
             });
 
         http_server_.start();
@@ -32,12 +32,11 @@ namespace sm {
     }
 
     void ScenarioManager::setOnQuitCallback(std::function<void()> cb) {
-        on_quit_cb_ = std::move(cb);
+        on_quit_cb_ = std::move(cb);        //handleQuit();
     }
 
     void ScenarioManager::handleStartSignal(const std::string& scenario_id) {
         bool loaded = false;
-
         {
             std::lock_guard<std::mutex> lock(mutex_);
 
@@ -67,8 +66,7 @@ namespace sm {
     }
 
     void ScenarioManager::handleQuitSignal() {
-        bool was_running = false;
-
+        //bool was_running = false;
         {
             std::lock_guard<std::mutex> lock(mutex_);
             std::cout << u8"[" << client_id_ << u8"] OCC 종료 신호 수신 → 시나리오 종료 처리\n";
@@ -81,13 +79,13 @@ namespace sm {
 
             http_client_.clearState();
             is_running_ = false;
-            was_running = true;
+            //was_running = true;
 
             std::cout << u8"[" << client_id_ << u8"] 시나리오 종료 및 상태 초기화 완료\n";
         }
 
-        if (was_running && on_quit_cb_) {
-            on_quit_cb_();
+        if (!is_running_ && on_quit_cb_) {
+            on_quit_cb_();          //handleQuit();
         }
     }
 
