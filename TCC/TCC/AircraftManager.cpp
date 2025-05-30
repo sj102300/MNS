@@ -3,13 +3,15 @@
 #include "UdpSender.h"
 #include "EngagementManager.h"
 
-AircraftManager::AircraftManager() {
+AircraftManager::AircraftManager(TCC::Position& batteryLocation) : batteryLocation_(batteryLocation) {
+
 }
 
 AircraftManager::~AircraftManager() {
-	for (auto& v : aircrafts_) {
-		delete v.second;
+	for (auto& pair : aircrafts_) {
+		delete pair.second;  // 각 Aircraft* 삭제
 	}
+	aircrafts_.clear();       // map 자체는 자동 소멸되지만 명시적으로 비워줘도 OK
 }
 
 bool AircraftManager::init(TCC::UdpSender* sender, EngagementManager* engagementManager) {
@@ -27,6 +29,8 @@ void AircraftManager::start() {
 }
 
 void AircraftManager::handleReceivedAircraft(NewAircraft& newAircraft) {
+	std::cout << std::fixed << std::setprecision(9); // 소수점 9자리까지 고정 출력
+
 	std::cout << "Aircraft ID: " << newAircraft.aircraftId_
 		<< ", Latitude: " << newAircraft.location_.latitude_
 		<< ", Longitude: " << newAircraft.location_.longitude_ << std::endl;
@@ -84,13 +88,17 @@ void AircraftManager::judgeEngagable() {
 				continue;
 			}
 			bool isEngagementStatusChanged = false;
-			if (targetAircraft->isIpInEngageRange(newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_, isEngagementStatusChanged)) {	//적군 항공기 중 교전 가능 범위 아님
+			if (targetAircraft->isIpInEngageRange(batteryLocation_, newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_, isEngagementStatusChanged)) {	//적군 항공기 중 교전 가능 범위 아님
 				sender_->sendAircraftData(newAircraftWithIp);
 			}
 
 			//교전 불가능에서 교전 가능 상태로 바뀌었을때만 addEngagableAircraft호출해야함
 			if (isEngagementStatusChanged) {
 				engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
+			}
+
+			if (newAircraftWithIp.engagementStatus_ == Aircraft::EngagementStatus::Engageable) {
+				std::cout << "findEngagableAircraft Data: " << newAircraftWithIp.aircraftData_.aircraftId_ << std::endl;
 			}
 
 		}
@@ -106,7 +114,3 @@ void AircraftManager::stop() {
 	}
 	return;
 }
-
-//void AircraftManager::updateAircraftStatus() {
-//
-//}

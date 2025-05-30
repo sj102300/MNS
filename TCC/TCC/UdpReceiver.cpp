@@ -14,7 +14,8 @@ bool TCC::UdpReceiver::init(EngagementManager * engagementManager) {
 	
 	if (engagementManager == nullptr)
 		return false;
-	
+	engagementManager_ = engagementManager;
+
 	WSADATA wsaData;
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -75,14 +76,12 @@ void TCC::UdpReceiver::receive() {
 		}
 
 		parseHeader(buffer, header);
-		//std::cout << header.commandCode_ << std::endl;
 
 		switch (header.commandCode_) {
 		case CommandCode::ModeChangeRequest:
 			if (!parseModeChangeMSG(buffer + 8, modechangemsg)) 
 				break;
 			std::cout << "Modechanged: " << modechangemsg.mode_ << "\n";
-			//engagementManager_->changeMode(modechangemsg.mode_);
 			responseChangeModeAck(engagementManager_->changeMode(modechangemsg.mode_));
 			break;
 
@@ -90,6 +89,7 @@ void TCC::UdpReceiver::receive() {
 			std::cout << "ManualFireRequest" << std::endl;
 			if (!parseManualFireMSG(buffer + 8, manualFireMsg))
 				break;
+			responseManualFireAck(manualFireMsg);
 			engagementManager_->manualFire(std::string(manualFireMsg.commandId_, 20), std::string(manualFireMsg.targetAircraftId_, 8));
 			break;
 
@@ -97,10 +97,8 @@ void TCC::UdpReceiver::receive() {
 			std::cout << "EmergencyDestroyRequest" << std::endl;
 			if (!parseEmergencyDestroyMSG(buffer + 8, emergencyDestroyMsg))
 				break;
-			//ack 보내기
-			std::cout << "EmergencyDestroyMSG: " << emergencyDestroyMsg.commandId_ << "\n";
+			responseEmergencyDestroyAck(emergencyDestroyMsg);
 			engagementManager_->emergencyDestroy(std::string(emergencyDestroyMsg.commandId_, 20), std::string(emergencyDestroyMsg.targetMissileId_, 8));
-
 			break;
 
 		default:
@@ -109,17 +107,59 @@ void TCC::UdpReceiver::receive() {
 	}
 }
 
-void TCC::UdpReceiver::responseChangeModeAck(unsigned int changedMode) {
+void TCC::UdpReceiver::responseManualFireAck(ManualFireMSG& body) {
 	AckHeader header;
 	header.commandCode_ = CommandCode::ModeChangeRequest;
-	header.bodyLength_ = 4;
-	ModeChangeAck body;
-	body.mode_ = changedMode;
+	header.bodyLength_ = sizeof(ManualFireMSG);
 
-	char buffer[12];
-	//응답 에코하기    
+	char buffer[50];
+
 	memcpy(buffer, &header, sizeof(AckHeader));
-	memcpy(buffer + 8, &body, sizeof(ModeChangeAck));
+	memcpy(buffer + sizeof(AckHeader), &body, sizeof(ManualFireMSG));
+	int sent = sendto(serverSocket_, buffer, sizeof(buffer), 0,
+		reinterpret_cast<const sockaddr*>(&senderAddr_),
+		sizeof(senderAddr_));
+
+	if (sent == SOCKET_ERROR) {
+		std::cerr << "[UdpReceiver] Ack sendto failed: " << WSAGetLastError() << "\n";
+	}
+	else {
+		std::cout << "[UdpReceiver] Sent ManualFireAck to client\n";
+	}
+}
+
+void TCC::UdpReceiver::responseChangeModeAck(unsigned int changedMode) {  
+   AckHeader header;  
+   header.commandCode_ = CommandCode::ModeChangeRequest;  
+   header.bodyLength_ = sizeof(ModeChangeAck);  
+   ModeChangeAck body;  
+   body.mode_ = changedMode; 
+
+   // Ensure buffer size matches the actual data size being sent  
+   char buffer[20];
+
+   memcpy(buffer, &header, sizeof(AckHeader));  
+   memcpy(buffer + sizeof(AckHeader), &body, sizeof(ModeChangeAck));  
+
+   int sent = sendto(serverSocket_, buffer, sizeof(buffer), 0,
+       reinterpret_cast<const sockaddr*>(&senderAddr_),  
+       sizeof(senderAddr_));  
+
+   if (sent == SOCKET_ERROR) {  
+       std::cerr << "[UdpReceiver] Ack sendto failed: " << WSAGetLastError() << "\n";  
+   } else {  
+       std::cout << "[UdpReceiver] Sent ModeChangeAck to client\n";  
+   }  
+}
+
+void TCC::UdpReceiver::responseEmergencyDestroyAck(EmergencyDestroyMSG& body) {
+	AckHeader header;
+	header.commandCode_ = CommandCode::EmergencyDestroyRequest;
+	header.bodyLength_ = sizeof(EmergencyDestroyMSG);
+	char buffer[50];
+
+	memcpy(buffer, &header, sizeof(AckHeader));
+	memcpy(buffer + sizeof(AckHeader), &body, sizeof(EmergencyDestroyMSG));
 
 	int sent = sendto(serverSocket_, buffer, sizeof(buffer), 0,
 		reinterpret_cast<const sockaddr*>(&senderAddr_),
@@ -129,7 +169,7 @@ void TCC::UdpReceiver::responseChangeModeAck(unsigned int changedMode) {
 		std::cerr << "[UdpReceiver] Ack sendto failed: " << WSAGetLastError() << "\n";
 	}
 	else {
-		std::cout << "[UdpReceiver] Sent ModeChangeAck to client\n";
+		std::cout << "[UdpReceiver] Sent EmergencyDestroyAck to client\n";
 	}
 }
 
@@ -143,9 +183,6 @@ bool TCC::UdpReceiver::parseModeChangeMSG(const char* buffer, ModeChangeMSG& msg
 bool TCC::UdpReceiver::parseManualFireMSG(const char* buffer, ManualFireMSG& msg) {
 	memcpy(&msg, buffer, sizeof(ManualFireMSG));
 
-	std::cout << std::string(msg.commandId_, 20) << std::endl;
-	std::cout << std::string(msg.targetAircraftId_, 8) << std::endl;
-
 	//if (!TCC::isValidCommandId(msg.commandId_))
 	//	return false;
 	//if (!TCC::isValidAircraftId(msg.targetAircraftId_))
@@ -156,9 +193,6 @@ bool TCC::UdpReceiver::parseManualFireMSG(const char* buffer, ManualFireMSG& msg
 
 bool TCC::UdpReceiver::parseEmergencyDestroyMSG(const char* buffer, EmergencyDestroyMSG& msg) {
 	memcpy(&msg, buffer, sizeof(EmergencyDestroyMSG));
-
-	std::cout << std::string(msg.commandId_, 20) << std::endl;
-	std::cout << std::string(msg.targetMissileId_, 8) << std::endl;
 
 	//if (!TCC::isValidCommandId(msg.commandId_))
 	//	return false;

@@ -1,12 +1,13 @@
 #include "Aircraft.h"
+#include <iostream>
 
 Aircraft::Aircraft(std::string aircraftId, TCC::Position pos, bool isEnemy__) : aircraftId_(aircraftId), pos_(pos), 
     isEnemy_(isEnemy__), dirVec_({ 0,0 }), status_(EngagementStatus::NotEngageable), impactPoint_({ -200, -200, 10 }) {}
 
-#include <iostream>
 Aircraft::~Aircraft() {
     std::cout<<"aircraft deleted"<<std::endl;
 }
+
 const bool Aircraft::isEnemy() const {
 	return isEnemy_;
 }
@@ -56,8 +57,8 @@ void Aircraft::calcDirVec(const TCC::Position& newPos) {
     return;
 }
 
-TCC::Position Aircraft::getImpactPoint() {
-    return impactPoint_;
+void Aircraft::getImpactPoint(TCC::Position &impactPoint) {
+    impactPoint = impactPoint_;
 }
 
 void Aircraft::calcImpactPoint() {
@@ -103,7 +104,7 @@ void Aircraft::calcImpactPoint() {
     impactPoint_ = xyToLatLon(batteryLoc, impact_x, impact_y, pos_.altitude_);
 }
 
-bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& impactPoint, bool &isEngagementStatusChanged) {
+bool Aircraft::isIpInEngageRange(TCC::Position &batteryLoc, unsigned int& engagementStatus, TCC::Position& impactPoint, bool &isEngagementStatusChanged) {
 
     engagementStatus = (unsigned int)status_;
 
@@ -114,8 +115,13 @@ bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& i
     calcImpactPoint();
     impactPoint = impactPoint_;
 
-    // 포대 위치
-    TCC::Position batteryLoc = { 37.5432, 126.7321, 10 };
+	//std::cout << "aircraftId: " << aircraftId_ 
+	//	<<" pos: (" << pos_.latitude_ << ", " << pos_.longitude_ << ", " << pos_.altitude_ << ")"
+	//	<< " dirVec: (" << dirVec_.dx_ << ", " << dirVec_.dy_ << ")"
+	//	<< " isEnemy: " << (isEnemy_ ? "true" : "false")
+	//	<< " status: " << status_
+	//	<< " impactPoint: (" << impactPoint_.latitude_ << ", " << impactPoint_.longitude_ << ", " << impactPoint_.altitude_ << ")"
+	//	<< std::endl;
 
     // 위도와 경도를 라디안으로 변환
     double lat1 = batteryLoc.latitude_ * DEG_TO_RAD;

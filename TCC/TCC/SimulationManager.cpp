@@ -3,8 +3,8 @@
 
 SimulationManager::SimulationManager() {
 	scenarioManager_ = new sm::ScenarioManager(
-		"http://192.168.2.66:8080",     // 수신 주소
-		"http://192.168.2.30:8080",    // SCN 서버 주소
+		"http://192.168.2.66:8080",     // TCC Http 서버 주소
+		"http://192.168.2.30:8080",    // SCN Http 서버 주소
 		"TCC"         // 클라이언트 ID
 	);
 
@@ -63,9 +63,15 @@ void SimulationManager::startSimulation() {
 
 bool SimulationManager::startScenario() {
 
-	//sm::Coordinate batterylocation = scenarioManager_->getBatteryLocation();
+	sm::Coordinate battery = scenarioManager_->getBatteryLocation();
 
-	if (!createObjects()) {
+	TCC::Position batteryLocation = {
+		battery.latitude,
+		battery.longitude,
+		battery.altitude
+	};
+
+	if (!createObjects(batteryLocation)) {
 		std::cout << "startScenario() Failed\n";
 		return false;
 	}
@@ -102,19 +108,20 @@ bool SimulationManager::quitScenario() {
 	delete udpSender_;
 	delete udpReceiver_;
 	delete multiReceiver_;
+	delete multiSender_;
 
 	return true;
 }
 
-bool SimulationManager::createObjects() {
-	multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);
-	udpSender_ = new TCC::UdpSender("192.168.2.200", 9000); //OCC  ּ 
-	multiSender_ = new TCC::UdpMulticastSender("239.0.0.1", 9000);
-	aircraftManager_ = new AircraftManager();
+bool SimulationManager::createObjects(TCC::Position& batteryLocation) {
+
+	multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);		//192.168.2.190으로 수신
+	udpSender_ = new TCC::UdpSender("192.168.2.200", 9000);					//OCC 교전망
+	multiSender_ = new TCC::UdpMulticastSender("239.0.0.1", 9000);			//192.168.2.194로 송신
+	aircraftManager_ = new AircraftManager(batteryLocation);
 	engagementManager_ = new EngagementManager();
 	missileManager_ = new MissileManager(udpSender_, engagementManager_);
-	udpReceiver_ = new TCC::UdpReceiver("192.168.2.100", 9000);
-	
+	udpReceiver_ = new TCC::UdpReceiver("192.168.2.189", 9999);				//TCC 교전망
 
 	if (!aircraftManager_->init(udpSender_, engagementManager_)) {
 		std::cout << "aircraftManager init() Failed\n";
@@ -149,12 +156,10 @@ void SimulationManager::quitSimulation() {
 
 	std::cout << "quitSimulation()" << std::endl;
 
-	//    // http서버 종료 처리
-	//    if (scenarioThread.joinable()) scenarioThread.join();
-	//    if (radarThread.joinable()) radarThread.join();
-	//
-	//    std::cout << u8"[" << SUBSYSTEM_ID << u8"] 프로그램 정상 종료\n";
-	//    return 0;
+	// http서버 종료 처리
+	//if (sm::scenarioThread.joinable()) {
+	//	scenarioThread.join();
+	//}
 
 	delete scenarioManager_;
 }

@@ -85,8 +85,8 @@ std::string MissileManager::findAvailableMissile() {
 }
 
 MissileManager::~MissileManager() {
-    for (auto m : missiles_) {
-        delete m;
+    for (Missile* missile : missiles_) {
+        delete missile;
     }
-    std::cout << "MissileManager deleted" << std::endl;
+    missiles_.clear(); 
 }

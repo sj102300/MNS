@@ -20,7 +20,7 @@ namespace TCC {
 
 		typedef struct _header {
 			unsigned int commandCode_;
-			int32_t bodyLength_;
+			int bodyLength_;
 		}Header;
 
 		typedef struct _mode_change_message {
@@ -59,6 +59,8 @@ namespace TCC {
 		bool parseManualFireMSG(const char* buffer, ManualFireMSG& msg);
 		bool parseEmergencyDestroyMSG(const char* buffer, EmergencyDestroyMSG& msg);
 		void responseChangeModeAck(unsigned int changedMode);
+		void responseManualFireAck(ManualFireMSG& body);
+		void responseEmergencyDestroyAck(EmergencyDestroyMSG& body);
 
 		std::string ip_;
 		int port_;

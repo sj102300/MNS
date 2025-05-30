@@ -22,7 +22,7 @@ public:
 private:
 	bool startScenario();
 	bool quitScenario();
-	bool createObjects();
+	bool createObjects(TCC::Position& batteryLocation);
 
 	std::string scenarioId_;
 	TCC::Position batterLoc_;

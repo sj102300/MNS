@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "..\Test\Test.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestServer", "..\TestServer\TestServer.vcxproj", "{ECB7D2F3-4EC3-48AA-AD99-00C97D4C18BF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testWithOcc", "..\testWithOcc\testWithOcc.vcxproj", "{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -50,6 +52,14 @@ Global
 		{ECB7D2F3-4EC3-48AA-AD99-00C97D4C18BF}.Release|x64.Build.0 = Release|x64
 		{ECB7D2F3-4EC3-48AA-AD99-00C97D4C18BF}.Release|x86.ActiveCfg = Release|Win32
 		{ECB7D2F3-4EC3-48AA-AD99-00C97D4C18BF}.Release|x86.Build.0 = Release|Win32
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Debug|x64.ActiveCfg = Debug|x64
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Debug|x64.Build.0 = Debug|x64
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Debug|x86.ActiveCfg = Debug|Win32
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Debug|x86.Build.0 = Debug|Win32
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Release|x64.ActiveCfg = Release|x64
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Release|x64.Build.0 = Release|x64
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Release|x86.ActiveCfg = Release|Win32
+		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -97,7 +97,6 @@ void TCC::UdpMulticastReceiver::receive() {
 		}
 
 		parseHeader(header);
-		std::cout << header.eventCode_ << std::endl;
 
 		switch (header.eventCode_) {
 		case EventCode::FindTargetEvent:

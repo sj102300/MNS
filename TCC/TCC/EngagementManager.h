@@ -7,6 +7,11 @@
 #include <queue>
 #include <thread>
 #include <atomic>
+
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+
 #include "UdpSender.h"
 #include "UdpMulticastSender.h"
 
@@ -15,6 +20,7 @@ class AircraftManager;
 
 class EngagementManager {
 public:
+	EngagementManager();
 	void start();
 	void stop();
 	bool init(TCC::UdpSender* sender, AircraftManager* aircraftManager, TCC::UdpMulticastSender* multisender, MissileManager* missileManager);
@@ -25,6 +31,7 @@ public:
 	void addEngagableAircraft(std::string& aircraftId);
 	bool manualFire(std::string commandId, std::string targetAircraftId);
 	void notifyThread();
+	~EngagementManager();
 
 private:
 	enum Mode {
@@ -45,6 +52,8 @@ private:
 	};
 
 	std::mutex mtx_;				//cv_용
+	std::atomic<bool> isRunning_;
+	std::atomic<bool> isChanged_;
 	std::condition_variable cv_;
 
 	TCC::UdpSender* sender_;
@@ -53,13 +62,13 @@ private:
 	AircraftManager* aircraftManager_;
 	std::unordered_map<std::string, std::string> missileToAircraft_; // 미사일 : 키 , 항공기 : value
 	std::thread workThread_;
+
 	std::atomic<unsigned int> mode_;
 	EngagableAircraftQueue engagableAircrafts_;
-	std::atomic<bool> isRunning_;
-	std::atomic<bool> isChanged_;
 
 	void work();
-	void mappingMissileToAircraft(std::string& aircraftId, std::string& missileId);
+	bool mappingMissileToAircraft(std::string& aircraftId, std::string& missileId);
+	void makeAutoFireCommandId(std::string& commandId);
 };
 
 //

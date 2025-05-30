@@ -54,24 +54,64 @@ bool TCC::UdpMulticastSender::init() {
         return false;
     }
 
+    // 수신 타임아웃 설정
+    int timeout = 100; // 100ms
+    setsockopt(sock_, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
+
     return true;
 }
 
-bool TCC::UdpMulticastSender::sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
+void TCC::UdpMulticastSender::sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
 
-    std::cout << "sendLaunchCommand() called\n";
-
-    char buffer[100];
+    char* buffer = new char[100];
     //헤더 붙이기
-    int headerSize = serializeHeader(buffer, 2001, 60);
+    int headerSize = serializeHeader(buffer, EventCode::launchCommand, sizeof(LaunchCommandBody));
     int bodySize = serializeLauncCommandBody(buffer + headerSize, commandId, aircraftId, missileId, impactPoint);
+    int totalSize = headerSize + bodySize;
 
-    if (sendByteData(buffer, headerSize + bodySize) < 0) {
-        return false;
+    std::thread([this, buffer, totalSize]() {
+        sendUntilReceiveAck(buffer, totalSize);
+        delete[] buffer;
+        }).detach();
+    return;
+}
+
+void TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length) {
+
+    char recvBuffer[100];
+
+    sockaddr_in fromAddr;
+    int fromLen = sizeof(fromAddr);
+
+    for (int attempt = 0; attempt < 4; ++attempt) {
+        // 송신
+        if (sendByteData(buffer, length) < 0) {
+			continue;
+        }
+        // 수신 시도
+        int recvLen = recvfrom(sock_, recvBuffer, sizeof(recvBuffer) - 1, 0, (sockaddr*)&fromAddr, &fromLen);
+        if (recvLen > 0) {
+            return;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    std::cout << "Launch command sendByteData() success\n";
 
-    return true;
+	std::cout << "No ACK received after 10 attempts" << std::endl;
+}
+
+void TCC::UdpMulticastSender::sendEmergencyDestroyCommand(std::string& commandId, std::string& missileId) {
+    char * buffer = new char[100];
+
+    int headerSize = serializeHeader(buffer, EventCode::emergencyDestroyCommand, sizeof(EmergencyDestroyCommandBody));
+    int bodySize = serializeEmergencyDestroyCommandBody(buffer + headerSize, commandId, missileId);
+    
+	int totalSize = headerSize + bodySize;
+    std::thread([this, buffer, totalSize]() {
+        sendUntilReceiveAck(buffer, totalSize);
+        delete[] buffer;
+        }).detach();
+
+    return;
 }
 
 const int TCC::UdpMulticastSender::serializeHeader(char* buffer, unsigned int eventCode, int bodyLength) {
@@ -80,8 +120,7 @@ const int TCC::UdpMulticastSender::serializeHeader(char* buffer, unsigned int ev
     return 8;
 }
 
-const int TCC::UdpMulticastSender::serializeLauncCommandBody(char* buffer, std::string& commandId, std::string& aircraftId,
-    std::string& missileId, TCC::Position& impactPoint) {
+const int TCC::UdpMulticastSender::serializeLauncCommandBody(char* buffer, std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
     memcpy(buffer, commandId.c_str(), 20);
     memcpy(buffer + 20, aircraftId.c_str(), 8);
     memcpy(buffer + 28, missileId.c_str(), 8);
@@ -89,17 +128,21 @@ const int TCC::UdpMulticastSender::serializeLauncCommandBody(char* buffer, std::
     return 60;
 }
 
+const int TCC::UdpMulticastSender::serializeEmergencyDestroyCommandBody(char* buffer, std::string& commandId, std::string& missileId) {
+    memcpy(buffer, commandId.c_str(), 20);
+    memcpy(buffer + 20, missileId.c_str(), 8);
+    return 28;
+} 
 
-int TCC::UdpMulticastSender::sendByteData(const char* data, int length) {
-
+const int TCC::UdpMulticastSender::sendByteData(const char* data, int length) {
     if (sock_ == INVALID_SOCKET) {
-        std::cerr << "Socket is not initialized\n";
+        std::cout << "Socket is not initialized"<<std::endl;
         return -1;
     }
 
     int bytesSent = sendto(sock_, data, length, 0, (sockaddr*)&destAddr_, sizeof(destAddr_));
     if (bytesSent == SOCKET_ERROR) {
-        std::cerr << "sendto() failed: " << WSAGetLastError() << "\n";
+        std::cout << "sendto() failed: " << WSAGetLastError() << std::endl;
         return -1;
     }
     return bytesSent;

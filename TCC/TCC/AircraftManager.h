@@ -28,7 +28,7 @@ public:
         TCC::Position impactPoint_;
     } NewAircraftWithIP;
     
-    AircraftManager();
+    AircraftManager(TCC::Position &batteryLocation);
     bool init(TCC::UdpSender* sender, EngagementManager* engagementManager);
     void start();
     void stop();
@@ -45,6 +45,8 @@ private:
 
     std::atomic<bool> isRunning_;
     TCC::UdpSender* sender_;
+    TCC::Position batteryLocation_;
+
     EngagementManager* engagementManager_;
     std::queue<NewAircraft> newAircraftQueue_;
     std::unordered_map<std::string, Aircraft*> aircrafts_;
