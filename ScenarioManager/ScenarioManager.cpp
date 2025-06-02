@@ -31,6 +31,10 @@ namespace sm {
         }
     }
 
+    void ScenarioManager::stop() {
+        http_server_.stop();
+    }
+
     void ScenarioManager::setOnReadyCallback(std::function<void()> cb) {
         on_start_cb_ = std::move(cb);
     }

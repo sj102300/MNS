@@ -120,6 +120,7 @@ int main() {
     }
 
     // 종료 처리
+    scenarioRunner.stop();
     if (scenarioThread.joinable()) scenarioThread.join();
     if (radarThread.joinable()) radarThread.join();
 

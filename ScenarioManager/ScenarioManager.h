@@ -14,6 +14,7 @@ namespace sm {
             const std::string& client_id);
 
         void run();
+        void stop();
         void handleStartSignal(const std::string& scenario_id);
         void handleQuitSignal();
 
