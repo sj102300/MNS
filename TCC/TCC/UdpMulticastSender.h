@@ -6,6 +6,8 @@
 #include <iostream>
 #include <thread>
 #include "share.h"
+#include <mutex>
+#include <unordered_map>
 
 
 namespace TCC {
@@ -38,12 +40,20 @@ namespace TCC {
             char missileId_[8];
         } EmergencyDestroyCommandBody;
 
+        // Ack 결과를 외부에서 확인할 수 있도록 getter 제공 (예시)
+        bool waitForAckResult(const std::string& missileId, int timeoutMs = 3000);
+        void setAckResult(const std::string& missileId, bool result);
+
     private:
         const int serializeHeader(char* buffer, unsigned int eventCode, int bodyLength);
         const int serializeLauncCommandBody(char* buffer, std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint);
         const int serializeEmergencyDestroyCommandBody(char* buffer, std::string& commandId, std::string& missileId);
         const int sendByteData(const char* data, int len);
-		void sendUntilReceiveAck(const char* buffer, int length);
+		bool sendUntilReceiveAck(const char* buffer, int length);
+
+        std::mutex ackMtx_;
+        std::condition_variable ackCv_;
+        std::unordered_map<std::string, bool> ackResults_;  // missileId별 Ack 결과 저장
 
         SOCKET sock_;
         sockaddr_in mcastAddr_;

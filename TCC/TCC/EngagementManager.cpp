@@ -161,6 +161,10 @@ void EngagementManager::work() {
 		if (!isRunning_)
 			break;
 
+		//if () {
+		//	// 비상폭파 관련 cv 로직
+		//}
+
 		if (mode_ == Mode::Manual) {
 			continue;	//수동발사 모드일때는 작업할게 없음
 		}
@@ -240,8 +244,16 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 bool EngagementManager::emergencyDestroy(std::string commandId, std::string missileId) {
 	
 	multisender_->sendEmergencyDestroyCommand(commandId, missileId);
-	//missileToAircraft_.erase(missileId);
-	//Missile* missile = missileManager_->selectMissile(missileId);
+
+	bool result = multisender_->waitForAckResult(missileId, 3000); // 3초 대기
+	if (result) {
+		// Ack 수신 성공 처리
+		missileToAircraft_.erase(missileId);
+		Missile* missile = missileManager_->selectMissile(missileId);
+	}
+	else {
+		// Ack 수신 실패 처리
+	}
 	
 	// TCC receiver 미사일의 데이터를 계속 수신 -> status == 비상폭파
 	// 이 비상폭파가 어느 미사일의 비상폭파인지 확인 -> Ack
