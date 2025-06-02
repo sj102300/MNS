@@ -29,11 +29,11 @@ void AircraftManager::start() {
 }
 
 void AircraftManager::handleReceivedAircraft(NewAircraft& newAircraft) {
-	std::cout << std::fixed << std::setprecision(9); // 소수점 9자리까지 고정 출력
+	//std::cout << std::fixed << std::setprecision(9); // 소수점 9자리까지 고정 출력
 
-	std::cout << "Aircraft ID: " << newAircraft.aircraftId_
-		<< ", Latitude: " << newAircraft.location_.latitude_
-		<< ", Longitude: " << newAircraft.location_.longitude_ << std::endl;
+	//std::cout << "Aircraft ID: " << newAircraft.aircraftId_
+	//	<< ", Latitude: " << newAircraft.location_.latitude_
+	//	<< ", Longitude: " << newAircraft.location_.longitude_ << std::endl;
 	pushNewAircraftQueue(newAircraft);
 }
 
@@ -83,26 +83,15 @@ void AircraftManager::judgeEngagable() {
 			Aircraft* targetAircraft = aircrafts_[newAircraftWithIp.aircraftData_.aircraftId_];
 			targetAircraft->updatePosition(newAircraftWithIp.aircraftData_.location_);
 
-			if (!targetAircraft->isEnemy()) {	//아군 항공기
-				sender_->sendAircraftData(newAircraftWithIp);
-				continue;
-			}
-			bool isEngagementStatusChanged = false;
-			if (targetAircraft->isIpInEngageRange(batteryLocation_, newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_, isEngagementStatusChanged)) {	//적군 항공기 중 교전 가능 범위 아님
-				sender_->sendAircraftData(newAircraftWithIp);
+			if (targetAircraft->isEnemy()) {
+				if (targetAircraft->hasBecomeEngageable(batteryLocation_, newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_)) {
+					engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
+				}
 			}
 
-			//교전 불가능에서 교전 가능 상태로 바뀌었을때만 addEngagableAircraft호출해야함
-			if (isEngagementStatusChanged) {
-				engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
-			}
-
-			if (newAircraftWithIp.engagementStatus_ == Aircraft::EngagementStatus::Engageable) {
-				std::cout << "findEngagableAircraft Data: " << newAircraftWithIp.aircraftData_.aircraftId_ << std::endl;
-			}
-
+			sender_->sendAircraftData(newAircraftWithIp);
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 }
 

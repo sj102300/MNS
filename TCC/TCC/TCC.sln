@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestServer", "..\TestServer
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testWithOcc", "..\testWithOcc\testWithOcc.vcxproj", "{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testEngagementSuccess", "..\testEngagementSuccess\testEngagementSuccess.vcxproj", "{3CC3F188-AD2E-4D05-877A-1DE6275671A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -60,6 +62,14 @@ Global
 		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Release|x64.Build.0 = Release|x64
 		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Release|x86.ActiveCfg = Release|Win32
 		{01DEBE83-D75D-4DBD-B17E-A63BCAD1569D}.Release|x86.Build.0 = Release|Win32
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Debug|x64.ActiveCfg = Debug|x64
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Debug|x64.Build.0 = Debug|x64
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Debug|x86.ActiveCfg = Debug|Win32
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Debug|x86.Build.0 = Debug|Win32
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Release|x64.ActiveCfg = Release|x64
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Release|x64.Build.0 = Release|x64
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Release|x86.ActiveCfg = Release|Win32
+		{3CC3F188-AD2E-4D05-877A-1DE6275671A0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

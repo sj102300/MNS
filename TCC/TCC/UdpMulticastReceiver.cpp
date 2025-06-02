@@ -16,16 +16,17 @@ TCC::UdpMulticastReceiver::~UdpMulticastReceiver() {
 	WSACleanup();
 }
 
-bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileManager* missileManager) {
+bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileManager* missileManager, EngagementManager* engagementManager) {
 
 	isRunning_ = true;
 	//여기서 포인터 연결 먼저 하기
-	if (aircraftManager == nullptr || missileManager == nullptr) {
+	if (aircraftManager == nullptr || missileManager == nullptr || engagementManager == nullptr) {
 		return false;
 	}
 
 	aircraftManager_ = aircraftManager;
 	missileManager_ = missileManager;
+	engagementManager_ = engagementManager;
 
 	WSADATA wsaData;
 
@@ -83,13 +84,13 @@ void TCC::UdpMulticastReceiver::stop() {
 void TCC::UdpMulticastReceiver::receive() {
 
 	Header header;
-	sockaddr_in senderAddr;
-	int addrLen = sizeof(senderAddr);
+	int addrLen = sizeof(senderAddr_);
 	AircraftManager::NewAircraft newAircraft;
 	MissileMSG missileMsg;
+	EngagementSuccessMSG engagementSuccessMsg;
 
 	while (isRunning_) {
-		int bytesReceived = recvfrom(serverSocket_, buffer, sizeof(buffer), 0, (struct sockaddr*)&senderAddr, &addrLen);
+		int bytesReceived = recvfrom(serverSocket_, buffer, sizeof(buffer), 0, (struct sockaddr*)&senderAddr_, &addrLen);
 		
 		if (bytesReceived < 0) {
 			std::cout << "UdpMulticastReceiver: recvfrom Failed. Error: " << WSAGetLastError() << "\n";
@@ -104,8 +105,14 @@ void TCC::UdpMulticastReceiver::receive() {
 				break;
 			aircraftManager_->handleReceivedAircraft(newAircraft);
 			break;
-		case EventCode::KillSuccess:
-			//격추 성공
+
+		case EventCode::EngagementSuccess:
+			if (!parseReceivedEngagementSuccessMSG(buffer + 8, engagementSuccessMsg, header.bodyLength_))
+				break;
+			responseEngagementSuccessAck(engagementSuccessMsg);
+			engagementManager_->engagementSuccess(std::string(engagementSuccessMsg.targetAircraftId_, 8), std::string(engagementSuccessMsg.targetMissileId_, 8));
+			break;
+
 		case EventCode::MissileStatus:
 			//미사일 데이터
 			memcpy(&missileMsg, buffer + 8, sizeof(MissileMSG));
@@ -152,6 +159,28 @@ bool TCC::UdpMulticastReceiver::parseReceivedAircraftMSG(const char * buffer, Ai
 	return true;
 }
 
+bool TCC::UdpMulticastReceiver::responseEngagementSuccessAck(EngagementSuccessMSG& msg) {
+	Header header;
+	header.eventCode_ = EventCode::EngagementSuccess;
+	header.bodyLength_ = sizeof(EngagementSuccessMSG);
+
+	char buffer[100];
+	memcpy(buffer, &header, sizeof(Header));
+	memcpy(buffer + sizeof(Header), &msg, sizeof(EngagementSuccessMSG));
+	int sent = sendto(serverSocket_, buffer, sizeof(buffer), 0,
+		reinterpret_cast<const sockaddr*>(&senderAddr_),
+		sizeof(senderAddr_));
+
+	if (sent == SOCKET_ERROR) {
+		std::cerr << "[UdpReceiver] Ack sendto failed: " << WSAGetLastError() << "\n";
+		return false;
+	}
+	else {
+		std::cout << "[UdpReceiver] Sent EngagementSuccessAck to client\n";
+		return true;
+	}
+}
+
 bool TCC::UdpMulticastReceiver::parseReceivedMissileMSG(const char* buffer, MissileMSG& data, int length) {
 
 	MissileMSG msg;
@@ -165,5 +194,18 @@ bool TCC::UdpMulticastReceiver::parseReceivedMissileMSG(const char* buffer, Miss
 
 	data = msg;
 
+	return true;
+}
+
+bool TCC::UdpMulticastReceiver::parseReceivedEngagementSuccessMSG(const char* buffer, EngagementSuccessMSG& msg, int length) {
+	if (length < sizeof(EngagementSuccessMSG)) {
+		std::cout << "EngagementSuccessMSG length error\n";
+		return false;
+	}
+	memcpy(&msg, buffer, sizeof(EngagementSuccessMSG));
+	//if (!TCC::isValidAircraftId(msg.targetAircraftId_))
+	//	return false;
+	//if (!TCC::isValidMissileId(msg.targetMissileId_))
+	//	return false;
 	return true;
 }

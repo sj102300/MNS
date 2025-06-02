@@ -24,6 +24,7 @@ public:
 	void start();
 	void stop();
 	bool init(TCC::UdpSender* sender, AircraftManager* aircraftManager, TCC::UdpMulticastSender* multisender, MissileManager* missileManager);
+	bool engagementSuccess(std::string targetAircraftId, std::string targetMissileId);
 	bool isHitTarget(std::string& missileId);
 	unsigned int changeMode(unsigned int mode);
 	bool launchMissile(std::string& commandId, std::string& aircraftId);

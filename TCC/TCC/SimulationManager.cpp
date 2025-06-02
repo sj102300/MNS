@@ -1,7 +1,7 @@
 
 #include "SimulationManager.h"
 
-SimulationManager::SimulationManager() {
+SimulationManager::SimulationManager():isRunning_(false), isChanged_(false) {
 	scenarioManager_ = new sm::ScenarioManager(
 		"http://192.168.2.66:8080",     // TCC Http 서버 주소
 		"http://192.168.2.30:8080",    // SCN Http 서버 주소
@@ -127,7 +127,7 @@ bool SimulationManager::createObjects(TCC::Position& batteryLocation) {
 		std::cout << "aircraftManager init() Failed\n";
 		return false;
 	}
-	if (!multiReceiver_->init(aircraftManager_, missileManager_)) {
+	if (!multiReceiver_->init(aircraftManager_, missileManager_, engagementManager_)) {
 		std::cout << "multiReceiver init() Failed\n";
 		return false;
 	}

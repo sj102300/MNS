@@ -61,13 +61,13 @@ void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg)
             std::cout << "미사일 데이터 전송 실패\n";
         }
     }
-    if (msg.status_ == 2) { // 2: 격추 성공
-		std::string missileId(msg.missileId, 8);
-        if (engagementManager_) {
-            engagementManager_->isHitTarget(missileId);
+  //  if (msg.status_ == 2) { // 2: 격추 성공
+		//std::string missileId(msg.missileId, 8);
+  //      if (engagementManager_) {
+  //          engagementManager_->isHitTarget(missileId);
 
-        }
-    }
+  //      }
+  //  }
 	updateMissileStatus(msg.missileId, Missile::MissileStatus(msg.status_));
 }
 

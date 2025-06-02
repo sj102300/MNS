@@ -17,7 +17,7 @@ public:
 	Aircraft(std::string id, TCC::Position pos_, bool isEnemy_);
 	const bool isEnemy() const;
 	void calcImpactPoint();
-	bool isIpInEngageRange(TCC::Position &batteryLoc, unsigned int& engagementStatus, TCC::Position& iplocation, bool &isEngagementStatusChanged);
+	bool hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus, TCC::Position& iplocation);
 	void updatePosition(TCC::Position& newLocation);
 	bool isEngagable();
 	unsigned int updateStatus(unsigned int engagementStatus);
@@ -26,7 +26,6 @@ public:
 
 private:
 	void calcDirVec(const TCC::Position& newPos);
-	bool isStatusChanged(unsigned int a, unsigned int b);
 
 	typedef struct _direction_vector {
 		double dx_;

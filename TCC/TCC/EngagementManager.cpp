@@ -62,7 +62,6 @@ void EngagementManager::makeAutoFireCommandId(std::string &commandId) {
 	return;
 }
 
-
 bool EngagementManager::mappingMissileToAircraft(std::string & aircraftId, std::string& missileId) {
 
 	missileId = missileManager_->findAvailableMissile();
@@ -77,42 +76,76 @@ bool EngagementManager::mappingMissileToAircraft(std::string & aircraftId, std::
 	return true;
 }
 
-// MissileManager에서 미사일의 상태가 격추 성공일 때 이 함수를 호출
-// 
-bool EngagementManager::isHitTarget(std::string& missileId) {
-	//격추 성공 수신
-	//해당 미사일이 격추하던 항공기를 올바르게 격추했는지를 판단.
-	//만약 올바르게 격추했다면 항공기의 status를 EngagementStatus::Destroyed
-	//올바르게 격추되지 않았다면 항공기의 status를 EngagementStatus::NotEngagable
-	
-	// 미사일-항공기 매핑 확인
-	auto it = missileToAircraft_.find(missileId);
-	if (it == missileToAircraft_.end()) {
-		// 매핑된 항공기가 없음
+bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::string targetMissileId) {
+
+	auto it = missileToAircraft_.find(targetMissileId);
+	if (it == missileToAircraft_.end()) {		//사용한 미사일이 아님
 		return false;
 	}
 
-	std::string& aircraftId = it->second;
-	Aircraft* aircraft = aircraftManager_->getAircraft(aircraftId);
-	if (!aircraft) {
-		// 항공기 객체가 존재하지 않음
-		missileToAircraft_.erase(it);
+	// 미사일 상태변화는 미사일 정보 메시지 들어왔을때 업데이트.
+	//missileManager_->updateMissileStatus(targetMissileId, Missile::MissileStatus::NotEngagable);
+
+	//격추된 항공기 상태 변화
+	Aircraft* targetAircraft = aircraftManager_->getAircraft(targetAircraftId);
+	if (targetAircraft == nullptr) {
+		std::cout << "탐지된 항공기가 아닙니다!" << std::endl;
 		return false;
 	}
+	targetAircraft->updateStatus(Aircraft::EngagementStatus::Destroyed);
 
-	// 실제로 격추한 항공기가 내가 쫓던 항공기가 맞는지 확인하는 로직
-	
-	//내가 쫓던 항공기의 EngagementStatus를 Engagable or NotEngagable로 변경
-	//근데 두개의 미사일이 하나를 쫓다가 하나가	격추했다면 Engagable? NotEngagable?
-	//Todo : 내가 쫓던 항공기가 아닌 항공기를 격추 한 경우  
-	// 올바르게 격추했다고 판단
-	std::cout << aircraftId << " 미사일 격추 성공 " << "\n";
+	//원래 쫓던 항공기 상태 변화
+	std::string& originalTargetAircraftId = it->second;
+	if (originalTargetAircraftId != targetAircraftId) {		//원하던 항공기를 격추한게 아님.
+		Aircraft* originalTargetAircraft = aircraftManager_->getAircraft(originalTargetAircraftId);
+		if (originalTargetAircraft == nullptr) {
+			std::cout << "교전 중인 항공기가 아닙니다!" << std::endl;
+			return false;
+		}
+		originalTargetAircraft->updateStatus(Aircraft::EngagementStatus::NotEngageable);
+		// TODO: WDL기능 추가 가능
+	}
 
-	// 매핑 해제
 	missileToAircraft_.erase(it);
 
 	return true;
 }
+
+//MissileManager에서 이거 호출할까?
+//bool EngagementManager::isHitTarget(std::string& missileId) {
+//	//격추 성공 수신
+//	//해당 미사일이 격추하던 항공기를 올바르게 격추했는지를 판단.
+//	//만약 올바르게 격추했다면 항공기의 status를 EngagementStatus::Destroyed
+//	//올바르게 격추되지 않았다면 항공기의 status를 EngagementStatus::NotEngagable
+//	// 
+//	// 미사일-항공기 매핑 확인
+//	auto it = missileToAircraft_.find(missileId);
+//	if (it == missileToAircraft_.end()) {
+//		// 매핑된 항공기가 없음
+//		return false;
+//	}
+//
+//	std::string& aircraftId = it->second;
+//	Aircraft* aircraft = aircraftManager_->getAircraft(aircraftId);
+//	if (!aircraft) {
+//		// 항공기 객체가 존재하지 않음
+//		missileToAircraft_.erase(it);
+//		return false;
+//	}
+//
+//	// 실제로 격추한 항공기가 내가 쫓던 항공기가 맞는지 확인하는 로직
+//
+//	//내가 쫓던 항공기의 EngagementStatus를 Engagable or NotEngagable로 변경
+//	//근데 두개의 미사일이 하나를 쫓다가 하나가	격추했다면 Engagable? NotEngagable?
+//	//Todo : 내가 쫓던 항공기가 아닌 항공기를 격추 한 경우  
+//	// 올바르게 격추했다고 판단
+//	std::cout << aircraftId << " 미사일 격추 성공 " << "\n";
+//
+//	// 매핑 해제
+//	missileToAircraft_.erase(it);
+//
+//	return true;
+//}
 
 void EngagementManager::work() {
 
@@ -133,7 +166,7 @@ void EngagementManager::work() {
 		}
 
 		//자동발사일때
-		if (engagableAircrafts_.popQueue(aircraftId)) {
+		while (!engagableAircrafts_.popQueue(aircraftId)) {
 			std::string commandId;
 			makeAutoFireCommandId(commandId);
 			launchMissile(commandId, aircraftId);
@@ -151,8 +184,6 @@ void EngagementManager::notifyThread() {
 unsigned int EngagementManager::changeMode(unsigned int mode) {
 	mode_ = mode;
 	notifyThread();
-	// 수동발사일때는 queueclear하기
-	// engagableAircrafts_.clear();
 	return mode_;
 }
 
@@ -172,7 +203,7 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 	TCC::Position impactPoint;
 	
 	if (!aircraft->isEngagable()) {
-		std::cout << "aircraft is notEngagable" << std::endl;
+		std::cout << "Aircraft is notEngageable" << std::endl;
 		aircraft->getImpactPoint(impactPoint);
 		std::cout << "lati: " << impactPoint.latitude_
 			<< "longi: " << impactPoint.longitude_
