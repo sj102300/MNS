@@ -98,11 +98,11 @@ namespace OCC.ViewModels
         private readonly List<(string url, string id)> subsystems = new()
         {
             ($"{Network.TCC}", "TCC"),
-            ("http://192.168.2.66:8080", "TCC"),
-            ($"{Network.MSS}", "MSS"),
-            ($"{Network.ATS}", "ATS"),
-            ($"{Network.LCH}", "LCH"),
-            ($"{Network.MFR}", "MFR")
+            //("http://192.168.2.66:8080", "TCC"),
+            //($"{Network.MSS}", "MSS"),
+            //($"{Network.ATS}", "ATS"),
+            //($"{Network.LCH}", "LCH"),
+            //($"{Network.MFR}", "MFR")
         };
 
         private async void Quit()
@@ -163,7 +163,7 @@ namespace OCC.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"[OCC] 예외 발생: {ex.Message}");
+                //MessageBox.Show($"[OCC] 예외 발생: {ex.Message}");
                 return false;
             }
         }

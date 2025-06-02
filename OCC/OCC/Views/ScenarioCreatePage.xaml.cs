@@ -62,6 +62,9 @@ namespace OCC.Views
             {
                 _viewModel.NavigationService = frame.NavigationService;
             }
+
+            // GMapControl에 포커스 강제 부여
+            mapControl.Focus();
         }
 
         //Position : 위/경도 정보 -> 입력 순서는 경도, 위도 순서
@@ -79,6 +82,15 @@ namespace OCC.Views
             mapControl.DragButton = MouseButton.Left;
             mapControl.MouseLeftButtonDown += mapControl_MouseLeftButtonDown;
             mapControl.MouseLeftButtonUp += mapControl_MouseLeftButtonUp;
+
+            mapControl.PreviewMouseWheel += (s, e) =>
+            {
+                if (e.Delta > 0)
+                    mapControl.Zoom = Math.Min(mapControl.Zoom + 1, mapControl.MaxZoom);
+                else
+                    mapControl.Zoom = Math.Max(mapControl.Zoom - 1, mapControl.MinZoom);
+                e.Handled = true;
+            };
         }
 
         private void mapControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
