@@ -2,7 +2,10 @@
 
 #include "MFR.h"
 #include <iostream>
+#include <unordered_map>
 #include <cmath>
+#include <chrono>
+
 namespace mfr {
 
     constexpr double PI = 3.141592653589793;
@@ -84,25 +87,24 @@ namespace mfr {
         return true;
     }
 
+    // 고도를 반영한 하버사인 공식
+    double computeDistanceKm(double lat1, double lon1, double alt1,
+        double lat2, double lon2, double alt2) {
+        double dLat = (lat2 - lat1) * PI / 180.0;
+        double dLon = (lon2 - lon1) * PI / 180.0;
 
-    bool MFR::withinRange(double lat, double lon, double alt,
-        double batteryLat, double batteryLon, double batteryAlt) {
-        double dLat = (lat - batteryLat) * PI / 180.0;
-        double dLon = (lon - batteryLon) * PI / 180.0;
-
-        double lat1 = batteryLat * PI / 180.0;
-        double lat2 = lat * PI / 180.0;
+        lat1 *= PI / 180.0;
+        lat2 *= PI / 180.0;
 
         double a = std::pow(std::sin(dLat / 2), 2) +
             std::cos(lat1) * std::cos(lat2) * std::pow(std::sin(dLon / 2), 2);
         double c = 2 * std::asin(std::sqrt(a));
 
         double groundDistance = EARTH_RADIUS_KM * c;
-        double dAlt = (alt - batteryAlt) / 1000.0;
-        double totalDistance = std::sqrt(groundDistance * groundDistance + dAlt * dAlt);
-
-        return totalDistance <= maxDetectKm;
+        double dAlt = (alt2 - alt1) / 1000.0;
+        return std::sqrt(groundDistance * groundDistance + dAlt * dAlt);
     }
+
 
     void MFR::stop() {
         stopFlag_ = true;
@@ -113,44 +115,72 @@ namespace mfr {
         int addrLen = sizeof(senderAddr);
         AircraftPacket packet;
 
+        std::unordered_map<std::string, AircraftPacket> aircraftMap;
+        auto lastTrackSend = std::chrono::steady_clock::now();
+        auto lastWideSend = std::chrono::steady_clock::now();
+
         while (!stopFlag_) {
             int received = recvfrom(sock_, reinterpret_cast<char*>(&packet), sizeof(packet), 0,
                 (sockaddr*)&senderAddr, &addrLen);
 
-            std::cout << u8"[MFR] 탐지 루프 시작됨. stopFlag = " << stopFlag_ << "\n";
             if (received == SOCKET_ERROR) {
                 std::cerr << u8"[MFR] recvfrom() 실패: " << WSAGetLastError() << "\n";
                 continue;
             }
 
             if (received == sizeof(packet)) {
-                // 수신 패킷 정보 출력
+                std::string id(packet.aircraftId, 8);
+                aircraftMap[id] = packet;
+
+                double dist = computeDistanceKm(batteryLat, batteryLon, batteryAlt,
+                    packet.latitude, packet.longitude, packet.altitude);
+
                 std::cout << u8"[MFR] 수신 패킷 ← "
-                    << u8"ID: " << std::string(packet.aircraftId, 8)
+                    << u8"ID: " << id
                     << u8", 위도: " << packet.latitude
                     << u8", 경도: " << packet.longitude
                     << u8", 고도: " << packet.altitude
-                    << u8", 이벤트: " << packet.eventCode << "\n";
+                    << u8", 이벤트: " << packet.eventCode
+                    << u8", 거리: " << dist << u8"km\n";
                 std::cout << u8"\n====================================================\n";
+            }
 
-                if (packet.eventCode == 1001 &&
-                    withinRange(packet.latitude, packet.longitude, packet.altitude,
-                        batteryLat, batteryLon, batteryAlt)) {
+            auto now = std::chrono::steady_clock::now();
 
-                    packet.eventCode = 1002;
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTrackSend).count() >= 100) {
+                for (const auto& entry : aircraftMap) {
+                    const std::string& id = entry.first;
+                    const AircraftPacket& pkt = entry.second;
 
-                    // 전송 전 패킷 정보 출력
-                    std::cout << u8"[MFR] 전송 패킷 → "
-                        << u8"ID: " << std::string(packet.aircraftId, 8)
-                        << u8", 위도: " << packet.latitude
-                        << u8", 경도: " << packet.longitude
-                        << u8", 고도: " << packet.altitude
-                        << u8", 이벤트: " << packet.eventCode << "\n";
-                    std::cout << u8"\n====================================================\n";
-
-                    sendto(sock_, reinterpret_cast<char*>(&packet), sizeof(packet), 0,
-                        (sockaddr*)&sendAddr_, sizeof(sendAddr_));
+                    double dist = computeDistanceKm(batteryLat, batteryLon, batteryAlt,
+                        pkt.latitude, pkt.longitude, pkt.altitude);
+                    if (dist <= 150.0 && pkt.eventCode == 1001) {
+                        AircraftPacket p = pkt;
+                        p.eventCode = 1002;
+                        std::cout << u8"[MFR] 추적 탐지 전송 → ID: " << id << u8", 거리: " << dist << "km\n";
+                        sendto(sock_, reinterpret_cast<char*>(&p), sizeof(p), 0,
+                            (sockaddr*)&sendAddr_, sizeof(sendAddr_));
+                    }
                 }
+                lastTrackSend = now;
+            }
+
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastWideSend).count() >= 1000) {
+                for (const auto& entry : aircraftMap) {
+                    const std::string& id = entry.first;
+                    const AircraftPacket& pkt = entry.second;
+
+                    double dist = computeDistanceKm(batteryLat, batteryLon, batteryAlt,
+                        pkt.latitude, pkt.longitude, pkt.altitude);
+                    if (dist > 150.0 && dist <= 300.0 && pkt.eventCode == 1001) {
+                        AircraftPacket p = pkt;
+                        p.eventCode = 1002;
+                        std::cout << u8"[MFR] 광역 탐지 전송 → ID: " << id << u8", 거리: " << dist << "km\n";
+                        sendto(sock_, reinterpret_cast<char*>(&p), sizeof(p), 0,
+                            (sockaddr*)&sendAddr_, sizeof(sendAddr_));
+                    }
+                }
+                lastWideSend = now;
             }
         }
 

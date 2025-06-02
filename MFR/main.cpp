@@ -106,10 +106,9 @@ int main() {
                 catch (const std::exception& e) {
                     std::cerr << "[" << SUBSYSTEM_ID << u8"] 탐지 오류: " << e.what() << "\n";
                 }
-                });
+            });
         }
         else {
-            std::cout << u8"시나리오 종료일 때" << std::endl;
             if (mfrPtr) {
                 mfrPtr->stop();  // 탐지 루프 종료 요청
             }

@@ -147,7 +147,7 @@ void ScenarioService::handlePostSave(http_request request) {
             std::cerr << u8"[¿¹¿Ü] handlePostSave: " << e.what() << std::endl;
             request.reply(status_codes::InternalError, utility::conversions::to_string_t(e.what()));
         }
-        }).wait();
+    }).wait();
 }
 
 // Generates a new scenario ID by finding the smallest unused number in "SCENE-XX.json" format.
