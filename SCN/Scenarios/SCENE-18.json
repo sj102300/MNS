@@ -1,0 +1,96 @@
+{
+  "aircraft_count": 6,
+  "aircraft_list": [
+    {
+      "aircraft_id": "ATS-0001",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.54457732085582,
+        "longitude": 128.232421875
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.05517710666081,
+        "longitude": 126.9140625
+      }
+    },
+    {
+      "aircraft_id": "ATS-0002",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.25656608611521,
+        "longitude": 128.759765625
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.36142550190516,
+        "longitude": 127.056884765625
+      }
+    },
+    {
+      "aircraft_id": "ATS-0003",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.762029885732105,
+        "longitude": 128.155517578125
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 36.659606226479696,
+        "longitude": 127.3974609375
+      }
+    },
+    {
+      "aircraft_id": "ATS-0004",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 36.941111430107696,
+        "longitude": 128.47412109375
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.63163475580644,
+        "longitude": 127.1337890625
+      }
+    },
+    {
+      "aircraft_id": "ATS-0005",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.58811876638321,
+        "longitude": 128.935546875
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 36.791690619070756,
+        "longitude": 127.584228515625
+      }
+    },
+    {
+      "aircraft_id": "ATS-0006",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.666429212090605,
+        "longitude": 128.671875
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 36.659606226479696,
+        "longitude": 126.990966796875
+      }
+    }
+  ],
+  "battery_location": {
+    "altitude": 10,
+    "latitude": 37.142803443716836,
+    "longitude": 127.880859375
+  },
+  "scenario_id": "SCENE-18",
+  "scenario_title": "시현시나리오"
+}

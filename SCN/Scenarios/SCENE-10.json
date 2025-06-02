@@ -1,0 +1,54 @@
+{
+  "aircraft_count": 3,
+  "aircraft_list": [
+    {
+      "aircraft_id": "ATS-0001",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.586758481479094,
+        "longitude": 127.0294189453125
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.59383169151128,
+        "longitude": 127.00538635253906
+      }
+    },
+    {
+      "aircraft_id": "ATS-0002",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.59573590243414,
+        "longitude": 127.03662872314453
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.58376576718622,
+        "longitude": 127.0184326171875
+      }
+    },
+    {
+      "aircraft_id": "ATS-0003",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.581861249992635,
+        "longitude": 127.04761505126953
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.601176236566666,
+        "longitude": 127.02186584472656
+      }
+    }
+  ],
+  "battery_location": {
+    "altitude": 10,
+    "latitude": 37.59029517052193,
+    "longitude": 127.02838897705078
+  },
+  "scenario_id": "SCENE-10",
+  "scenario_title": "적군2아군1 시나리오"
+}

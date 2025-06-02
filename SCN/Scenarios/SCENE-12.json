@@ -1,0 +1,15 @@
+{
+    "scenario_id": "SCENE-12",
+    "scenario_title": "항공기 종료 확인용 시나리오",
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "start_point": { "latitude": 37.000, "longitude": 127.000, "altitude": 10.0 },
+            "end_point":   { "latitude": 36.500, "longitude": 127.000, "altitude": 10.0 },
+            "friend_or_foe": "E"
+        }
+    ],
+    "battery_location": {
+        "latitude": 35.300, "longitude": 129.300, "altitude": 10.0
+    }
+}
