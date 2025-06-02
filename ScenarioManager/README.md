@@ -95,16 +95,3 @@ int main() {
 - 콜백 함수(`setOnReadyCallback`, `setOnQuitCallback`)는 멀티스레드 환경에서 안전하게 작성해야 합니다.
 
 ---
-
-## 🔚 부록
-
-### 📌 Visual Studio 외 환경 (CMake 등)
-
-> 추후 요청 시 CMake 설정 방법도 제공 가능합니다.
-
-```
-target_include_directories(MyApp PRIVATE ../ScenarioManager/include)
-target_link_libraries(MyApp PRIVATE ../ScenarioManager/lib/ScenarioManager.lib)
-```
-
----
