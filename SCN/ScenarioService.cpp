@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <regex>
 #include <set>
+#include <nlohmann/json.hpp>
 
 using namespace web;
 using namespace web::http;
@@ -126,6 +127,12 @@ void ScenarioService::handlePostSave(http_request request) {
             // save directory and filename
             std::string filename = scenario_dir_ + "/" + new_id + ".json";
 
+            // convert to UTF-8 string
+            std::string raw = utility::conversions::to_utf8string(body.serialize());
+
+            // parse into nlohmann::json
+            nlohmann::json pretty = nlohmann::json::parse(raw);
+
             // save
             std::ofstream file(filename);
             if (!file.is_open()) {
@@ -134,7 +141,7 @@ void ScenarioService::handlePostSave(http_request request) {
                 return;
             }
 
-            file << utility::conversions::to_utf8string(body.serialize());
+            file << pretty.dump(4);  // indent=4
             file.close();
 
             // reload
