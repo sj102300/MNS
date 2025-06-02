@@ -5,6 +5,8 @@ Missile::Missile(std::string id, TCC::Position pos_, int status, TCC::Position i
 	status_ = MissileStatus::Wait; // 대기 상태로 초기화
 }
 
+Missile::~Missile() {}
+
 namespace {
 	
 }

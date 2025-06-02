@@ -1,7 +1,7 @@
 
 #pragma once
 #include <WinSock2.h>
-#include <ws2tcpip.h>  // ²À Ãß°¡ ÇÊ¿ä
+#include <ws2tcpip.h>  // ê¼­ ì¶”ê°€ í•„ìš”
 #include <iostream>
 #include <thread>
 #include "share.h"
@@ -13,6 +13,8 @@ namespace TCC {
 	class UdpMulticastReceiver {
 	public:
 		UdpMulticastReceiver(const std::string& multicastIp, int port);
+
+		~UdpMulticastReceiver();
 
 #pragma pack(push,1)
 		typedef struct _header {
@@ -37,19 +39,28 @@ namespace TCC {
 		} MissileMSG;
 #pragma pack(pop)
 
-		bool init(AircraftManager* aircraftManager, MissileManager* missileManager);
+		typedef struct _engagement_success_message {
+			char engagementSuccessId_[20];
+			char targetAircraftId_[8];
+			char targetMissileId_[8];
+		} EngagementSuccessMSG;
+
+		bool init(AircraftManager* aircraftManager, MissileManager* missileManager, EngagementManager* engagementManager);
 		void start();
+		void stop();
 
 	private:
 
 		enum EventCode {
+			//AircraftData = 1001,		ATSì—ì„œ ë“¤ì–´ì˜¤ëŠ” í•­ê³µê¸°
 			FindTargetEvent = 1002,
-			KillSuccess = 2003,
+			EngagementSuccess = 2003,
 			MissileStatus = 3001
 		};
 
-		AircraftManager* aircraftManager_;		//Æ÷ÀÎÅÍ¿¡ ³Î°ª ³Ö¾îÁÖ°í Ã¼Å©ÇØÁà¾ßµÊ.
-		MissileManager* missileManager_;		//Æ÷ÀÎÅÍ¿¡ ³Î°ª ³Ö¾îÁÖ°í Ã¼Å©ÇØÁà¾ßµÊ.
+		AircraftManager* aircraftManager_;		//í¬ì¸í„°ì— ë„ê°’ ë„£ì–´ì£¼ê³  ì²´í¬í•´ì¤˜ì•¼ë¨.
+		MissileManager* missileManager_;		//í¬ì¸í„°ì— ë„ê°’ ë„£ì–´ì£¼ê³  ì²´í¬í•´ì¤˜ì•¼ë¨.
+		EngagementManager* engagementManager_;	//í¬ì¸í„°ì— ë„ê°’ ë„£ì–´ì£¼ê³  ì²´í¬í•´ì¤˜ì•¼ë¨.
 		//ISuccessReceiver* successRecv_;
 		//IMissileReceiver* missileRecv_;
 		std::thread recvThread_;
@@ -57,10 +68,15 @@ namespace TCC {
 		int port_;
 		SOCKET serverSocket_;
 		char buffer[100];
-		
+		std::atomic<bool> isRunning_;
+		sockaddr_in senderAddr_;
+
 		void receive();
 		void parseHeader(Header& header);
 		bool parseReceivedAircraftMSG(const char* buffer, AircraftManager::NewAircraft& newAircraft, int length);
 		bool parseReceivedMissileMSG(const char* buffer, MissileMSG& data, int length);
+		bool parseReceivedEngagementSuccessMSG(const char* buffer, EngagementSuccessMSG& msg, int length);
+		bool responseEngagementSuccessAck(EngagementSuccessMSG& msg);
+
 	};
 }

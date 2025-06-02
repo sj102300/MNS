@@ -7,25 +7,34 @@
 #include <queue>
 #include <thread>
 #include <atomic>
+
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+
 #include "UdpSender.h"
+#include "UdpMulticastSender.h"
 
 class MissileManager;
 class AircraftManager;
 
 class EngagementManager {
 public:
-
+	EngagementManager();
 	void start();
-	bool init(TCC::UdpSender* sender);
+	void stop();
+	bool init(TCC::UdpSender* sender, AircraftManager* aircraftManager, TCC::UdpMulticastSender* multisender, MissileManager* missileManager);
+	bool engagementSuccess(std::string targetAircraftId, std::string targetMissileId);
 	bool isHitTarget(std::string& missileId);
 	unsigned int changeMode(unsigned int mode);
-	bool launchMissile(std::string& aircraftId);
+	bool launchMissile(std::string& commandId, std::string& aircraftId);
 	bool emergencyDestroy(std::string commandId, std::string missileId);
 	void addEngagableAircraft(std::string& aircraftId);
 	bool manualFire(std::string commandId, std::string targetAircraftId);
+	void notifyThread();
+	~EngagementManager();
 
 private:
-
 	enum Mode {
 		Auto = 0,
 		Manual = 1,
@@ -33,7 +42,7 @@ private:
 
 	class EngagableAircraftQueue {
 	public:
-		std::mutex mtx_;
+		std::mutex mtx_;		//queue용
 		std::queue<std::string> queue;
 		std::unordered_set<std::string> set;
 
@@ -43,22 +52,25 @@ private:
 		void clear();
 	};
 
-	std::mutex mtx_;
+	std::mutex mtx_;				//cv_용
+	std::atomic<bool> isRunning_;
+	std::atomic<bool> isChanged_;
 	std::condition_variable cv_;
 
 	TCC::UdpSender* sender_;
-	//TCC::UdpMulticastSender* multisender_;
+	TCC::UdpMulticastSender * multisender_;
 	MissileManager* missileManager_;
 	AircraftManager* aircraftManager_;
 	std::unordered_map<std::string, std::string> missileToAircraft_; // 미사일 : 키 , 항공기 : value
 	std::thread workThread_;
+
 	std::atomic<unsigned int> mode_;
 	EngagableAircraftQueue engagableAircrafts_;
 
 	void work();
-	bool mappingMissileToAircraft(std::string& aircraftId);
+	bool mappingMissileToAircraft(std::string& aircraftId, std::string& missileId);
+	void makeAutoFireCommandId(std::string& commandId);
 };
-
 
 //
 //class EngagableAircraftQueue {

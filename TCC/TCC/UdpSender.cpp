@@ -30,15 +30,20 @@ bool TCC::UdpSender::init() {
     }
 
     targetAddr_.sin_family = AF_INET;
-    targetAddr_.sin_port = htons(port_);
-    targetAddr_.sin_addr.s_addr = inet_addr(ip_.c_str());
+    targetAddr_.sin_port = htons(9999);
+	targetAddr_.sin_addr.s_addr = inet_addr("192.168.2.195"); // occ의 서버 주소
 
     return true;
 }
 
 int TCC::UdpSender::sendByteData(const char* data, int length) {
-    int bytesSent = sendto(sock_, data, length, 0,
-        (sockaddr*)&targetAddr_, sizeof(targetAddr_));
+
+	if (sock_ == INVALID_SOCKET) {
+		std::cerr << "Socket is not initialized\n";
+		return -1;
+	}
+
+    int bytesSent = sendto(sock_, data, length, 0, (sockaddr*)&targetAddr_, sizeof(targetAddr_));
     if (bytesSent == SOCKET_ERROR) {
         std::cerr << "sendto() failed: " << WSAGetLastError() << "\n";
         return -1;
@@ -48,7 +53,7 @@ int TCC::UdpSender::sendByteData(const char* data, int length) {
 
 bool TCC::UdpSender::sendAircraftData(AircraftManager::NewAircraftWithIP& data){
 
-    char buffer[72];
+    char buffer[100];
     //헤더 붙이기
     int headerSize = serializeHeader(buffer, 100, 64);
     int bodySize = serializeAircraftSender(buffer+headerSize, data);
@@ -56,6 +61,7 @@ bool TCC::UdpSender::sendAircraftData(AircraftManager::NewAircraftWithIP& data){
     if (sendByteData(buffer, headerSize + bodySize) < 0) {
         return false;
     }
+
     return true;
 }
 
@@ -112,38 +118,37 @@ const int TCC::UdpSender::serializeMissileSender(char* buffer, UdpMulticastRecei
 const int TCC::UdpSender::serializeEmergencySender(char* buffer, std::string commandId, std::string missileId) {
     std::memset(buffer + 0, 0, 20);
     std::memcpy(buffer + 0, &commandId, 20);
-
     std::memcpy(buffer + 20, &missileId, 8);
 
     return 28; // 총 직렬화된 body바이트 수
 }
 
-bool TCC::UdpSender::sendEmergencyDestroy(std::string commandId, std::string missileId) {
-
-    //스레드 따로 만들어서 1초동안 10번 송신
-    //ack수신 할때까지
-
-    char buffer[36];
-    //헤더 붙이기
-    int headerSize = serializeHeader(buffer, 202, 28);
-    int bodySize = serializeEmergencySender(buffer + headerSize, commandId, missileId);
-
-    // 송신 스레드 생성
-    std::thread([=]() {
-        for (int i = 0; i < 10; ++i) {
-            sendByteData(buffer, headerSize + bodySize);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			// Todo : ack 수신 대기 로직 추가 필요
-        }
-    }).detach();
-
-    // 호출 즉시 true 반환 (스레드에서 실제 송신)
-    return true;
+//bool TCC::UdpSender::sendEmergencyDestroy(std::string commandId, std::string missileId) {
+//
+//    //스레드 따로 만들어서 1초동안 10번 송신
+//    //ack수신 할때까지
+//
+//    char buffer[36];
+//    //헤더 붙이기
+//    int headerSize = serializeHeader(buffer, 202, 28);
+//    int bodySize = serializeEmergencySender(buffer + headerSize, commandId, missileId);
+//
+//    // 송신 스레드 생성
+//    std::thread([=]() {
+//        for (int i = 0; i < 10; ++i) {
+//            sendByteData(buffer, headerSize + bodySize);
+//            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//			// Todo : ack 수신 대기 로직 추가 필요
+//        }
+//    }).detach();
+//
+//    // 호출 즉시 true 반환 (스레드에서 실제 송신)
+    //return true;
 
     /*if (sendByteData(buffer, headerSize + bodySize) < 0) {
         return false;
     }
     return true;*/
-}
+//}
 
 

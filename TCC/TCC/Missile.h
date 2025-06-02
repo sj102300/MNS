@@ -17,6 +17,7 @@ public:
 	bool checkId(std::string id);
 	bool isAvailable(unsigned int status, std::string& missileId);
 	void updateStatus(MissileStatus);
+	~Missile();
 
 private:
 	/*typedef struct _direction_vector {

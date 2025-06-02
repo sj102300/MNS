@@ -17,10 +17,12 @@ public:
 	Aircraft(std::string id, TCC::Position pos_, bool isEnemy_);
 	const bool isEnemy() const;
 	void calcImpactPoint();
-	bool isIpInEngageRange(unsigned int engagementStatus, TCC::Position& iplocation);
+	bool hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus, TCC::Position& iplocation);
 	void updatePosition(TCC::Position& newLocation);
 	bool isEngagable();
 	unsigned int updateStatus(unsigned int engagementStatus);
+	void getImpactPoint(TCC::Position &impactPoint);
+	~Aircraft();
 
 private:
 	void calcDirVec(const TCC::Position& newPos);

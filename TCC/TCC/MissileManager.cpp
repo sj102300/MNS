@@ -61,31 +61,32 @@ void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg)
             std::cout << u8"미사일 데이터 전송 실패\n";
         }
     }
-    if (msg.status_ == 2) { // 2: 격추 성공
-		std::string missileId(msg.missileId, 8);
-        if (engagementManager_) {
-            engagementManager_->isHitTarget(missileId);
+  //  if (msg.status_ == 2) { // 2: 격추 성공
+		//std::string missileId(msg.missileId, 8);
+  //      if (engagementManager_) {
+  //          engagementManager_->isHitTarget(missileId);
 
-        }
-    }
+  //      }
+  //  }
 	updateMissileStatus(msg.missileId, Missile::MissileStatus(msg.status_));
 }
 
 std::string MissileManager::findAvailableMissile() {
+    std::cout << "findAvailableMissile() called\n";
     std::string missileId;
-	for (auto* m : missiles_) {
+	for (auto m : missiles_) {
 		if (m->isAvailable(0, missileId)) { // 사용가능한 미사일
-			std::cout << "Found available missile: " << m->checkId("MSS-001") << "\n";
+			std::cout << "Found available missile: " << m->checkId("MSS-100") << "\n";
 			return missileId;
 		}
 	}
-
 	std::cout << "No available missile found\n";
 	return ""; // 사용 가능한 미사일이 없을 경우 빈 문자열 반환
 }
 
 MissileManager::~MissileManager() {
-    //for (auto m : missiles_) {
-    //    delete m;
-    //}
+    for (Missile* missile : missiles_) {
+        delete missile;
+    }
+    missiles_.clear(); 
 }

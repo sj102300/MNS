@@ -20,7 +20,7 @@ namespace TCC {
 
 		typedef struct _header {
 			unsigned int commandCode_;
-			int32_t bodyLength_;
+			int bodyLength_;
 		}Header;
 
 		typedef struct _mode_change_message {
@@ -46,9 +46,10 @@ namespace TCC {
 			char targetMissileId_[8];
 		} EmergencyDestroyMSG;
 
-		UdpReceiver(std::string& ip, int port);
+		UdpReceiver(std::string ip, int port);
 		bool init(EngagementManager * engagementManager);
 		void start();
+		void stop();
 		~UdpReceiver();
 
 	private:
@@ -58,6 +59,8 @@ namespace TCC {
 		bool parseManualFireMSG(const char* buffer, ManualFireMSG& msg);
 		bool parseEmergencyDestroyMSG(const char* buffer, EmergencyDestroyMSG& msg);
 		void responseChangeModeAck(unsigned int changedMode);
+		void responseManualFireAck(ManualFireMSG& body);
+		void responseEmergencyDestroyAck(EmergencyDestroyMSG& body);
 
 		std::string ip_;
 		int port_;
@@ -66,6 +69,7 @@ namespace TCC {
 		std::thread recvThread_;
 		char buffer[100];
 		sockaddr_in senderAddr_;
+		std::atomic<bool> isRunning_;
 
 		EngagementManager* engagementManager_;
 	};

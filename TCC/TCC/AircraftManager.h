@@ -4,6 +4,7 @@
 #include <queue>
 #include <mutex>
 #include <thread>
+#include <atomic>
 
 #include "Aircraft.h"
 
@@ -27,9 +28,10 @@ public:
         TCC::Position impactPoint_;
     } NewAircraftWithIP;
     
-    AircraftManager();
+    AircraftManager(TCC::Position &batteryLocation);
     bool init(TCC::UdpSender* sender, EngagementManager* engagementManager);
     void start();
+    void stop();
     void handleReceivedAircraft(NewAircraft& newAircraft);
     Aircraft* getAircraft(std::string& aircraftId);
     ~AircraftManager();
@@ -41,10 +43,13 @@ private:
     void pushNewAircraftQueue(NewAircraft& newAircraft);
     bool popNewAircraftQueue(NewAircraft& newAircraft);
 
+    std::atomic<bool> isRunning_;
     TCC::UdpSender* sender_;
+    TCC::Position batteryLocation_;
+
     EngagementManager* engagementManager_;
     std::queue<NewAircraft> newAircraftQueue_;
     std::unordered_map<std::string, Aircraft*> aircrafts_;
     std::thread workThread_;
-    std::mutex mtx_;
+    std::mutex mtx_;            //queue¿ë
 };

@@ -1,13 +1,20 @@
 #include "Aircraft.h"
+#include <iostream>
 
 Aircraft::Aircraft(std::string aircraftId, TCC::Position pos, bool isEnemy__) : aircraftId_(aircraftId), pos_(pos), 
     isEnemy_(isEnemy__), dirVec_({ 0,0 }), status_(EngagementStatus::NotEngageable), impactPoint_({ -200, -200, 10 }) {}
+
+Aircraft::~Aircraft() {
+    std::cout<<"aircraft deleted"<<std::endl;
+}
 
 const bool Aircraft::isEnemy() const {
 	return isEnemy_;
 }
 
 void Aircraft::updatePosition(TCC::Position& newLocation) {
+	//std::cout << "Aircraft::updatePosition() called" << std::endl;
+	calcDirVec(newLocation);
     pos_ = newLocation;
 }
 
@@ -48,7 +55,13 @@ void Aircraft::calcDirVec(const TCC::Position& newPos) {
     // 정규화
     dirVec_.dx_ = dx / magnitude;
     dirVec_.dy_ = dy / magnitude;
+
+	//std::cout << "calcDirVec: " << "dx: " << dirVec_.dx_ << ", dy: " << dirVec_.dy_ << std::endl;
     return;
+}
+
+void Aircraft::getImpactPoint(TCC::Position &impactPoint) {
+    impactPoint = impactPoint_;
 }
 
 void Aircraft::calcImpactPoint() {
@@ -94,10 +107,10 @@ void Aircraft::calcImpactPoint() {
     impactPoint_ = xyToLatLon(batteryLoc, impact_x, impact_y, pos_.altitude_);
 }
 
-bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& impactPoint) {
+//return value: NotEngagable -> Engageable 상태로 변화했으면 true. EngagementManager에게 알려주어야 할 경우에만 push
+bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus, TCC::Position& impactPoint) {
 
     engagementStatus = (unsigned int)status_;
-
     if (status_ == EngagementStatus::Engaging || status_ == EngagementStatus::Destroyed) {
         return false;
     }
@@ -105,8 +118,13 @@ bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& i
     calcImpactPoint();
     impactPoint = impactPoint_;
 
-    // 포대 위치
-    TCC::Position batteryLoc = { 37.5597, 126.9869, 10 };
+	//std::cout << "aircraftId: " << aircraftId_ 
+	//	<<" pos: (" << pos_.latitude_ << ", " << pos_.longitude_ << ", " << pos_.altitude_ << ")"
+	//	<< " dirVec: (" << dirVec_.dx_ << ", " << dirVec_.dy_ << ")"
+	//	<< " isEnemy: " << (isEnemy_ ? "true" : "false")
+	//	<< " status: " << status_
+	//	<< " impactPoint: (" << impactPoint_.latitude_ << ", " << impactPoint_.longitude_ << ", " << impactPoint_.altitude_ << ")"
+	//	<< std::endl;
 
     // 위도와 경도를 라디안으로 변환
     double lat1 = batteryLoc.latitude_ * DEG_TO_RAD;
@@ -127,10 +145,18 @@ bool Aircraft::isIpInEngageRange(unsigned int engagementStatus, TCC::Position& i
 
     // 100km 이내, 교전 가능
     if (distanceKm <= 100.0) {
-        status_ = EngagementStatus::Engageable;
-        engagementStatus = (unsigned int) status_;
-        return true;
-    }
+        if (status_ == EngagementStatus::NotEngageable) {       //교전 불가능이었다가 교전 가능범위 내로 진입한 상태
+            status_ = EngagementStatus::Engageable;
+			engagementStatus = (unsigned int)status_;
+			return true; // 교전 가능 상태로 변경됨
+        }   
+        else {             // 이미 교전 가능 상태이므로 변경 없음
+            status_ = EngagementStatus::Engageable;
+            engagementStatus = (unsigned int)status_;
+            return false;
+        }
+     }
+
     status_ = EngagementStatus::NotEngageable;
     engagementStatus = (unsigned int)status_;
     return false;

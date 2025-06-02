@@ -3,19 +3,19 @@
 #include "UdpSender.h"
 #include "EngagementManager.h"
 
-AircraftManager::AircraftManager() {
+AircraftManager::AircraftManager(TCC::Position& batteryLocation) : batteryLocation_(batteryLocation) {
 
 }
 
 AircraftManager::~AircraftManager() {
-	for (auto& v : aircrafts_) {
-		delete v.second;
+	for (auto& pair : aircrafts_) {
+		delete pair.second;  // 각 Aircraft* 삭제
 	}
+	aircrafts_.clear();       // map 자체는 자동 소멸되지만 명시적으로 비워줘도 OK
 }
 
 bool AircraftManager::init(TCC::UdpSender* sender, EngagementManager* engagementManager) {
-	//engagementManager도 nullptr확인
-	if (sender == nullptr) {
+	if (sender == nullptr || engagementManager == nullptr) {
 		return false;
 	}
 	engagementManager_ = engagementManager;
@@ -24,11 +24,16 @@ bool AircraftManager::init(TCC::UdpSender* sender, EngagementManager* engagement
 }
 
 void AircraftManager::start() {
+	isRunning_ = true;
 	workThread_ = std::thread(&AircraftManager::judgeEngagable, this);
 }
 
 void AircraftManager::handleReceivedAircraft(NewAircraft& newAircraft) {
-	//std::cout << newAircraft.aircraftId_ << std::endl;
+	//std::cout << std::fixed << std::setprecision(9); // 소수점 9자리까지 고정 출력
+
+	//std::cout << "Aircraft ID: " << newAircraft.aircraftId_
+	//	<< ", Latitude: " << newAircraft.location_.latitude_
+	//	<< ", Longitude: " << newAircraft.location_.longitude_ << std::endl;
 	pushNewAircraftQueue(newAircraft);
 }
 
@@ -56,14 +61,19 @@ void AircraftManager::addAircraft(NewAircraft& newAircraft) {
 }
 
 Aircraft* AircraftManager::getAircraft(std::string& aircraftId) {
-	return aircrafts_[aircraftId];
+
+	auto it = aircrafts_.find(aircraftId);
+	if (it != aircrafts_.end()) {
+		return it->second;
+	}
+	return nullptr;
 }
 
 void AircraftManager::judgeEngagable() {
 
 	NewAircraftWithIP newAircraftWithIp;
 
-	while (true) {
+	while (isRunning_) {
 		if (popNewAircraftQueue(newAircraftWithIp.aircraftData_)) {
 
 			if (!isExistAircraft(newAircraftWithIp.aircraftData_.aircraftId_)) {
@@ -73,23 +83,23 @@ void AircraftManager::judgeEngagable() {
 			Aircraft* targetAircraft = aircrafts_[newAircraftWithIp.aircraftData_.aircraftId_];
 			targetAircraft->updatePosition(newAircraftWithIp.aircraftData_.location_);
 
-			if (!targetAircraft->isEnemy()) {	//아군 항공기
-				sender_->sendAircraftData(newAircraftWithIp);
-				continue;
-			}
-
-			if (targetAircraft->isIpInEngageRange(newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_)) {	//적군 항공기 중 교전 가능 범위 아님
-				sender_->sendAircraftData(newAircraftWithIp);
-				continue;
+			if (targetAircraft->isEnemy()) {
+				if (targetAircraft->hasBecomeEngageable(batteryLocation_, newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_)) {
+					engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
+				}
 			}
 
 			sender_->sendAircraftData(newAircraftWithIp);
-			engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
 		}
-		std::this_thread::sleep_for(std::chrono::microseconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 }
 
-//void AircraftManager::updateAircraftStatus() {
-//
-//}
+void AircraftManager::stop() {
+	isRunning_ = false;
+	//스레드 종료
+	if (workThread_.joinable()) {
+		workThread_.join();
+	}
+	return;
+}
