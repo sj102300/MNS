@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -20,8 +21,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
-        // InitPage를 Frame에 로드
         MainFrame.Navigate(new InitPage(MainFrame.NavigationService));
+        // InitPage를 Frame에 로드
+        //MainFrame.Navigate(new InitPage(MainFrame.NavigationService));
     }
 }

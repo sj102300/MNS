@@ -3,15 +3,15 @@
 
 SimulationManager::SimulationManager() {
 	scenarioManager_ = new sm::ScenarioManager(
-		"http://192.168.2.66:8080",     // 수신 주소
-		"http://192.168.2.30:8080",    // SCN 서버 주소
-		"TCC"         // 클라이언트 ID
+		"http://192.168.2.77:8080",     // ?�신 주소
+		"http://192.168.2.30:8080",    // SCN ?�버 주소
+		"TCC"         // ?�라?�언??ID
 	);
 
 	scenarioManager_->setOnReadyCallback([this]() {
 		std::lock_guard<std::mutex> lock(mtx_);
 
-		if (isRunning_) {       //이미 시나리오가 실행 중
+		if (isRunning_) {       //?��? ?�나리오가 ?�행 �?
 			return;
 		}
 
@@ -24,7 +24,7 @@ SimulationManager::SimulationManager() {
 	scenarioManager_->setOnQuitCallback([this]() {
 		std::lock_guard<std::mutex> lock(mtx_);
 
-		if (!isRunning_) {		//실행중인 시나리오가 없음
+		if (!isRunning_) {		//?�행중인 ?�나리오가 ?�음
 			return;
 		}
 
@@ -37,7 +37,7 @@ SimulationManager::SimulationManager() {
 
 void SimulationManager::startSimulation() {
 
-	//http서버 시작
+	//http?�버 ?�작
 	std::thread scenarioThread([&]() {
 		scenarioManager_->run();
 		});
@@ -115,11 +115,11 @@ bool SimulationManager::createObjects() {
 void SimulationManager::quitSimulation() {
 
 	std::cout << "quitSimulation()" << std::endl;
-	//    // http서버 종료 처리
+	//    // http?�버 종료 처리
 	//    if (scenarioThread.joinable()) scenarioThread.join();
 	//    if (radarThread.joinable()) radarThread.join();
 	//
-	//    std::cout << u8"[" << SUBSYSTEM_ID << u8"] 프로그램 정상 종료\n";
+	//    std::cout << u8"[" << SUBSYSTEM_ID << u8"] ?�로그램 ?�상 종료\n";
 	//    return 0;
 
 	delete scenarioManager_;

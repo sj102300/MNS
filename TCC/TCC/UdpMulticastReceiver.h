@@ -14,24 +14,28 @@ namespace TCC {
 	public:
 		UdpMulticastReceiver(const std::string& multicastIp, int port);
 
+#pragma pack(push,1)
 		typedef struct _header {
 			unsigned int eventCode_;
 			int bodyLength_;
 		} Header;
+#pragma pack(pop)
 
+#pragma pack(push,1)
 		typedef struct _aircraft_message {
 			char aircraftId_[8];
 			Position location_;
 			char ourOrEnemy_;
 		}AircraftMSG;
+#pragma pack(pop)
 
+#pragma pack(push,1)
 		typedef struct _missile_message {
-			unsigned int eventCode_;
-			unsigned int bodyLength_;
 			char missileId[8];
 			unsigned int status_;
 			Position location_;
 		} MissileMSG;
+#pragma pack(pop)
 
 		bool init(AircraftManager* aircraftManager, MissileManager* missileManager);
 		void start();

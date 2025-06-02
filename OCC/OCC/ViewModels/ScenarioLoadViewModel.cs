@@ -36,11 +36,12 @@ namespace OCC.ViewModels
         // 서브시스템 정보
         private readonly List<(string url, string id)> subsystems = new()
         {
-            //("http://127.0.0.1:9011", "TCC"),
-            //("http://127.0.0.1:9012", "MSS"),
-            //("http://127.0.0.1:9013", "ATS"),
-            //("http://127.0.0.1:9014", "LCH"),
-            ("http://192.168.2.31:8080", "MFR")
+            ($"{Network.TCC}", "TCC"),
+            ($"http://192.168.2.66:8080", "TCC"),
+            ($"{Network.MSS}", "MSS"),
+            ($"{Network.ATS}", "ATS"),
+            ($"{Network.LCH}", "LCH"),
+            ($"{Network.MFR}", "MFR")
         };
 
         public ScenarioLoadViewModel()
@@ -85,14 +86,6 @@ namespace OCC.ViewModels
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ScenarioCollection.Clear();
-
-                //// 더미 데이터 추가
-                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-01", scenario_title = "더미 시나리오 1" });
-                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-02", scenario_title = "더미 시나리오 2" });
-                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-03", scenario_title = "더미 시나리오 3" });
-                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-04", scenario_title = "더미 시나리오 4" });
-                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-05", scenario_title = "더미 시나리오 5" });
-                //ScenarioCollection.Add(new ScenarioGet { scenario_id = "SCENE-06", scenario_title = "더미 시나리오 6" });
             });
 
             try
@@ -131,6 +124,13 @@ namespace OCC.ViewModels
             }
         }
 
+        private void NavigateToScenarioCreate()
+        {
+            // ScenarioCreatePage.xaml로 이동
+            Uri uri = new Uri("/Views/AttackDisplayPage.xaml", UriKind.Relative);
+            NavigationService.Navigate(uri);
+        }
+
         private async void Start()
         {
             if (SelectedScenario == null)
@@ -141,17 +141,44 @@ namespace OCC.ViewModels
 
             string scenarioId = SelectedScenario.scenario_id;
 
-            foreach (var (url, id) in subsystems)
+            // 모든 서브시스템에 대해 비동기 요청을 병렬로 실행
+            var tasks = subsystems.Select(subsystem =>
+                SendStartSignalAsync(subsystem.url, subsystem.id, scenarioId)
+            ).ToList();
+
+            var results = await Task.WhenAll(tasks);
+
+            // 결과 집계
+            if (results.All(r => r))
             {
-                Debug.WriteLine("시작 요청");
-                await SendStartSignalAsync(url, id, scenarioId);
+                // 모두 성공
+                var result = MessageBox.Show(
+                    $"[OCC] 모든 서브시스템에 시나리오({scenarioId}) 시작 신호 전송 완료",
+                    "시작 완료",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information
+                );
+                if (result == MessageBoxResult.OK)
+                {
+                    NavigateToScenarioCreate();
+                }
+            }
+            else
+            {
+                // 일부 실패
+                MessageBox.Show(
+                    $"[OCC] 일부 서브시스템에 시작 신호 전송 실패\n상세 오류는 개별 메시지를 확인하세요.",
+                    "시작 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
             }
         }
 
-        private async Task SendStartSignalAsync(string targetUrl, string subsystemId, string scenarioId)
+        private async Task<bool> SendStartSignalAsync(string targetUrl, string subsystemId, string scenarioId)
         {
             using var client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
+            client.Timeout = TimeSpan.FromSeconds(3);
             var postData = new
             {
                 command = "start",
@@ -169,37 +196,60 @@ namespace OCC.ViewModels
                 Debug.WriteLine($"response : {response.ToString()}");
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"[OCC] {subsystemId} → {scenarioId} 시작 성공");
+                    // 성공
+                    return true;
                 }
                 else
                 {
-                    MessageBox.Show($"[OCC] {subsystemId} → 응답 오류: {(int)response.StatusCode}");
+                    //MessageBox.Show($"[OCC] {subsystemId} → 응답 오류: {(int)response.StatusCode}");
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"[OCC] 예외 발생: {ex.Message}");
+                MessageBox.Show($"[OCC] {subsystemId} 예외 발생: {ex.Message}");
+                return false;
             }
         }
 
         private async void Quit()
         {
-            if (SelectedScenario == null)
+            Debug.WriteLine("종료 요청");
+            // 모든 서브시스템에 대해 비동기 요청을 병렬로 실행
+            var tasks = subsystems.Select(subsystem =>
+                SendQuitSignalAsync(subsystem.url, subsystem.id)
+            ).ToList();
+
+            var results = await Task.WhenAll(tasks);
+
+            // 결과 집계
+            if (results.All(r => r))
             {
-                MessageBox.Show("시작할 시나리오를 먼저 선택하세요.", "선택 필요", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                // 모두 성공
+                var result = MessageBox.Show(
+                    $"[OCC] 모든 서브시스템에 시나리오 종료 전송 완료",
+                    "종료 완료",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information
+                );
+                if (result == MessageBoxResult.OK)
+                {
+                    //NavigateToScenarioCreate();
+                }
             }
-
-            string scenarioId = SelectedScenario.scenario_id;
-
-            foreach (var (url, id) in subsystems)
+            else
             {
-                Debug.WriteLine("종료 요청");
-                await SendQuitSignalAsync(url, id, scenarioId);
+                // 일부 실패
+                MessageBox.Show(
+                    $"[OCC] 일부 서브시스템에 시작 신호 전송 실패\n상세 오류는 개별 메시지를 확인하세요.",
+                    "시작 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
             }
         }
 
-        private async Task SendQuitSignalAsync(string targetUrl, string subsystemId, string scenarioId)
+        private async Task<bool> SendQuitSignalAsync(string targetUrl, string subsystemId)
         {
             using var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(3); // 3초 타임아웃 설정
@@ -210,16 +260,18 @@ namespace OCC.ViewModels
                 Debug.WriteLine($"response : {response.ToString()}");
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"[OCC] {subsystemId} → {scenarioId} 종료 성공");
+                    return true;
                 }
                 else
                 {
-                    MessageBox.Show($"[OCC] {subsystemId} → 응답 오류: {(int)response.StatusCode}");
+                    //MessageBox.Show($"[OCC] {subsystemId} → 응답 오류: {(int)response.StatusCode}");
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"[OCC] 예외 발생: {ex.Message}");
+                MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
+                return false;
             }
         }
 

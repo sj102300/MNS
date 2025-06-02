@@ -50,7 +50,7 @@ bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileMa
 
 	ip_mreq mreq = {};
 	mreq.imr_multiaddr.s_addr = inet_addr(multicastIp_.c_str());
-	mreq.imr_interface.s_addr = inet_addr("127.0.0.1"); // ← 수신에 사용할 NIC의 실제 IP로 지정
+	mreq.imr_interface.s_addr = inet_addr("192.168.2.201"); // ← 수신에 사용할 NIC의 실제 IP로 지정
 
 	if (setsockopt(serverSocket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) < 0) {
 		std::cout << "setsockopt(IPP_ADD_MEMBERSHIP) Failed\n";
@@ -80,7 +80,7 @@ void TCC::UdpMulticastReceiver::receive() {
 		}
 
 		parseHeader(header);
-		std::cout << header.eventCode_ << std::endl;
+		//std::cout << header.eventCode_ << std::endl;
 
 		switch (header.eventCode_) {
 		case EventCode::FindTargetEvent:
@@ -92,16 +92,17 @@ void TCC::UdpMulticastReceiver::receive() {
 			//격추 성공
 		case EventCode::MissileStatus:
 			//미사일 데이터
-			memcpy(&missileMsg, buffer + 8, sizeof(MissileMSG));
+			if (!parseReceivedMissileMSG(buffer + 8, missileMsg, header.bodyLength_))
+				break;
 			//여기서 호출
 			if (missileManager_) {
 				missileManager_->echoMissileData(missileMsg);
-				std::cout << "미사일 데이터 수신----------------------" << "\n";
-				std::cout << "ID : " << missileMsg.missileId << "\n";
-				std::cout << "Status : " << missileMsg.status_ << "\n";
-				std::cout << "위도 : " << missileMsg.location_.latitude_ << "\n";
-				std::cout << "경도 : " << missileMsg.location_.longitude_ << "\n";
-				std::cout << "고도 : " << missileMsg.location_.altitude_ << "\n";
+				std::cout << u8"---------------미사일 데이터 수신---------------" << "\n";
+				std::cout << u8"ID : " << missileMsg.missileId << "\n";
+				std::cout << u8"Status : " << missileMsg.status_ << "\n";
+				std::cout << u8"위도 : " <<missileMsg.location_.latitude_ << "\n";
+				std::cout << u8"경도 : " << missileMsg.location_.longitude_ << "\n";
+				std::cout << u8"고도 : " << missileMsg.location_.altitude_ << "\n";
 			}
 			break;
 		default:
@@ -138,16 +139,12 @@ bool TCC::UdpMulticastReceiver::parseReceivedAircraftMSG(const char * buffer, Ai
 
 bool TCC::UdpMulticastReceiver::parseReceivedMissileMSG(const char* buffer, MissileMSG& data, int length) {
 
-	MissileMSG msg;
-	memcpy((void*)&msg, buffer, length);
-
-	if (!TCC::isValidMissileId(msg.missileId))
+	memcpy((void*)&data, buffer, length);
+	/*if (!TCC::isValidMissileId(msg.missileId))
 		return false;
 
 	if (!data.location_.isValidPosition())
-		return false;
-
-	data = msg;
+		return false;*/
 
 	return true;
 }
