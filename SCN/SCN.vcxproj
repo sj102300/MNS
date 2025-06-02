@@ -132,10 +132,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AsciiBanner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ScenarioService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AsciiBanner.h" />
     <ClInclude Include="ScenarioService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -5,7 +5,6 @@
 #include <iostream>
 #include <atomic>
 #include <thread>
-#pragma comment(lib, "ScenarioManager.lib")
 
 using namespace sm;
 

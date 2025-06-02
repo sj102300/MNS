@@ -88,7 +88,7 @@ namespace mfr {
     }
 
     // 고도를 반영한 하버사인 공식
-    double computeDistanceKm(double lat1, double lon1, double alt1,
+    double MFR::computeDistanceKm(double lat1, double lon1, double alt1,
         double lat2, double lon2, double alt2) {
         double dLat = (lat2 - lat1) * PI / 180.0;
         double dLon = (lon2 - lon1) * PI / 180.0;

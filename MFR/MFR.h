@@ -35,7 +35,7 @@ namespace mfr {
         std::atomic<bool> stopFlag_ = false;  // 종료 플래그
 
         bool setupSocket(const std::string& recvIp, int recvPort);
-        bool withinRange(double lat, double lon, double alt,
+        double computeDistanceKm(double lat, double lon, double alt,
             double batteryLat, double batteryLon, double batteryAlt); // 레이더 판단
 
         static constexpr double maxDetectKm = 300.0;

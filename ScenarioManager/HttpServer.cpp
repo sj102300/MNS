@@ -95,10 +95,12 @@ namespace sm {
                 if (attempt < max_retries) {
                     std::this_thread::sleep_for(retry_interval);
                 }
+                else {
+                    std::cerr << u8"\n[" << client_id_ << u8"] 리스너 재시작 실패: " << e.what() << std::endl;
+                }
             }
         }
 
-        std::cerr << u8"\n[" << client_id_ << u8"] 리스너 재시작 실패\n";
         return false;
     }
 

@@ -1,6 +1,7 @@
 #define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
 #include "ScenarioService.h"
+#include "AsciiBanner.h"
 #include <cpprest/http_listener.h>
 #include <windows.h>
 #include <iostream>
@@ -40,7 +41,6 @@ int main() {
 
     // === 서비스 초기화 ===
     ScenarioService scenario_service(scenario_dir);
-    scenario_service.loadMetaCache();
 
     http_listener post_info_listener(to_string_t(base_address + "/scenario/info"));
     post_info_listener.support(web::http::methods::POST, std::bind(&ScenarioService::handlePostInfo, &scenario_service, std::placeholders::_1));
@@ -57,6 +57,8 @@ int main() {
         get_list_listener.open().wait();
         post_save_listener.open().wait();
 
+        banner::printAsciiBanner();
+        scenario_service.loadMetaCache();
         std::cout << u8"[SCN 주소] " << base_address << std::endl;
         std::cout << u8"[서버 실행 중] POST /scenario/info" << std::endl;
         std::cout << u8"[서버 실행 중] POST /scenario/save" << std::endl;
