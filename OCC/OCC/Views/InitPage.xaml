@@ -4,39 +4,70 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:OCC.Views"
+      xmlns:ui="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="768" d:DesignWidth="1024"
+      Background="#1A1D23"
       Title="InitPage">
 
-    <Grid Margin="10">
-        <Grid.RowDefinitions >
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions >
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
+        <!-- 좌측: 타이틀 및 설명 -->
+        <ui:Card Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                 Background="#23262E"
+                 Margin="0,0,20,0"
+                 Padding="24"
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="지대공 유도무기 시뮬레이터"
+                           FontSize="28"
+                           FontWeight="Bold"
+                           Foreground="#4FC3F7"
+                           Margin="0 24 0 12"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="유도무기 시뮬레이터"
+                           FontSize="14"
+                           Foreground="#B0BEC5"
+                           Margin="0 0 0 0"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </ui:Card>
 
-        <Border Grid.Row="1" Grid.Column="0">
-            <TextBlock Text="지대공 유도무기 시뮬레이터"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       FontSize="30"/>
-        </Border>
-        
-        <Border Grid.Row="0" Grid.Column="1">
-            <Button Content="시나리오 생성" 
-                Command="{Binding NavigateToScenarioCreateCommand}"
-                Margin="10" />
-        </Border>
-
-        <Border Grid.Row="1" Grid.Column="1">
-            <Button Content="시나리오 불러오기" 
-                Command="{Binding NavigateToScenarioLoadCommand}"
-                Margin="10"/>
-        </Border>
+        <!-- 우측: 버튼 영역 -->
+        <StackPanel Grid.Row="1" Grid.Column="1"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Width="220">
+            <ui:Button Content="시나리오 생성"
+                       Command="{Binding NavigateToScenarioCreateCommand}"
+                       Width="200"
+                       Height="40"
+                       Appearance="Primary"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Background="#263238"
+                       Foreground="#FFFFFF"
+                       CornerRadius="8"
+                       Margin="0,0,0,10"/>
+            <ui:Button Content="시나리오 불러오기"
+                       Command="{Binding NavigateToScenarioLoadCommand}"
+                       Width="200"
+                       Height="40"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Background="#4FC3F7"
+                       Foreground="#23262E"
+                       CornerRadius="8"/>
+        </StackPanel>
     </Grid>
 </Page>

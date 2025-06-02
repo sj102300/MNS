@@ -4,66 +4,133 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:OCC.Views"
+      xmlns:ui="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="768" d:DesignWidth="1024"
+      Background="#1A1D23"
       Title="ScenarioLoadPage">
 
-    <DockPanel LastChildFill="True" >
-        <!-- 뒤로가기 버튼 영역 -->
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
-            <Button Content="← 뒤로가기"
-                    Command="{Binding GoBackCommand}"
-                    Width="80" Height="30"/>
-        </StackPanel>
-        
-        <Grid Margin="10">
-            <Grid.RowDefinitions >
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions >
-                <ColumnDefinition Width="5*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
+        <!-- 좌측: 시나리오 목록 -->
+        <ui:Card Grid.Row="0" Grid.Column="0"
+                 Background="#23262E"
+                 Margin="0,0,16,0"
+                 Padding="18"
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch">
+            <DockPanel LastChildFill="True">
+                <!-- 상단: 뒤로가기 버튼 -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,12">
+                    <ui:Button Command="{Binding GoBackCommand}"
+                               Width="110"
+                               Height="36"
+                               Appearance="Secondary"
+                               Background="#263238"
+                               Foreground="#4FC3F7"
+                               FontWeight="SemiBold"
+                               FontSize="14"
+                               CornerRadius="16"
+                               Padding="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Viewbox Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center">
+                                <Path Data="M 12,2 L 4,10 L 12,18"
+                                      Stroke="#4FC3F7"
+                                      StrokeThickness="2"
+                                      StrokeEndLineCap="Round"
+                                      StrokeStartLineCap="Round"
+                                      Fill="Transparent"/>
+                            </Viewbox>
+                            <TextBlock Text="뒤로가기"
+                                       VerticalAlignment="Center"
+                                       FontWeight="SemiBold"
+                                       FontSize="14"
+                                       Foreground="#4FC3F7"/>
+                        </StackPanel>
+                    </ui:Button>
+                </StackPanel>
+                <!-- 시나리오 목록 -->
+                <GroupBox Header="시나리오 목록"
+                          Background="#23262E"
+                          BorderBrush="#37474F"
+                          Foreground="#B0BEC5"
+                          FontWeight="SemiBold"
+                          FontSize="14"
+                          Margin="0"
+                          MinHeight="340"
+                          MinWidth="480">
+                    <ListBox ItemsSource="{Binding ScenarioCollection}"
+                             SelectedItem="{Binding SelectedScenario, Mode=TwoWay}"
+                             Background="#263238"
+                             Foreground="#FFFFFF"
+                             BorderThickness="0"
+                             FontSize="14"
+                             Margin="0"
+                             Padding="4"
+                             MinHeight="220">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,4">
+                                    <TextBlock Text="[" Foreground="#4FC3F7"/>
+                                    <TextBlock Text="{Binding scenario_id}" FontWeight="Bold" Foreground="#4FC3F7"/>
+                                    <TextBlock Text="] " Foreground="#4FC3F7"/>
+                                    <TextBlock Text="{Binding scenario_title}" Foreground="#FFFFFF"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </GroupBox>
+            </DockPanel>
+        </ui:Card>
 
-            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3">
-                <ListBox ItemsSource="{Binding ScenarioCollection}"
-                    SelectedItem="{Binding SelectedScenario, Mode=TwoWay}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="["/>
-                                <TextBlock Text="{Binding scenario_id}" FontWeight="Bold"/>
-                                <TextBlock Text="] " />
-                                <TextBlock Text="{Binding scenario_title}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Border>
-
-            <!-- 시나리오 불러오기 버튼 -->
-            <Border Grid.Row="0" Grid.Column="1">
-                <Button Content="불러오기" 
-                        Command="{Binding LoadCommand}" 
-                        Margin="10"  />     
-            </Border>
-
-            <!-- 시나리오 시작 버튼 -->
-            <Border Grid.Row="1" Grid.Column="1">
-                <Button Content="시작" 
-                Command="{Binding StartCommand}" 
-                Margin="10"  />
-            </Border>
-
-            <!-- 시나리오 종료 버튼 -->
-            <Border Grid.Row="2" Grid.Column="1">
-                <Button Content="종료" 
-                Command="{Binding QuitCommand}" 
-                Margin="10"  />
-            </Border>
-        </Grid>
-    </DockPanel>
+        <!-- 우측: 컨트롤 영역 -->
+        <ui:Card Grid.Row="0" Grid.Column="1"
+                 Background="#23262E"
+                 Padding="24"
+                 VerticalAlignment="Center"
+                 HorizontalAlignment="Center">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="180">
+                <ui:Button Content="불러오기"
+                           Command="{Binding LoadCommand}"
+                           Width="150"
+                           Height="40"
+                           Appearance="Primary"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Background="#263238"
+                           Foreground="#FFFFFF"
+                           CornerRadius="8"
+                           Margin="0,0,0,10"/>
+                <ui:Button Content="시작"
+                           Command="{Binding StartCommand}"
+                           Width="150"
+                           Height="40"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Background="#388E3C"
+                           Foreground="#FFFFFF"
+                           CornerRadius="8"
+                           Margin="0,0,0,10"/>
+                <ui:Button Content="종료"
+                           Command="{Binding QuitCommand}"
+                           Width="150"
+                           Height="40"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Background="#B71C1C"
+                           Foreground="#FFFFFF"
+                           CornerRadius="8"/>
+            </StackPanel>
+        </ui:Card>
+    </Grid>
 </Page>

@@ -64,6 +64,8 @@ namespace OCC.ViewModels
             }
         }
 
+        public Brush MarkerColor => GetMarkerColor();
+
         public string? SelectedItem
         {
             get => _selectedItem;
@@ -74,6 +76,8 @@ namespace OCC.ViewModels
                     // 선택된 항목이 변경되었을 때 초기화
                     _startPoint = null;
                     _endPoint = null;
+                    // MarkerColor도 갱신 알림
+                    OnPropertyChanged(nameof(MarkerColor));
                 }
             }
         }
