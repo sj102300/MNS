@@ -22,9 +22,13 @@ namespace sm {
             handleQuitSignal(); 
             });
 
-        http_server_.start();
-
-        std::cout << u8"[" << client_id_ << u8"] OCC 시작신호를 기다립니다.\n";
+        if (http_server_.start()) {
+            std::cout << u8"[" << client_id_ << u8"] OCC 시작신호를 기다립니다.\n";
+        }
+        else {
+            std::cerr << u8"\n[" << client_id_ << u8"] 리스너 시작 실패로 프로그램을 종료합니다.\n";
+            std::cerr << u8"프로그램을 재실행해 주세요.\n";
+        }
     }
 
     void ScenarioManager::setOnReadyCallback(std::function<void()> cb) {

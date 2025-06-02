@@ -142,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AsciiBanner.h" />
     <ClInclude Include="JsonParser.h" />
     <ClInclude Include="ScenarioInfoPrinter.h" />
     <ClInclude Include="ScenarioManager.h" />
@@ -149,6 +150,7 @@
     <ClInclude Include="HttpServer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsciiBanner.cpp" />
     <ClCompile Include="ScenarioInfoPrinter.cpp" />
     <ClCompile Include="ScenarioManager.cpp" />
     <ClCompile Include="HttpClient.cpp" />

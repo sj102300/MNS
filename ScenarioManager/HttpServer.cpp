@@ -1,8 +1,10 @@
-#define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
+ï»¿#define _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS
 
 #include "HttpServer.h"
+#include "AsciiBanner.h"
 #include <cpprest/json.h>
 #include <iostream>
+#include <thread>
 
 using namespace web;
 using namespace web::http;
@@ -21,13 +23,13 @@ namespace sm {
                         auto scenario_id = utility::conversions::to_utf8string(body[U("scenario_id")].as_string());
 
                         if (cmd == "start" && on_start_callback_) {
-                            std::cout << u8"[" << client_id_ << u8"] ½ÃÀÛ ½ÅÈ£ ¼ö½Å! ½Ã³ª¸®¿À ID: " << scenario_id << "\n";
+                            std::cout << u8"[" << client_id_ << u8"] ì‹œìž‘ ì‹ í˜¸ ìˆ˜ì‹ ! ì‹œë‚˜ë¦¬ì˜¤ ID: " << scenario_id << "\n";
                             on_start_callback_(scenario_id);
                         }
                     }
                 }
                 catch (const std::exception& e) {
-                    std::cerr << u8"[HttpServer] POST ÆÄ½Ì ¿À·ù: " << e.what() << "\n";
+                    std::cerr << u8"[HttpServer] POST íŒŒì‹± ì˜¤ë¥˜: " << e.what() << "\n";
                 }
                 }).wait();
 
@@ -39,7 +41,7 @@ namespace sm {
                 auto path = uri::decode(request.relative_uri().path());
 
                 if (path == U("/quit")) {
-                    std::cout << u8"[" << client_id_ << u8"] Á¾·á ½ÅÈ£ ¼ö½Å (GET /quit)\n";
+                    std::cout << u8"[" << client_id_ << u8"] ì¢…ë£Œ ì‹ í˜¸ ìˆ˜ì‹  (GET /quit)\n";
                     request.reply(status_codes::OK, U("QUIT_ACK"));
 
                     if (on_quit_callback_) on_quit_callback_();         //handleQuitSignal();
@@ -49,7 +51,7 @@ namespace sm {
                 }
             }
             catch (const std::exception& e) {
-                std::cerr << u8"[HttpServer] GET ÇÚµé·¯ ¿À·ù: " << e.what() << "\n";
+                std::cerr << u8"[HttpServer] GET í•¸ë“¤ëŸ¬ ì˜¤ë¥˜: " << e.what() << "\n";
                 request.reply(status_codes::InternalError, U("GET handler error"));
             }
             });
@@ -69,20 +71,35 @@ namespace sm {
 
     bool HttpServer::start() {
         if (is_open_) {
-            std::cout << u8"[" << client_id_ << u8"] ¸®½º³Ê´Â ÀÌ¹Ì ¿­·Á ÀÖ½À´Ï´Ù.\n";
+            std::cout << u8"[" << client_id_ << u8"] ë¦¬ìŠ¤ë„ˆëŠ” ì´ë¯¸ ì—´ë ¤ ìžˆìŠµë‹ˆë‹¤.\n";
             return false;
         }
 
-        try {
-            listener_.open().wait();
-            is_open_ = true;
-            std::cout << u8"[" << client_id_ << u8"] ¸®½º³Ê ½ÃÀÛµÊ. ´ë±â Áß...\n";
-            return true;
+        const int max_retries = 10;
+        const std::chrono::seconds retry_interval(1);
+        std::string retry_dots;
+
+        for (int attempt = 1; attempt <= max_retries; ++attempt) {
+            try {
+                listener_.open().wait();
+                is_open_ = true;
+                banner::printAsciiBanner();
+
+                std::cout << u8"\n[" << client_id_ << u8"] ë¦¬ìŠ¤ë„ˆ ì‹œìž‘ë¨. ëŒ€ê¸° ì¤‘...\n";
+                return true;
+            }
+            catch (const std::exception& e) {
+                retry_dots += ".";
+
+                std::cerr << u8"\r[" << client_id_ << u8"] ë¦¬ìŠ¤ë„ˆ ì‹œìž‘ ìž¬ì‹œë„ ì¤‘" << retry_dots << std::flush;
+                if (attempt < max_retries) {
+                    std::this_thread::sleep_for(retry_interval);
+                }
+            }
         }
-        catch (const std::exception& e) {
-            std::cerr << u8"[" << client_id_ << u8"] ¸®½º³Ê ½ÃÀÛ ½ÇÆÐ: " << e.what() << "\n";
-            return false;
-        }
+
+        std::cerr << u8"\n[" << client_id_ << u8"] ë¦¬ìŠ¤ë„ˆ ìž¬ì‹œìž‘ ì‹¤íŒ¨\n";
+        return false;
     }
 
     void HttpServer::stop() {
@@ -91,10 +108,10 @@ namespace sm {
         try {
             listener_.close().wait();
             is_open_ = false;
-            std::cout << u8"[" << client_id_ << u8"] ¸®½º³Ê Á¤»ó Á¾·áµÊ.\n";
+            std::cout << u8"[" << client_id_ << u8"] ë¦¬ìŠ¤ë„ˆ ì •ìƒ ì¢…ë£Œë¨.\n";
         }
         catch (const std::exception& e) {
-            std::cerr << u8"[" << client_id_ << u8"] ¸®½º³Ê Á¾·á ½ÇÆÐ: " << e.what() << "\n";
+            std::cerr << u8"[" << client_id_ << u8"] ë¦¬ìŠ¤ë„ˆ ì¢…ë£Œ ì‹¤íŒ¨: " << e.what() << "\n";
         }
     }
 
