@@ -1,9 +1,11 @@
 ﻿using System.Configuration;
 using System.Data;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Navigation;
 using Microsoft.Extensions.DependencyInjection;
 using OCC.ViewModels;
+using Wpf.Ui.Appearance;
 
 namespace OCC;
 
@@ -27,6 +29,7 @@ public partial class App : Application
         ServiceProvider = services.BuildServiceProvider();
 
         base.OnStartup(e);
+
     }
 }
 

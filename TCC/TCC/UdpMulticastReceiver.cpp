@@ -8,7 +8,7 @@
 TCC::UdpMulticastReceiver::UdpMulticastReceiver(const std::string& multicastIp, int port) 
 	: multicastIp_(multicastIp), port_(port), serverSocket_(INVALID_SOCKET), aircraftManager_(nullptr)
 {
-	//¿©±â¼­µµ ¸í½ÃÀûÀ¸·Î nullptr ³Ö¾îÁÖ±â
+	//ì—¬ê¸°ì„œë„ ëª…ì‹œì ìœ¼ë¡œ nullptr ë„£ì–´ì£¼ê¸°
 	std::cout << "UdpMulticastReceiver created\n";
 }
 
@@ -19,7 +19,7 @@ TCC::UdpMulticastReceiver::~UdpMulticastReceiver() {
 bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileManager* missileManager, EngagementManager* engagementManager) {
 
 	isRunning_ = true;
-	//¿©±â¼­ Æ÷ÀÎÅÍ ¿¬°á ¸ÕÀú ÇÏ±â
+	//ì—¬ê¸°ì„œ í¬ì¸í„° ì—°ê²° ë¨¼ì € í•˜ê¸°
 	if (aircraftManager == nullptr || missileManager == nullptr || engagementManager == nullptr) {
 		return false;
 	}
@@ -58,7 +58,7 @@ bool TCC::UdpMulticastReceiver::init(AircraftManager* aircraftManager, MissileMa
 
 	ip_mreq mreq;
 	mreq.imr_multiaddr.s_addr = inet_addr(MULTICAST_GROUP);
-	mreq.imr_interface.s_addr = inet_addr("192.168.2.190");  // <- ½ÇÁ¦ À¯¼± LAN IP ÁÖ¼Ò ÁöÁ¤
+	mreq.imr_interface.s_addr = inet_addr("192.168.2.190");  // <- ì‹¤ì œ ìœ ì„  LAN IP ì£¼ì†Œ ì§€ì •
 
 	if (setsockopt(serverSocket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) < 0) {
 		std::cout << "setsockopt(IPP_ADD_MEMBERSHIP) Failed\n";
@@ -114,17 +114,18 @@ void TCC::UdpMulticastReceiver::receive() {
 			break;
 
 		case EventCode::MissileStatus:
-			//¹Ì»çÀÏ µ¥ÀÌÅÍ
-			memcpy(&missileMsg, buffer + 8, sizeof(MissileMSG));
-			//¿©±â¼­ È£Ãâ
+			//ë¯¸ì‚¬ì¼ ë°ì´í„°
+			if (!parseReceivedMissileMSG(buffer + 8, missileMsg, header.bodyLength_))
+				break;
+			//ì—¬ê¸°ì„œ í˜¸ì¶œ
 			if (missileManager_) {
 				missileManager_->echoMissileData(missileMsg);
-				std::cout << "¹Ì»çÀÏ µ¥ÀÌÅÍ ¼ö½Å----------------------" << "\n";
-				std::cout << "ID : " << missileMsg.missileId << "\n";
-				std::cout << "Status : " << missileMsg.status_ << "\n";
-				std::cout << "À§µµ : " << missileMsg.location_.latitude_ << "\n";
-				std::cout << "°æµµ : " << missileMsg.location_.longitude_ << "\n";
-				std::cout << "°íµµ : " << missileMsg.location_.altitude_ << "\n";
+				std::cout << u8"---------------ë¯¸ì‚¬ì¼ ë°ì´í„° ìˆ˜ì‹ ---------------" << "\n";
+				std::cout << u8"ID : " << missileMsg.missileId << "\n";
+				std::cout << u8"Status : " << missileMsg.status_ << "\n";
+				std::cout << u8"ìœ„ë„ : " <<missileMsg.location_.latitude_ << "\n";
+				std::cout << u8"ê²½ë„ : " << missileMsg.location_.longitude_ << "\n";
+				std::cout << u8"ê³ ë„ : " << missileMsg.location_.altitude_ << "\n";
 			}
 			break;
 		default:
@@ -183,16 +184,12 @@ bool TCC::UdpMulticastReceiver::responseEngagementSuccessAck(EngagementSuccessMS
 
 bool TCC::UdpMulticastReceiver::parseReceivedMissileMSG(const char* buffer, MissileMSG& data, int length) {
 
-	MissileMSG msg;
-	memcpy((void*)&msg, buffer, length);
-
-	if (!TCC::isValidMissileId(msg.missileId))
+	memcpy((void*)&data, buffer, length);
+	/*if (!TCC::isValidMissileId(msg.missileId))
 		return false;
 
 	if (!data.location_.isValidPosition())
-		return false;
-
-	data = msg;
+		return false;*/
 
 	return true;
 }

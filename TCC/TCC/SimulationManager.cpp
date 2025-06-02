@@ -3,15 +3,15 @@
 
 SimulationManager::SimulationManager():isRunning_(false), isChanged_(false) {
 	scenarioManager_ = new sm::ScenarioManager(
-		"http://192.168.2.66:8080",     // TCC Http 서버 주소
-		"http://192.168.2.30:8080",    // SCN Http 서버 주소
-		"TCC"         // 클라이언트 ID
+		"http://192.168.2.66:8080",     // TCC Http ì„œë²„ ì£¼ì†Œ
+		"http://192.168.2.30:8080",    // SCN Http ì„œë²„ ì£¼ì†Œ
+		"TCC"         // í´ë¼ì´ì–¸íŠ¸ ID
 	);
 
 	scenarioManager_->setOnReadyCallback([this]() {
 		std::lock_guard<std::mutex> lock(mtx_);
 
-		if (isRunning_) {       //이미 시나리오가 실행 중
+		if (isRunning_) {       //?´ë? ?œë‚˜ë¦¬ì˜¤ê°€ ?¤í–‰ ì¤?
 			return;
 		}
 
@@ -24,7 +24,7 @@ SimulationManager::SimulationManager():isRunning_(false), isChanged_(false) {
 	scenarioManager_->setOnQuitCallback([this]() {
 		std::lock_guard<std::mutex> lock(mtx_);
 
-		if (!isRunning_) {		//실행중인 시나리오가 없음
+		if (!isRunning_) {		//?¤í–‰ì¤‘ì¸ ?œë‚˜ë¦¬ì˜¤ê°€ ?†ìŒ
 			return;
 		}
 
@@ -40,7 +40,8 @@ void SimulationManager::startSimulation() {
 	//startScenario();
 	//while (1);
 
-	//http서버 시작
+	//httpì„œë²„ ì‹œìž‘
+
 	std::thread scenarioThread([&]() {
 		scenarioManager_->run();
 		});
@@ -115,13 +116,13 @@ bool SimulationManager::quitScenario() {
 
 bool SimulationManager::createObjects(TCC::Position& batteryLocation) {
 
-	multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);		//192.168.2.190으로 수신
-	udpSender_ = new TCC::UdpSender("192.168.2.200", 9000);					//OCC 교전망
-	multiSender_ = new TCC::UdpMulticastSender("239.0.0.1", 9000);			//192.168.2.194로 송신
+	multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);		//192.168.2.190ìœ¼ë¡œ ìˆ˜ì‹ 
+	udpSender_ = new TCC::UdpSender("192.168.2.200", 9000);					//OCC êµì „ë§
+	multiSender_ = new TCC::UdpMulticastSender("239.0.0.1", 9000);			//192.168.2.194ë¡œ ì†¡ì‹ 
 	aircraftManager_ = new AircraftManager(batteryLocation);
 	engagementManager_ = new EngagementManager();
 	missileManager_ = new MissileManager(udpSender_, engagementManager_);
-	udpReceiver_ = new TCC::UdpReceiver("192.168.2.189", 9999);				//TCC 교전망
+	udpReceiver_ = new TCC::UdpReceiver("192.168.2.189", 9999);				//TCC êµì „ë§
 
 	if (!aircraftManager_->init(udpSender_, engagementManager_)) {
 		std::cout << "aircraftManager init() Failed\n";
@@ -156,7 +157,7 @@ void SimulationManager::quitSimulation() {
 
 	std::cout << "quitSimulation()" << std::endl;
 
-	// http서버 종료 처리
+	// httpì„œë²„ ì¢…ë£Œ ì²˜ë¦¬
 	//if (sm::scenarioThread.joinable()) {
 	//	scenarioThread.join();
 	//}

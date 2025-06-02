@@ -16,6 +16,7 @@ namespace OCC.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        // ICommand : MVVM 패턴에서 명령 패턴을 구현하기 위한 인터페이스
         public ICommand GoBackCommand { get; }
 
         public BaseViewModel()
