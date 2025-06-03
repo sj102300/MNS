@@ -19,6 +19,10 @@ public:
 
 	void updatePosition(float speed = 5.0f);
 
+	// gtest를 위한 코드 2줄
+public:
+	bool hasTarget() const { return hasTarget_; }
+	double getEstimatedTimeToImpact() const { return estimatedTimeToImpact_; }
 
 private:
 	Location impact_point;

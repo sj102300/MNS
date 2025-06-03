@@ -6,8 +6,8 @@
 #include <memory>
 #include <iostream>
 #include <unordered_map>
-
-#include "IReceiver.h"
+#include <gtest/gtest.h>
+#include "IReceiver.h" // 이 부분 테스팅 위해 추가
 #include "Missile.h"
 
 class UdpReceiver : public IReceiver {

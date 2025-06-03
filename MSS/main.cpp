@@ -49,7 +49,6 @@ int main() {
 #endif
 #if 1
 #pragma once
-
 #include "UdpReceiver.h"
 #include "UdpMuticast.h"
 #include "MissileController.h"
@@ -143,7 +142,7 @@ int main() {
             // 포대 위치 획득
             Coordinate battery = scenarioRunner.getBatteryLocation();
             Location loca = { battery.latitude,battery.longitude,battery.altitude };
-            std::cout << "[" << SUBSYSTEM_ID << "] 포대 위치: "
+            std::cout << "u8[" << SUBSYSTEM_ID << "] 포대 위치: "
                 << battery.latitude << ", " << battery.longitude << ", " << battery.altitude << "\n";
 
             // 기존 미사일 정리
@@ -151,7 +150,7 @@ int main() {
             missileMap.clear();
 
             // 미사일 생성
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 3; ++i) {
                 auto missile = std::make_shared<Missile>();
 
                 std::string id = "MSS-" + std::to_string(100 + i);
@@ -163,7 +162,7 @@ int main() {
 
                 auto controller = std::make_shared<MissileController>();
                 missile->init(sender, controller);
-                missile->start(0.1); // 초속 2km
+                missile->start(2.0); // 초속 2km
 
                 missileMap[id] = missile;
                 missiles.push_back(missile);

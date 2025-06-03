@@ -109,7 +109,7 @@ void UdpMulticast::run() {
                 if (sent == SOCKET_ERROR) {
                     std::cerr << u8"sendto failed: " << WSAGetLastError() << "\n";
                 }
-                else if (missile_->MissileState == 3 || missile_->MissileState == 4) {
+                else if (missile_ -> MissileState == 2 || missile_->MissileState == 3 || missile_->MissileState == 4) {
                     std::cout << u8"Missile state is " << missile_->MissileState
                         << u8" ¡æ stopping multicast.\n";
 
