@@ -13,7 +13,7 @@ bool TCC::UdpMulticastSender::init() {
         return false;
     }
 
-    // ¼ÒÄÏ »ı¼º (UDP)
+    // ì†Œì¼“ ìƒì„± (UDP)
     sock_ = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock_ == INVALID_SOCKET) {
         std::cerr << "Failed to create socket\n";
@@ -24,7 +24,7 @@ bool TCC::UdpMulticastSender::init() {
     destAddr_.sin_port = htons(port_);
 
 
-    if (inet_pton(AF_INET, "239.0.0.1", &destAddr_.sin_addr) <= 0) { // destAddrÀ» ÀÌÁ¦ ¸ÖÆ¼Ä³½ºÆ® ÁÖ¼Ò·Î
+    if (inet_pton(AF_INET, "239.0.0.1", &destAddr_.sin_addr) <= 0) { // destAddrì„ ì´ì œ ë©€í‹°ìºìŠ¤íŠ¸ ì£¼ì†Œë¡œ
         std::cerr << u8"Invalid multicast address format\n";
         closesocket(sock_);
         WSACleanup();
@@ -54,7 +54,7 @@ bool TCC::UdpMulticastSender::init() {
         return false;
     }
 
-    // ¼ö½Å Å¸ÀÓ¾Æ¿ô ¼³Á¤
+    // ìˆ˜ì‹  íƒ€ì„ì•„ì›ƒ ì„¤ì •
     int timeout = 100; // 100ms
     setsockopt(sock_, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
 
@@ -64,7 +64,7 @@ bool TCC::UdpMulticastSender::init() {
 void TCC::UdpMulticastSender::sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
 
     char* buffer = new char[100];
-    //Çì´õ ºÙÀÌ±â
+    //í—¤ë” ë¶™ì´ê¸°
     int headerSize = serializeHeader(buffer, EventCode::launchCommand, sizeof(LaunchCommandBody));
     int bodySize = serializeLauncCommandBody(buffer + headerSize, commandId, aircraftId, missileId, impactPoint);
     int totalSize = headerSize + bodySize;
@@ -98,17 +98,18 @@ bool TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length
     sockaddr_in fromAddr;
     int fromLen = sizeof(fromAddr);
 
-    for (int attempt = 0; attempt < 4; ++attempt) {
-        // ¼Û½Å
+    for (int attempt = 0; attempt < 10; ++attempt) {
+        // ì†¡ì‹ 
         if (sendByteData(buffer, length) < 0) {
 			continue;
         }
-        // ¼ö½Å ½Ãµµ
+        // ìˆ˜ì‹  ì‹œë„
         int recvLen = recvfrom(sock_, recvBuffer, sizeof(recvBuffer) - 1, 0, (sockaddr*)&fromAddr, &fromLen);
         if (recvLen > 0) {
+            //ACKíŒŒì‹± ì•ˆí–ˆìŒ . eventcodeì½ì–´ì„œ ackì¸ê±° í™•ì¸ ..
             return true;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
 	std::cout << "No ACK received after 10 attempts" << std::endl;
@@ -124,14 +125,14 @@ void TCC::UdpMulticastSender::sendEmergencyDestroyCommand(std::string& commandId
 	int totalSize = headerSize + bodySize;
     std::thread([this, buffer, totalSize, missileId]() {
         bool ackReceived = sendUntilReceiveAck(buffer, totalSize);
-        setAckResult(missileId, ackReceived); // °á°ú ÀúÀå ¹× ¾Ë¸²
+        setAckResult(missileId, ackReceived); // ê²°ê³¼ ì €ì¥ ë° ì•Œë¦¼
         //     if sendUntilReceiveAck(buffer, totalSize) {
-        //         //¼º°ø
-                 ////cv¸¦ ÀÌ¿ëÇØ¼­ EngagementManager¿¡ ¾Ë¸®±â
+        //         //ì„±ê³µ
+                 ////cvë¥¼ ì´ìš©í•´ì„œ EngagementManagerì— ì•Œë¦¬ê¸°
         //     }
         //     else {
-        //         //½ÇÆĞ
-                 //// cv¸¦ ÀÌ¿ëÇØ¼­ EngagementManager¿¡ ¾Ë¸®±â
+        //         //ì‹¤íŒ¨
+                 //// cvë¥¼ ì´ìš©í•´ì„œ EngagementManagerì— ì•Œë¦¬ê¸°
         //     }
         delete[] buffer;
         }).detach();

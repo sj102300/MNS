@@ -29,7 +29,7 @@
                  HorizontalAlignment="Stretch">
             <DockPanel LastChildFill="True">
                 <!-- 상단:뒤로가기 버튼 -->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="12,12,12,12">
                     <ui:Button Command="{Binding GoBackCommand}"
                                Width="110"
                                Height="36"
@@ -42,9 +42,9 @@
                                Padding="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Margin="0,0,0,8">
+                               Margin="0,0,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Viewbox Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center">
+                            <Viewbox Width="13" Height="16" Margin="0,0,6,0" VerticalAlignment="Center">
                                 <Path Data="M 12,2 L 4,10 L 12,18"
                                       Stroke="#4FC3F7"
                                       StrokeThickness="2"
@@ -69,7 +69,7 @@
                           FontSize="14"
                           VerticalContentAlignment="Stretch"
                           HorizontalContentAlignment="Stretch"
-                          Margin="0"
+                          Margin="12,0,12,12"
                           MinHeight="340"
                           MinWidth="480">
                     <gmap:GMapControl 
@@ -96,15 +96,15 @@
                         FontSize="16"
                         FontWeight="Bold"
                         Foreground="#4FC3F7"
-                        Margin="0,0,0,10"
-                        HorizontalAlignment="Left"/>
+                        Margin="10"
+                        HorizontalAlignment="Center"/>
                 <ComboBox ItemsSource="{Binding Items}" 
                       SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
                       Width="160"
                       Height="40"
                       FontSize="15"
                       FontWeight="Bold"
-                      Margin="0,0,0,8"
+                      Margin="0,0,0,0"
                       Background="#181A20"
                       Foreground="#4FC3F7"
                       BorderBrush="#4FC3F7"
@@ -144,11 +144,12 @@
                     Foreground="{Binding MarkerColor}"/>
                 <ui:Button Content="저장"
                     Command="{Binding SaveCommand}"
-                    Width="150"
+                    Width="160"
                     Height="40"
                     Appearance="Primary"
                     FontSize="15"
                     FontWeight="SemiBold"
+                    Margin="10"
                     Background="#263238"
                     Foreground="#FFFFFF"
                     CornerRadius="8"/>
