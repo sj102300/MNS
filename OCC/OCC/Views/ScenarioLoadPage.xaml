@@ -121,7 +121,7 @@
                            Foreground="#FFFFFF"
                            CornerRadius="8"
                            Margin="0,0,0,10"/>
-                <ui:Button Content="종료"
+                <!--<ui:Button Content="종료"
                            Command="{Binding QuitCommand}"
                            Width="150"
                            Height="40"
@@ -129,7 +129,7 @@
                            FontWeight="SemiBold"
                            Background="#B71C1C"
                            Foreground="#FFFFFF"
-                           CornerRadius="8"/>
+                           CornerRadius="8"/>-->
             </StackPanel>
         </ui:Card>
     </Grid>

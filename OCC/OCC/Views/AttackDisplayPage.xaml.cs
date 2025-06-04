@@ -18,6 +18,9 @@ using GMap.NET.WindowsPresentation;
 using GMap.NET;
 using OCC.Models;
 using OCC.ViewModels;
+using Newtonsoft.Json;
+using OCC.Utils;
+using System.Net.Http;
 
 namespace OCC.Views
 {
@@ -26,45 +29,38 @@ namespace OCC.Views
     /// </summary>
     public partial class AttackDisplayPage : Page
     {
-        private Point _mouseDownPoint;
-        private DateTime _mouseDownTime;
-        private const double CLICK_THRESHOLD = 5.0; // 픽셀 거리
-        private const int CLICK_TIME_MS = 300; // 클릭 시간 제한 (밀리초)
-
         private AttackDisplayViewModel _viewModel;
-
         public AttackDisplayPage()
         {
             InitializeComponent();
             _viewModel = new AttackDisplayViewModel();
             DataContext = _viewModel;
-            InitializeMap();
-
             // Loaded 이벤트를 통해 NavigationService를 설정
-            Loaded += ScenarioLoadPage_Loaded;
+            Loaded += AttackDisplayPage_Loaded;
+            InitializeMap();
         }
-
-        private void ScenarioLoadPage_Loaded(object sender, RoutedEventArgs e)
+        private void AttackDisplayPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (NavigationService != null)
-            {
-                _viewModel.NavigationService = NavigationService;
-            }
-            else if (Parent is Frame frame && frame.NavigationService != null)
-            {
-                _viewModel.NavigationService = frame.NavigationService;
-            }
+            //if (NavigationService != null)
+            //{
+            //    _viewModel.NavigationService = NavigationService;
+            //}
+            //else if (Parent is Frame frame && frame.NavigationService != null)
+            //{
+            //    _viewModel.NavigationService = frame.NavigationService;
+            //}
 
+            //async로 시나리오 정보 가져오기
+            getScenarioInfo();
             // GMapControl에 포커스 강제 부여
             mapControl.Focus();
         }
-
-        //Position : 위/경도 정보 -> 입력 순서는 경도, 위도 순서
         private void InitializeMap()
         {
             // config map
             mapControl.MapProvider = GMapProviders.GoogleMap;
-            mapControl.Position = new PointLatLng(37.5665, 126.9780);
+            //getScenarioInfo()에서 Position 초기화함
+            //mapControl.Position = new PointLatLng(37.5665, 126.9780);
             mapControl.MinZoom = 2;
             mapControl.MaxZoom = 18;
             mapControl.Zoom = 12;
@@ -72,8 +68,8 @@ namespace OCC.Views
             mapControl.CanDragMap = true;
             mapControl.MouseWheelZoomType = MouseWheelZoomType.MousePositionAndCenter;
             mapControl.DragButton = MouseButton.Left;
-            mapControl.MouseLeftButtonDown += mapControl_MouseLeftButtonDown;
-            mapControl.MouseLeftButtonUp += mapControl_MouseLeftButtonUp;
+            //mapControl.MouseLeftButtonDown += mapControl_MouseLeftButtonDown;
+            //mapControl.MouseLeftButtonUp += mapControl_MouseLeftButtonUp;
 
             mapControl.PreviewMouseWheel += (s, e) =>
             {
@@ -81,20 +77,17 @@ namespace OCC.Views
                     mapControl.Zoom = Math.Min(mapControl.Zoom + 1, mapControl.MaxZoom);
                 else
                     mapControl.Zoom = Math.Max(mapControl.Zoom - 1, mapControl.MinZoom);
-                e.Handled = true;
+                e.Handled = true; 
             };
         }
-
-        private void mapControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private async void getScenarioInfo()
         {
-            
+            var coord = await _viewModel.GetScenarioInfoAsync();
+            if (coord != null)
+                mapControl.Position = new PointLatLng(coord.latitude, coord.longitude);
+            else
+                mapControl.Position = new PointLatLng(37.5665, 126.9780);
         }
 
-        private void mapControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
- 
-            // 이벤트 전파 차단 -> 다른 컨트롤에 이벤트가 전달되지 않도록 함(한번 클릭해도 두번 눌리는 현상 방지)
-            e.Handled = true;
-        }
     }
 }

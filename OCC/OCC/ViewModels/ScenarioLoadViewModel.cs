@@ -77,7 +77,6 @@ namespace OCC.ViewModels
             LoadCommand.Execute(null);
         }
 
-
         private async void Load()
         {
             string serverUrl = $"{Network.SCN}/scenario/list"; // 시나리오 서버 주소로 교체
@@ -124,11 +123,37 @@ namespace OCC.ViewModels
             }
         }
 
-        private void NavigateToScenarioCreate()
+        private void NavigateToAttackDisplayPage()
         {
-            // ScenarioCreatePage.xaml로 이동
-            Uri uri = new Uri("/Views/AttackDisplayPage.xaml", UriKind.Relative);
-            NavigationService.Navigate(uri);
+            var currentWindow = Application.Current.Windows
+                                .OfType<Window>()
+                                .FirstOrDefault(w => w.IsActive);
+            if (currentWindow != null)
+            {
+                currentWindow.Content = new OCC.Views.AttackDisplayPage();
+            }
+
+            // AircraftLogPage를 Window에 담아서 띄우기
+            var aircraftLogPage = new OCC.Views.AircraftLogPage();
+            var aircraftLogWindow = new Window
+            {
+                Title = "Aircraft Log",
+                Width = 600,
+                Height = 800,
+                Content = aircraftLogPage
+            };
+            aircraftLogWindow.Show();
+
+            // MissileLog Window에 담아서 띄우기
+            var missileLogPage = new OCC.Views.MissileLogPage();
+            var missileLogWindow = new Window
+            {
+                Title = "Missile Log",
+                Width = 600,
+                Height = 800,
+                Content = missileLogPage
+            };
+            missileLogWindow.Show();
         }
 
         private async void Start()
@@ -138,7 +163,9 @@ namespace OCC.ViewModels
                 MessageBox.Show("시작할 시나리오를 먼저 선택하세요.", "선택 필요", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+            NavigateToAttackDisplayPage();
 
+#if true
             string scenarioId = SelectedScenario.scenario_id;
 
             // 모든 서브시스템에 대해 비동기 요청을 병렬로 실행
@@ -160,7 +187,7 @@ namespace OCC.ViewModels
                 );
                 if (result == MessageBoxResult.OK)
                 {
-                    NavigateToScenarioCreate();
+                    NavigateToAttackDisplayPage();
                 }
             }
             else
@@ -173,6 +200,7 @@ namespace OCC.ViewModels
                     MessageBoxImage.Warning
                 );
             }
+#endif
         }
 
         private async Task<bool> SendStartSignalAsync(string targetUrl, string subsystemId, string scenarioId)

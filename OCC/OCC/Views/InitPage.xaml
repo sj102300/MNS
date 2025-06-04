@@ -9,16 +9,24 @@
       d:DesignHeight="768" d:DesignWidth="1024"
       Background="#1A1D23"
       Title="InitPage">
-
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="2*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.Background>
+            <ImageBrush ImageSource="C:\Users\user\source\repos\MNS\OCC\OCC\images\background-img.png" Stretch="UniformToFill"/>
+        </Grid.Background>
+
+        <!-- 흐릿한 회색 오버레이 -->
+        <Rectangle Fill="#B3202127"
+           Panel.ZIndex="1"
+           Opacity="0.3"
+           IsHitTestVisible="False"
+           HorizontalAlignment="Stretch"
+           VerticalAlignment="Stretch"
+           Grid.Row="0" Grid.Column="0"
+           Grid.RowSpan="2" Grid.ColumnSpan="2"/>
 
         <!-- 좌측: 타이틀 및 설명 -->
         <ui:Card Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
@@ -34,7 +42,7 @@
                            Foreground="#4FC3F7"
                            Margin="0 24 0 12"
                            HorizontalAlignment="Center"/>
-                <TextBlock Text="유도무기 시뮬레이터"
+                <TextBlock Text="팀 오예스"
                            FontSize="14"
                            Foreground="#B0BEC5"
                            Margin="0 0 0 0"

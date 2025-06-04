@@ -83,7 +83,7 @@ void TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length
     sockaddr_in fromAddr;
     int fromLen = sizeof(fromAddr);
 
-    for (int attempt = 0; attempt < 4; ++attempt) {
+    for (int attempt = 0; attempt < 10; ++attempt) {
         // 송신
         if (sendByteData(buffer, length) < 0) {
 			continue;
@@ -91,9 +91,10 @@ void TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length
         // 수신 시도
         int recvLen = recvfrom(sock_, recvBuffer, sizeof(recvBuffer) - 1, 0, (sockaddr*)&fromAddr, &fromLen);
         if (recvLen > 0) {
+            //ACK파싱 안했음 . eventcode읽어서 ack인거 확인 ..
             return;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
 	std::cout << "No ACK received after 10 attempts" << std::endl;
