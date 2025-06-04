@@ -76,7 +76,22 @@ void TCC::UdpMulticastSender::sendLaunchCommand(std::string& commandId, std::str
     return;
 }
 
-void TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length) {
+void TCC::UdpMulticastSender::setAckResult(const std::string& missileId, bool result) {
+    {
+        std::lock_guard<std::mutex> lock(ackMtx_);
+        ackResults_[missileId] = result;
+    }
+    ackCv_.notify_all();
+}
+
+bool TCC::UdpMulticastSender::waitForAckResult(const std::string& missileId, int timeoutMs) {
+    std::unique_lock<std::mutex> lock(ackMtx_);
+    return ackCv_.wait_for(lock, std::chrono::milliseconds(timeoutMs), [&] {
+        return ackResults_.find(missileId) != ackResults_.end();
+        }) && ackResults_[missileId];
+}
+
+bool TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length) {
 
     char recvBuffer[100];
 
@@ -91,12 +106,13 @@ void TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length
         // 수신 시도
         int recvLen = recvfrom(sock_, recvBuffer, sizeof(recvBuffer) - 1, 0, (sockaddr*)&fromAddr, &fromLen);
         if (recvLen > 0) {
-            return;
+            return true;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
 	std::cout << "No ACK received after 10 attempts" << std::endl;
+    return false;
 }
 
 void TCC::UdpMulticastSender::sendEmergencyDestroyCommand(std::string& commandId, std::string& missileId) {
@@ -106,8 +122,17 @@ void TCC::UdpMulticastSender::sendEmergencyDestroyCommand(std::string& commandId
     int bodySize = serializeEmergencyDestroyCommandBody(buffer + headerSize, commandId, missileId);
     
 	int totalSize = headerSize + bodySize;
-    std::thread([this, buffer, totalSize]() {
-        sendUntilReceiveAck(buffer, totalSize);
+    std::thread([this, buffer, totalSize, missileId]() {
+        bool ackReceived = sendUntilReceiveAck(buffer, totalSize);
+        setAckResult(missileId, ackReceived); // 결과 저장 및 알림
+        //     if sendUntilReceiveAck(buffer, totalSize) {
+        //         //성공
+                 ////cv를 이용해서 EngagementManager에 알리기
+        //     }
+        //     else {
+        //         //실패
+                 //// cv를 이용해서 EngagementManager에 알리기
+        //     }
         delete[] buffer;
         }).detach();
 

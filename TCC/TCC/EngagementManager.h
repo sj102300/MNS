@@ -67,6 +67,10 @@ private:
 	std::atomic<unsigned int> mode_;
 	EngagableAircraftQueue engagableAircrafts_;
 
+	//필요시 EngagableAircraftQueue같은 자료구조 사용
+	bool isEmergencySuccess; // cv로 알림 받을 변수
+	std::string missileId; // cv로 알림 받을 변수 
+
 	void work();
 	bool mappingMissileToAircraft(std::string& aircraftId, std::string& missileId);
 	void makeAutoFireCommandId(std::string& commandId);
