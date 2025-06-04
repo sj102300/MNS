@@ -13,7 +13,6 @@ namespace TCC {
 	class UdpMulticastReceiver {
 	public:
 		UdpMulticastReceiver(const std::string& multicastIp, int port);
-
 		~UdpMulticastReceiver();
 
 #pragma pack(push,1)

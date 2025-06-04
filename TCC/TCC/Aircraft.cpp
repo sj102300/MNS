@@ -64,15 +64,14 @@ void Aircraft::getImpactPoint(TCC::Position &impactPoint) {
     impactPoint = impactPoint_;
 }
 
-void Aircraft::calcImpactPoint() {
-    TCC::Position batteryLoc = { 37.5597, 126.9869, 10 };
+void Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
     double vt = 1.0; // 항공기 속도 (km/s)
     double vm = 2.0; // 미사일 속도 (km/s)
 
-    if (dirVec_.isZeroVector()) {
-        impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
-        return;
-    }
+    //if (dirVec_.isZeroVector()) {
+    //    impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
+    //    return;
+    //}
 
     // 1. 위치 평면 좌표로 변환
     double tx, ty, mx, my;
@@ -86,6 +85,7 @@ void Aircraft::calcImpactPoint() {
     double discriminant = b * b - 4 * a * c;
 
     if (discriminant < 0) {
+		std::cout << "impossible to intercept: discriminant < 0" << std::endl;
         impactPoint_ = { -200, -200, 10 };   // 수학적으로 요격 불가능
         return;
     }
@@ -95,6 +95,7 @@ void Aircraft::calcImpactPoint() {
     double t2 = (-b - sqrtD) / (2 * a);
     double t = (t1 > 0) ? t1 : ((t2 > 0) ? t2 : -1);
     if (t < 0) {
+		std::cout << "impossible to intercept: t < 0" << std::endl;
         impactPoint_ = { -200, -200, 10 };       //과거에 요격했어야함.
         return;
     }
@@ -111,11 +112,11 @@ void Aircraft::calcImpactPoint() {
 bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus, TCC::Position& impactPoint) {
 
     engagementStatus = (unsigned int)status_;
-    if (status_ == EngagementStatus::Engaging || status_ == EngagementStatus::Destroyed) {
-        return false;
-    }
+    //if (status_ == EngagementStatus::Engaging || status_ == EngagementStatus::Destroyed) {
+    //    return false;
+    //}
 
-    calcImpactPoint();
+    calcImpactPoint(batteryLoc);
     impactPoint = impactPoint_;
 
 	//std::cout << "aircraftId: " << aircraftId_ 
@@ -148,11 +149,13 @@ bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& enga
         if (status_ == EngagementStatus::NotEngageable) {       //교전 불가능이었다가 교전 가능범위 내로 진입한 상태
             status_ = EngagementStatus::Engageable;
 			engagementStatus = (unsigned int)status_;
+			std::cout << "Aircraft has become engageable: " << aircraftId_ << std::endl;
 			return true; // 교전 가능 상태로 변경됨
         }   
         else {             // 이미 교전 가능 상태이므로 변경 없음
             status_ = EngagementStatus::Engageable;
             engagementStatus = (unsigned int)status_;
+			std::cout << "Aircraft is already engageable: " << aircraftId_ << std::endl;
             return false;
         }
      }

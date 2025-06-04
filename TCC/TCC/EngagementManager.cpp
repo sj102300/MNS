@@ -161,23 +161,18 @@ void EngagementManager::work() {
 		if (!isRunning_)
 			break;
 
-		//if () {
-		//	// 비상폭파 관련 cv 로직
-		//}
-
 		if (mode_ == Mode::Manual) {
 			continue;	//수동발사 모드일때는 작업할게 없음
 		}
 
 		//자동발사일때
-		while (!engagableAircrafts_.popQueue(aircraftId)) {
+		while (engagableAircrafts_.popQueue(aircraftId)) {
 			std::string commandId;
 			makeAutoFireCommandId(commandId);
 			launchMissile(commandId, aircraftId);
 		}
 	}
 }
-
 
 void EngagementManager::notifyThread() {
 	isChanged_ = true;
@@ -200,25 +195,30 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 
 	Aircraft* aircraft = aircraftManager_->getAircraft(aircraftId);
 	if(aircraft == nullptr){
+		std::cout << "--------------------------------" << std::endl;
 		std::cout << "No Aircraft!" << std::endl;
+		std::cout << "--------------------------------" << std::endl;
 		return false;
 	}
 
 	TCC::Position impactPoint;
-	
 	if (!aircraft->isEngagable()) {
+		std::cout << "--------------------------------" << std::endl;
 		std::cout << "Aircraft is notEngageable" << std::endl;
 		aircraft->getImpactPoint(impactPoint);
 		std::cout << "lati: " << impactPoint.latitude_
 			<< "longi: " << impactPoint.longitude_
 			<< "alti: " << impactPoint.altitude_
 			<< std::endl;
+		std::cout << "--------------------------------" << std::endl;
 		return false;		//교전 불가능 한 항공기임.
 	}
 
 	std::string missileId;
 	if (!mappingMissileToAircraft(aircraftId, missileId)) {
+		std::cout << "--------------------------------" << std::endl;
 		std::cout << "Failed to map missile to aircraft." << std::endl;
+		std::cout << "--------------------------------" << std::endl;
 		return false; // 미사일 매핑 실패
 	};
 
@@ -228,12 +228,10 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 	multisender_->sendLaunchCommand(commandId, aircraftId, missileId, impactPoint);
 
 	std::cout << "==================================" << std::endl;
-
 	std::cout << "launchMissile(): " << commandId << " " << aircraftId << " " << missileId <<" success" << std::endl;
 	std::cout << "impactPoint: "<< "lati: "<<impactPoint.latitude_
 		<<"longi: "<<impactPoint.longitude_
 		<<"alti: "<<impactPoint.altitude_ << std::endl;
-
 	std::cout << "==================================" << std::endl;
 
 	return true;
@@ -264,9 +262,6 @@ bool EngagementManager::emergencyDestroy(std::string commandId, std::string miss
 }
 
 void EngagementManager::addEngagableAircraft(std::string& aircraftId) {
-	if (mode_ == Mode::Manual)
-		return;
-	
 	if (engagableAircrafts_.pushQueue(aircraftId)) {
 		notifyThread();
 	}
@@ -278,6 +273,7 @@ bool EngagementManager::EngagableAircraftQueue::pushQueue(std::string& aircraftI
 		return false;
 	set.insert(aircraftId);
 	queue.push(aircraftId);
+	std::cout << "EngagableAircraftQueue pushQueue() : " << aircraftId << std::endl;
 	return true;
 }
 
@@ -285,6 +281,7 @@ bool EngagementManager::EngagableAircraftQueue::popQueue(std::string& aircraftId
 	std::lock_guard<std::mutex>lock(mtx_);
 	if (queue.empty())
 		return false;
+	std::cout << queue.size() << " aircrafts in queue\n";
 	aircraftId = queue.front();
 	queue.pop();
 	set.erase(aircraftId);

@@ -87,8 +87,9 @@ void TCC::UdpReceiver::receive() {
 
 		case CommandCode::ManualFireRequest:
 			std::cout << "ManualFireRequest" << std::endl;
-			if (!parseManualFireMSG(buffer + 8, manualFireMsg))
-				break;
+			parseManualFireMSG(buffer + 8, manualFireMsg);
+			/*if (!parseManualFireMSG(buffer + 8, manualFireMsg))
+				break;*/
 			responseManualFireAck(manualFireMsg);
 			engagementManager_->manualFire(std::string(manualFireMsg.commandId_, 20), std::string(manualFireMsg.targetAircraftId_, 8));
 			break;
