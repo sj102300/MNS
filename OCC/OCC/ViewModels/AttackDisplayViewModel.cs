@@ -115,8 +115,6 @@ namespace OCC.ViewModels
                 return false;
             }
         }
-
-
         private async void Quit()
         {
             Debug.WriteLine("종료 요청");
@@ -139,7 +137,7 @@ namespace OCC.ViewModels
                 );
                 if (result == MessageBoxResult.OK)
                 {
-                    GoInitPage(); // InitPage로 이동
+
                 }
             }
             else
