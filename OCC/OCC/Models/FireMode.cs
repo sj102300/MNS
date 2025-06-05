@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace OCC.Models
 {
-    internal class FireMode
+    public class FireMode
     {
-        // 발사 모드 enum
-        public enum FireModeType { Auto = 0, Manual }
+        public enum FireModeType { Auto = 0, Manual = 1 }
 
-        private FireModeType _fireMode = FireModeType.Auto;
+        public FireModeType _fireMode = FireModeType.Auto;
         public FireModeType Mode
         {
             get => _fireMode;
@@ -20,14 +18,11 @@ namespace OCC.Models
                 if (_fireMode != value)
                 {
                     _fireMode = value;
-                    OnFireModeChanged();
+                    FireModeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
-        public event Action? FireModeChanged;
-        protected virtual void OnFireModeChanged()
-        {
-            FireModeChanged?.Invoke();
-        }
+
+        public event EventHandler? FireModeChanged;
     }
 }

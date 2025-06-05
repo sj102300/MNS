@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OCC.ViewModels;
 
 namespace OCC.Views
 {
@@ -20,10 +22,25 @@ namespace OCC.Views
     /// </summary>
     public partial class AircraftLogPage : Page
     {
-        public AircraftLogPage()
+
+        private AttackViewModel _viewModel;
+
+        public AircraftLogPage(AttackViewModel viewModel)
         {
             InitializeComponent();
-        }
+            //// NavigationService를 ViewModel에 전달
+            _viewModel = viewModel;
+            DataContext = _viewModel;
 
+#if false
+            Loaded += (_, __) =>
+            {
+                Debug.WriteLine($"[DEBUG] DataContext: {DataContext?.GetType().Name}");
+
+                var changeModeText = ((AttackViewModel)DataContext).ChangeModeText;
+                Debug.WriteLine($"[DEBUG] ChangeModeText 속성값 직접 호출: {changeModeText}");
+            };
+#endif
+        }
     }
 }

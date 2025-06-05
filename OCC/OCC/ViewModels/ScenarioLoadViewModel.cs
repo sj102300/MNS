@@ -36,12 +36,11 @@ namespace OCC.ViewModels
         // 서브시스템 정보
         private readonly List<(string url, string id)> subsystems = new()
         {
-            ($"{Network.TCC}", "TCC"),
-            //($"http://192.168.2.66:8080", "TCC"),
-            //($"{Network.MSS}", "MSS"),
-            //($"{Network.ATS}", "ATS"),
+            ($"http://192.168.2.66:8080", "TCC"),
+            ($"{Network.MFR}", "MFR"),
+            ($"{Network.ATS}", "ATS"),
             //($"{Network.LCH}", "LCH"),
-            //($"{Network.MFR}", "MFR")
+            //($"{Network.MSS}", "MSS"),
         };
 
         public ScenarioLoadViewModel()
@@ -125,16 +124,24 @@ namespace OCC.ViewModels
 
         private void NavigateToAttackDisplayPage()
         {
+            // AttackViewModel 하나 생성
+            if(NavigationService == null)
+            {
+                Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
+            }
+            var attackViewModel = new AttackViewModel(NavigationService);
+            // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
             var currentWindow = Application.Current.Windows
                                 .OfType<Window>()
                                 .FirstOrDefault(w => w.IsActive);
             if (currentWindow != null)
             {
-                currentWindow.Content = new OCC.Views.AttackDisplayPage();
+                var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
+                currentWindow.Content = attackDisplayPage;
             }
 
-            // AircraftLogPage를 Window에 담아서 띄우기
-            var aircraftLogPage = new OCC.Views.AircraftLogPage();
+            // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
+            var aircraftLogPage = new OCC.Views.AircraftLogPage(attackViewModel);
             var aircraftLogWindow = new Window
             {
                 Title = "Aircraft Log",
@@ -144,16 +151,19 @@ namespace OCC.ViewModels
             };
             aircraftLogWindow.Show();
 
-            // MissileLog Window에 담아서 띄우기
-            var missileLogPage = new OCC.Views.MissileLogPage();
-            var missileLogWindow = new Window
-            {
-                Title = "Missile Log",
-                Width = 600,
-                Height = 800,
-                Content = missileLogPage
-            };
-            missileLogWindow.Show();
+            // MissileLogPage를 Window에 담아서 띄우고 ViewModel 할당
+            //var missileLogPage = new OCC.Views.MissileLogPage
+            //{
+            //    DataContext = attackViewModel
+            //};
+            //var missileLogWindow = new Window
+            //{
+            //    Title = "Missile Log",
+            //    Width = 600,
+            //    Height = 800,
+            //    Content = missileLogPage
+            //};
+            //missileLogWindow.Show();
         }
 
         private async void Start()
@@ -163,7 +173,8 @@ namespace OCC.ViewModels
                 MessageBox.Show("시작할 시나리오를 먼저 선택하세요.", "선택 필요", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            NavigateToAttackDisplayPage();
+            Debug.WriteLine("디버깅 용. ...");
+           //NavigateToAttackDisplayPage();
 
 #if true
             string scenarioId = SelectedScenario.scenario_id;
@@ -202,7 +213,6 @@ namespace OCC.ViewModels
             }
 #endif
         }
-
         private async Task<bool> SendStartSignalAsync(string targetUrl, string subsystemId, string scenarioId)
         {
             using var client = new HttpClient();

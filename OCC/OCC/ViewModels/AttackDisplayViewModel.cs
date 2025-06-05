@@ -18,22 +18,6 @@ namespace OCC.ViewModels
 {
     public class AttackDisplayViewModel : BaseViewModel
     {
-        // 발사 모드 enum
-        public enum FireModeType { Auto, Manual }
-
-        private FireModeType _fireMode = FireModeType.Auto;
-        public FireModeType FireMode
-        {
-            get => _fireMode;
-            set
-            {
-                if (SetProperty(ref _fireMode, value))
-                {
-                    OnPropertyChanged(nameof(IsAutoFireMode));
-                    OnPropertyChanged(nameof(IsManualFireMode));
-                }
-            }
-        }
 
         // ICommand Interface 구현
         public ICommand ManualFireCommand { get; }
@@ -98,8 +82,8 @@ namespace OCC.ViewModels
         // 서브시스템 정보
         private readonly List<(string url, string id)> subsystems = new()
         {
-            //($"{Network.TCC}", "TCC"),
             ("http://192.168.2.66:8080", "TCC"),
+            //($"{Network.TCC}", "TCC"),
             //($"{Network.MSS}", "MSS"),
             //($"{Network.ATS}", "ATS"),
             //($"{Network.LCH}", "LCH"),

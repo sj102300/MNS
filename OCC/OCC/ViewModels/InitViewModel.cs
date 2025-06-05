@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using OCC.Commands;
 using System.Windows.Navigation;
+using System.Windows;
 
 namespace OCC.ViewModels
 {
@@ -44,5 +45,51 @@ namespace OCC.ViewModels
             Uri uri = new Uri("/Views/ScenarioLoadPage.xaml", UriKind.Relative);
             _navigationService.Navigate(uri);
         }
+
+        //private void NavigateToAttackDisplayPage()
+        //{
+        //    // AttackViewModel 하나 생성
+        //    var attackViewModel = new OCC.ViewModels.AttackViewModel(NavigationService);
+        //    // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
+        //    var currentWindow = Application.Current.Windows
+        //                        .OfType<Window>()
+        //                        .FirstOrDefault(w => w.IsActive);
+        //    if (currentWindow != null)
+        //    {
+        //        var attackDisplayPage = new OCC.Views.AttackDisplayPage
+        //        {
+        //            DataContext = attackViewModel
+        //        };
+        //        currentWindow.Content = attackDisplayPage;
+        //    }
+
+        //    // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
+        //    var aircraftLogPage = new OCC.Views.AircraftLogPage
+        //    {
+        //        DataContext = attackViewModel
+        //    };
+        //    var aircraftLogWindow = new Window
+        //    {
+        //        Title = "Aircraft Log",
+        //        Width = 600,
+        //        Height = 800,
+        //        Content = aircraftLogPage
+        //    };
+        //    aircraftLogWindow.Show();
+
+        //    // MissileLogPage를 Window에 담아서 띄우고 ViewModel 할당
+        //    var missileLogPage = new OCC.Views.MissileLogPage
+        //    {
+        //        DataContext = attackViewModel
+        //    };
+        //    var missileLogWindow = new Window
+        //    {
+        //        Title = "Missile Log",
+        //        Width = 600,
+        //        Height = 800,
+        //        Content = missileLogPage
+        //    };
+        //    missileLogWindow.Show();
+        //}
     }
 }
