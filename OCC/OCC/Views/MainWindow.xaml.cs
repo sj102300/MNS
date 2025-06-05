@@ -23,6 +23,6 @@ public partial class MainWindow : Window
         InitializeComponent();
         MainFrame.Navigate(new InitPage(MainFrame.NavigationService));
         // InitPage를 Frame에 로드
-        //MainFrame.Navigate(new InitPage(MainFrame.NavigationService));
+        //MainFrame.Navigate(new AircraftLogPage(MainFrame.NavigationService));
     }
 }

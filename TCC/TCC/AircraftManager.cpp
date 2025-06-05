@@ -30,10 +30,6 @@ void AircraftManager::start() {
 
 void AircraftManager::handleReceivedAircraft(NewAircraft& newAircraft) {
 	//std::cout << std::fixed << std::setprecision(9); // 소수점 9자리까지 고정 출력
-
-	//std::cout << "Aircraft ID: " << newAircraft.aircraftId_
-	//	<< ", Latitude: " << newAircraft.location_.latitude_
-	//	<< ", Longitude: " << newAircraft.location_.longitude_ << std::endl;
 	pushNewAircraftQueue(newAircraft);
 }
 
@@ -84,7 +80,11 @@ void AircraftManager::judgeEngagable() {
 			targetAircraft->updatePosition(newAircraftWithIp.aircraftData_.location_);
 
 			if (targetAircraft->isEnemy()) {
+				std::cout << newAircraftWithIp.aircraftData_.aircraftId_
+					<< " is enemy aircraft. Not engageable." << std::endl;	
 				if (targetAircraft->hasBecomeEngageable(batteryLocation_, newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_)) {
+					std::cout << newAircraftWithIp.aircraftData_.aircraftId_
+						<< "hasBecomeEngageable() true" << std::endl;
 					engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
 				}
 			}

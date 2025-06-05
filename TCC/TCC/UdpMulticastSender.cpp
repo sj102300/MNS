@@ -21,8 +21,18 @@ bool TCC::UdpMulticastSender::init() {
     }
 
     destAddr_.sin_family = AF_INET;
-    destAddr_.sin_port = htons(port_);
+    destAddr_.sin_addr.s_addr = htonl(INADDR_ANY);
+    destAddr_.sin_port = htons(9000);
+    bind(sock_, (sockaddr*)&destAddr_, sizeof(destAddr_));
 
+    // 멀티캐스트 전송 주소
+    sockaddr_in mcastAddr = {};
+    mcastAddr.sin_family = AF_INET;
+    mcastAddr.sin_port = htons(9000);
+    mcastAddr.sin_addr.s_addr = inet_addr("239.0.0.1");
+
+    int ttl = 4;
+    setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_TTL, (const char*)&ttl, sizeof(ttl));
 
     if (inet_pton(AF_INET, "239.0.0.1", &destAddr_.sin_addr) <= 0) { // destAddr을 이제 멀티캐스트 주소로
         std::cerr << u8"Invalid multicast address format\n";
@@ -31,13 +41,9 @@ bool TCC::UdpMulticastSender::init() {
         return false;
     }
 
-    in_addr localInterface{};
-    if (InetPton(AF_INET, L"192.168.2.194", &localInterface) != 1) {
-        std::cerr << u8"Failed to convert local interface IP\n";
-        closesocket(sock_);
-        WSACleanup();
-        return false;
-    }
+    in_addr localInterface;
+    localInterface.s_addr = inet_addr("192.168.2.194"); 
+    setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_IF, (char*)&localInterface, sizeof(localInterface));
 
     if (setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_IF, (char*)&localInterface, sizeof(localInterface)) == SOCKET_ERROR) {
         std::cerr << u8"setsockopt(IP_MULTICAST_IF) failed: " << WSAGetLastError() << "\n";
@@ -46,13 +52,14 @@ bool TCC::UdpMulticastSender::init() {
         return false;
     }
 
-    int ttl = 4;
-    if (setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl)) < 0) {
-        std::cerr << u8"setsockopt(IP_MULTICAST_TTL) failed\n";
-        closesocket(sock_);
-        WSACleanup();
-        return false;
-    }
+     //멀티캐스트 전송 시 TTL(Time-To-Live) 옵션 설정 (기본 1: 로컬 네트워크)
+    //int ttl = 4;
+    //if (setsockopt(sock_, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl)) < 0) {
+    //    std::cerr << u8"setsockopt(IP_MULTICAST_TTL) failed\n";
+    //    closesocket(sock_);
+    //    WSACleanup();
+    //    return false;
+    //}
 
     // 수신 타임아웃 설정
     int timeout = 100; // 100ms
@@ -63,6 +70,13 @@ bool TCC::UdpMulticastSender::init() {
 
 void TCC::UdpMulticastSender::sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
 
+	std::cout << "sendLaunchCommand() called with commandId: " << commandId
+		<< ", aircraftId: " << aircraftId
+		<< ", missileId: " << missileId
+		<< ", impactPoint: (" << impactPoint.latitude_ << ", "
+		<< impactPoint.longitude_ << ", "
+		<< impactPoint.altitude_ << ")"
+		<< std::endl;
     char* buffer = new char[100];
     //헤더 붙이기
     int headerSize = serializeHeader(buffer, EventCode::launchCommand, sizeof(LaunchCommandBody));
@@ -100,16 +114,19 @@ bool TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length
 
     for (int attempt = 0; attempt < 10; ++attempt) {
         // 송신
-        if (sendByteData(buffer, length) < 0) {
+		std::cout << "Attempt " << attempt + 1 << " to send data..." << std::endl;
+		if (sendByteData(buffer, length) < 0) {
+			std::cerr << "sendByteData failed on attempt " << attempt + 1 << std::endl;
 			continue;
         }
         // 수신 시도
-        int recvLen = recvfrom(sock_, recvBuffer, sizeof(recvBuffer) - 1, 0, (sockaddr*)&fromAddr, &fromLen);
-        if (recvLen > 0) {
-            //ACK파싱 안했음 . eventcode읽어서 ack인거 확인 ..
-            return true;
-        }
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+   //     int recvLen = recvfrom(sock_, recvBuffer, sizeof(recvBuffer) - 1, 0, (sockaddr*)&fromAddr, &fromLen);
+   //     if (recvLen > 0) {
+   //         //ACK파싱 안했음 . eventcode읽어서 ack인거 확인 ..
+			//std::cout << "ACK received from " << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port) << std::endl;
+   //         return true;
+   //     }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
 	std::cout << "No ACK received after 10 attempts" << std::endl;
@@ -170,6 +187,9 @@ const int TCC::UdpMulticastSender::sendByteData(const char* data, int length) {
     if (bytesSent == SOCKET_ERROR) {
         std::cout << "sendto() failed: " << WSAGetLastError() << std::endl;
         return -1;
+    }
+    else {
+		std::cout << "Sent " << bytesSent << " bytes to " << inet_ntoa(destAddr_.sin_addr) << ":" << ntohs(destAddr_.sin_port) << std::endl;
     }
     return bytesSent;
 }

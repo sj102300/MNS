@@ -29,21 +29,33 @@ namespace OCC.Views
     /// </summary>
     public partial class AttackDisplayPage : Page
     {
-        private AttackDisplayViewModel _viewModel;
-        public AttackDisplayPage()
+        private AttackViewModel _viewModel;
+        //public AttackDisplayPage()
+        //{
+        //    InitializeComponent();
+        //    DataContext = _viewModel;
+        //    // Loaded 이벤트를 통해 NavigationService를 설정
+        //    Loaded += AttackDisplayPage_Loaded;
+        //    InitializeMap();
+        //}
+        public AttackDisplayPage(AttackViewModel viewModel)
         {
             InitializeComponent();
-            _viewModel = new AttackDisplayViewModel();
+            _viewModel = viewModel;
             DataContext = _viewModel;
             // Loaded 이벤트를 통해 NavigationService를 설정
             Loaded += AttackDisplayPage_Loaded;
             InitializeMap();
+            Debug.WriteLine($"AttackDisplayPage DataContext type: {DataContext?.GetType().Name}");
+
+
         }
+
         private void AttackDisplayPage_Loaded(object sender, RoutedEventArgs e)
         {
             //if (NavigationService != null)
             //{
-            //    _viewModel.NavigationService = NavigationService;
+            //    _viewModel._navigationService = NavigationService;
             //}
             //else if (Parent is Frame frame && frame.NavigationService != null)
             //{

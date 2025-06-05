@@ -118,7 +118,7 @@ void TCC::UdpMulticastReceiver::receive() {
 			if (!parseReceivedMissileMSG(buffer + 8, missileMsg, header.bodyLength_))
 				break;
 			//여기서 호출
-			if (missileManager_) {
+			/*if (missileManager_) {
 				missileManager_->echoMissileData(missileMsg);
 				std::cout << u8"---------------미사일 데이터 수신---------------" << "\n";
 				std::cout << u8"ID : " << missileMsg.missileId << "\n";
@@ -126,7 +126,7 @@ void TCC::UdpMulticastReceiver::receive() {
 				std::cout << u8"위도 : " <<missileMsg.location_.latitude_ << "\n";
 				std::cout << u8"경도 : " << missileMsg.location_.longitude_ << "\n";
 				std::cout << u8"고도 : " << missileMsg.location_.altitude_ << "\n";
-			}
+			}*/
 			break;
 		default:
 			break;

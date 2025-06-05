@@ -21,7 +21,7 @@
         <!-- 흐릿한 회색 오버레이 -->
         <Rectangle Fill="#B3202127"
            Panel.ZIndex="1"
-           Opacity="0.3"
+           Opacity="0.5"
            IsHitTestVisible="False"
            HorizontalAlignment="Stretch"
            VerticalAlignment="Stretch"
