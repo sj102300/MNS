@@ -33,7 +33,7 @@ double AircraftCoordinate::haversine(double lat1, double lon1, double lat2, doub
 vector<double> AircraftCoordinate::makeStartOpt(std::pair<double, double> startPoint, std::pair<double, double> finishPoint) {
     vector<double> startOpt;
     double total_distance = haversine(startPoint.x, startPoint.y, finishPoint.x, finishPoint.y);
-    double unit_distance = 1.0 / 100.0;
+    double unit_distance = 1.0 / 10.0;
     double count = total_distance / unit_distance;
     double dx = (finishPoint.x - startPoint.x) / count;
     double dy = (finishPoint.y - startPoint.y) / count;
@@ -51,4 +51,9 @@ pair<double, double> AircraftCoordinate::makePoint(double dx, double dy, pair<do
     currentPoint.y += dy;
 
     return currentPoint;
+}
+
+bool AircraftCoordinate::SurviveStatus(pair<double, double> currentPoint, pair<double, double> endPoint) {
+    if (haversine(currentPoint.x, currentPoint.y, endPoint.x, endPoint.y) <= 0.05) return true;
+    return false;
 }

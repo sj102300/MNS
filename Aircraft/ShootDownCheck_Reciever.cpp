@@ -1,15 +1,86 @@
-#include "ShootDownCheck.h"
+#include "UdpMulticastReceiver.h"
 
-std::pair<double, double> ShootDownCheck::MissileReciever() {
-	// 실제 미사일 수신 코드 있어야 함 (각 항공기에 맞는 미사일의 데이터를 수신해야 함)
-	// 수신 데이터중 위/경도 좌표만 리턴
+UdpMulticastReceiver::UdpMulticastReceiver() : sock_(INVALID_SOCKET) {}
 
-	std::pair<double, double> missileCoordinate = {0.1, 0.2};
-	return missileCoordinate;
+UdpMulticastReceiver::~UdpMulticastReceiver() {
+    if (sock_ != INVALID_SOCKET) {
+        setsockopt(sock_, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char*)&mreq_, sizeof(mreq_));
+        closesocket(sock_);
+        WSACleanup();
+    }
 }
 
-std::string ShootDownCheck::MissileReciever(std::string id) {
+bool UdpMulticastReceiver::init(const std::string& multicast_address, int port) {
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        std::cerr << "WSAStartup failed\n";
+        return false;
+    }
 
-	std::string missileID = "MSS-0001";
-	return missileID;
+    sock_ = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock_ == INVALID_SOCKET) {
+        std::cerr << "Socket creation failed\n";
+        return false;
+    }
+
+    int reuse = 1;
+    setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse));
+
+    memset(&localAddr_, 0, sizeof(localAddr_));
+    localAddr_.sin_family = AF_INET;
+    localAddr_.sin_port = htons(port);
+    localAddr_.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (bind(sock_, (sockaddr*)&localAddr_, sizeof(localAddr_)) < 0) {
+        std::cerr << "Bind failed\n";
+        return false;
+    }
+
+    mreq_.imr_multiaddr.s_addr = inet_addr(multicast_address.c_str());
+    mreq_.imr_interface.s_addr = htonl(INADDR_ANY);
+
+    if (setsockopt(sock_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq_, sizeof(mreq_)) < 0) {
+        std::cerr << "setsockopt(IP_ADD_MEMBERSHIP) failed\n";
+        return false;
+    }
+
+    //논블로킹 소켓으로 설정
+    u_long mode = 1;
+    ioctlsocket(sock_, FIONBIO, &mode);
+
+    std::cout << "Multicast receiver initialized on " << multicast_address << ":" << port << "\n";
+    return true;
+}
+
+
+ParsedMissileData UdpMulticastReceiver::receiveMissile() {
+    ParsedMissileData latestMissile{};
+    Missile rawPacket{};
+    sockaddr_in senderAddr{};
+    int senderLen = sizeof(senderAddr);
+
+    // 수신 큐에서 가능한 모든 패킷을 소모
+    while (true) {
+        int recvLen = recvfrom(sock_, reinterpret_cast<char*>(&rawPacket), sizeof(rawPacket), 0,
+            (sockaddr*)&senderAddr, &senderLen);
+
+        if (recvLen <= 0) break; // 수신할 게 없으면 탈출
+
+        if (rawPacket.eventCode != 3001) continue; // 유효한 이벤트 코드만 처리
+
+        // 최신 패킷을 계속 덮어쓰기
+        std::string idStr(rawPacket.missileId, 8);
+        auto nullPos = idStr.find('\0');
+        if (nullPos != std::string::npos) {
+            idStr.erase(nullPos);
+        }
+
+        latestMissile.eventCode = rawPacket.eventCode;
+        latestMissile.missileId = idStr;
+        latestMissile.latitude = rawPacket.latitude;
+        latestMissile.longitude = rawPacket.longitude;
+        latestMissile.altitude = rawPacket.altitude;
+    }
+
+    return latestMissile;
 }

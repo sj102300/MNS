@@ -18,5 +18,6 @@ public:
 	pair<double, double> makePoint(double dx, double dy, pair<double, double> currentPoint) override;
 	void sendAircraftInfo(pair<double, double> currentPoint, string id, char IFF) override;
 	vector<vector<string>> scenarioReciever() override;
+	bool SurviveStatus(pair<double, double> currentPoint, pair<double, double> endPoint) override;
 	void initializeMultiSocket();
 };
