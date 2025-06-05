@@ -31,10 +31,11 @@ namespace OCC.Utils
 
             Task.Run(() =>
             {
-                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);
-                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);
-               //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
-                udp = new UdpClient(ep);
+                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.88"), 9001);        //승엽
+                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
+                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
+                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
+                using var udp = new UdpClient(ep);
 
                 Debug.WriteLine("항공기 정보 수신 시작");
 
