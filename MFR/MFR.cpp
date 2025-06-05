@@ -10,6 +10,7 @@ namespace mfr {
 
     constexpr double PI = 3.141592653589793;
     constexpr double EARTH_RADIUS_KM = 6371.0;
+    constexpr double DEG_TO_RAD = PI / 180.0;
 
     MFR::MFR(const std::string& udpIp, int udpPort) : stopFlag_(false) {  // 초기화 명시 
         // === WSA 초기화 ===
@@ -105,6 +106,26 @@ namespace mfr {
         return std::sqrt(groundDistance * groundDistance + dAlt * dAlt);
     }
 
+    // 부채꼴 함수, fov_deg 에 각도 지정
+    bool MFR::isTargetInFOV(double lat1, double lon1,
+        double lat2, double lon2,
+        double heading_deg, double fov_deg)
+    {
+        // 위경도 차이를 거리로 근사 (단위: km)
+        double dx = (lon2 - lon1) * EARTH_RADIUS_KM * DEG_TO_RAD * std::cos(lat1 * DEG_TO_RAD);
+        double dy = (lat2 - lat1) * EARTH_RADIUS_KM * DEG_TO_RAD;
+
+        // 타겟 방향의 방위각 계산 (0도 = 북쪽, 시계방향 기준)
+        double targetBearing = std::atan2(dx, dy) * 180.0 / PI;
+        if (targetBearing < 0) targetBearing += 360.0;
+
+        // 방위각 차이 계산
+        double diff = std::fabs(targetBearing - heading_deg);
+        if (diff > 180.0) diff = 360.0 - diff;
+
+        // 시야각 내에 있는지 여부
+        return diff <= fov_deg / 2.0;
+    }
 
     void MFR::stop() {
         stopFlag_ = true;
@@ -123,8 +144,7 @@ namespace mfr {
             int received = recvfrom(sock_, reinterpret_cast<char*>(&packet), sizeof(packet), 0,
                 (sockaddr*)&senderAddr, &addrLen);
 
-            if (received == SOCKET_ERROR) {
-                std::cerr << u8"[MFR] recvfrom() 실패: " << WSAGetLastError() << "\n";
+            if (received == SOCKET_ERROR) {  // 41 바이트 이외 패킷은 전부 무시
                 continue;
             }
 
@@ -142,7 +162,7 @@ namespace mfr {
                     << u8", 고도: " << packet.altitude
                     << u8", 이벤트: " << packet.eventCode
                     << u8", 거리: " << dist << u8"km\n";
-                std::cout << u8"\n====================================================\n";
+                std::cout << u8"\n========================================================================================================\n";
             }
 
             auto now = std::chrono::steady_clock::now();

@@ -36,7 +36,8 @@ namespace mfr {
 
         bool setupSocket(const std::string& recvIp, int recvPort);
         double computeDistanceKm(double lat, double lon, double alt,
-            double batteryLat, double batteryLon, double batteryAlt); // 레이더 판단
+        double batteryLat, double batteryLon, double batteryAlt); // 레이더 판단
+        bool isTargetInFOV(double lat1, double lon1, double lat2, double lon2, double heading_deg, double fov_deg);
 
         static constexpr double maxDetectKm = 300.0;
     };
