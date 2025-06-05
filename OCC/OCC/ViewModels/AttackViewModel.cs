@@ -27,6 +27,10 @@ using System.Reflection.PortableExecutable;
 using System.Windows.Media;
 using OCC.Views;
 using System.Windows.Controls;
+using GMap.NET;
+using System.Collections.ObjectModel;
+using GMap.NET.WindowsPresentation;
+using System.Windows.Shapes;
 
 
 namespace OCC.ViewModels
@@ -52,24 +56,13 @@ namespace OCC.ViewModels
             }
         }
         // AircraftList 프로퍼티 추가
-        public AircraftList AircraftList { get; } = new AircraftList();
 
-        public MissileList MissileList { get; } = new MissileList();
+        public ObservableCollection<AircraftWithIp> AircraftList { get; } = new();
+        private readonly Dictionary<string, AircraftWithIp> aircraftLookup = new();  // 빠른 검색을 위해
 
-        private AircraftWithIp _selectedAircraft;
-        public AircraftWithIp SelectedAircraft
-        {
-            get => _selectedAircraft;
-            set
-            {
-                if (_selectedAircraft != value)
-                {
-                    _selectedAircraft = value;
-                    // 선택된 항공기 식별자 저장
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public ObservableCollection<Missile> MissileList { get; } = new();
+        private readonly Dictionary<string, Missile> missileLookup = new(); // 빠른 검색을 위해
+
 
         public bool IsAutoFireMode => FireMode == Models.FireMode.FireModeType.Auto;
         public bool IsManualFireMode => FireMode == Models.FireMode.FireModeType.Manual;
@@ -86,7 +79,7 @@ namespace OCC.ViewModels
 
         public AttackViewModel(NavigationService navigationService)
         {
-            Debug.WriteLine($"[AttackViewModel 생성됨] HashCode: {this.GetHashCode()}");
+            //Debug.WriteLine($"[AttackViewModel 생성됨] HashCode: {this.GetHashCode()}");
 
             NavigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
@@ -110,14 +103,8 @@ namespace OCC.ViewModels
                 canExecute: _ => true
             );
 
-            //SelectAircraftCommand = new RelayCommand<object>(
-            //    execute: param => selectAircraft(param),
-            //    canExecute: _ => true
-            //);
-
             StartReceiving();
         }
-
 
         // 기존 코드 유지
         private void SendFireModePacketAsync()
@@ -178,7 +165,6 @@ namespace OCC.ViewModels
                         FireMode = (FireMode == Models.FireMode.FireModeType.Auto)
                             ? Models.FireMode.FireModeType.Manual
                             : Models.FireMode.FireModeType.Auto;
-
 #if true
                         Debug.WriteLine(FireMode);
                         MessageBox.Show($"ACK 수신 → 모드 전환 완료: {FireMode}");
@@ -191,7 +177,7 @@ namespace OCC.ViewModels
                 }
             });
         }
-        public async Task<Coordinate?> GetScenarioInfoAsync()
+        public async Task<Coordinate?> GetScenarioInfoAsync(string scenarioId)
         {
             try
             {
@@ -199,14 +185,25 @@ namespace OCC.ViewModels
                 client.Timeout = TimeSpan.FromSeconds(3);
                 // 실제 SCN API 주소와 파라미터로 교체
                 string url = $"{Network.SCN}/scenario/info"; // 예시
-                var response = await client.GetAsync(url);
+                
+                // POST body 생성
+                var postData = new
+                {
+                    scenario_id = scenarioId
+                };
+                var jsonBody = JsonConvert.SerializeObject(postData);
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+                
+                var response = await client.PostAsync(url, content);
                 if (!response.IsSuccessStatusCode)
                     return null;
 
                 string json = await response.Content.ReadAsStringAsync();
+
                 // 예시: Coordinate 객체로 역직렬화
-                var coord = JsonConvert.DeserializeObject<Coordinate>(json);
-                return coord;
+                var coord = JsonConvert.DeserializeObject<ScenarioInfo>(json);
+                //Debug.WriteLine($"-----------------------{coord.coordinate.latitude}------{coord.coordinate.longitude}---------------------");
+                return coord.coordinate;
             }
             catch
             {
@@ -240,7 +237,7 @@ namespace OCC.ViewModels
                 Array.Copy(srcCommandId, commandIdBytes, Math.Min(srcCommandId.Length, 20));
 
                 byte[] aircraftIdBytes = new byte[8];
-                byte[] srcAircraftId = Encoding.ASCII.GetBytes(aircraft.AircraftId);
+                byte[] srcAircraftId = Encoding.ASCII.GetBytes(aircraft.Id);
                 Array.Copy(srcAircraftId, aircraftIdBytes, Math.Min(srcAircraftId.Length, 8));
 
                 // 패킷 생성
@@ -258,7 +255,7 @@ namespace OCC.ViewModels
                     try
                     {
                         udpClient.Send(buffer, buffer.Length, remoteEP);
-                        Debug.WriteLine($"[{i + 1}] 발사 명령 전송! (commandId={commandId}, aircraftId={aircraft.AircraftId})");
+                        Debug.WriteLine($"[{i + 1}] 발사 명령 전송! (commandId={commandId}, aircraftId={aircraft.Id})");
 
                         var response = udpClient.Receive(ref localEP);
                         if (response != null && response.Length > 0)
@@ -313,7 +310,75 @@ namespace OCC.ViewModels
 
         public void StartReceiving()
         {
-            UdpReceiver.Start(AircraftList, MissileList);
+            UdpReceiver.AircraftReceived += OnAircraftReceived;
+            UdpReceiver.MissileReceived += OnMissileReceived;
+            UdpReceiver.Start(AircraftList, aircraftLookup, MissileList, missileLookup);
+        }
+
+        private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (missileLookup.TryGetValue(id, out var missile))
+                {
+                    missile.Latitude = lat;
+                    missile.Longitude = lon;
+                    missile.Altitude = alt;
+                    missile.Status = status;
+                }
+                else
+                {
+                    // 새로운 미사일 정보가 들어온 경우
+                    var newMissile = new Missile(id)
+                    {
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                        Status = status
+                    };
+                    MissileList.Add(newMissile);
+                    missileLookup[id] = newMissile;
+                }
+            });
+        }
+
+        private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, double iplat, double iplon, double ipalti)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (aircraftLookup.TryGetValue(id, out var ac))
+                {
+                    ac.Latitude = lat;
+                    ac.Longitude = lon;
+                    ac.Altitude = alt;
+                    ac.Status = status;
+                    ac.IpLatitude = iplat;
+                    ac.IpLongitude = iplon;
+                    ac.IpAltitude = ipalti;
+                }
+                else
+                {
+                    // 새로운 항공기 정보가 들어온 경우
+                    var newAc = new AircraftWithIp(id)
+                    {
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                        Status = status,
+                        IpLatitude = iplat,
+                        IpLongitude = iplon,
+                        IpAltitude = ipalti
+                    };
+                    AircraftList.Add(newAc);
+                    aircraftLookup[id] = newAc;
+                }
+            });
+        }
+
+
+        public void QuitReceiving()
+        {
+            UdpReceiver.Stop();
         }
 
         private readonly List<(string url, string id)> subsystems = new()
@@ -332,6 +397,7 @@ namespace OCC.ViewModels
 
             Debug.WriteLine("종료 요청");
             // 모든 서브시스템에 대해 비동기 요청을 병렬로 실행
+            QuitReceiving();
             var tasks = subsystems.Select(subsystem =>
                 SendQuitSignalAsync(subsystem.url, subsystem.id)
             ).ToList();
@@ -430,6 +496,21 @@ namespace OCC.ViewModels
             }
         }
 
+        public AircraftWithIp _selectedAircraft { get; set; }
+
+        public AircraftWithIp SelectedAircraft
+        {
+            get => _selectedAircraft;
+            set
+            {
+                if (_selectedAircraft != value)
+                {
+                    _selectedAircraft = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private void SendEmergencyDestroyPacketAsync(Missile missile)
         {
             if(missile == null)
@@ -450,7 +531,7 @@ namespace OCC.ViewModels
                 using var udpClient = new UdpClient();
                 udpClient.Client.ReceiveTimeout = RetryIntervalMs;
 
-                string missileId = missile != null ? missile.MissileId  : "MSS-100";
+                string missileId = missile != null ? missile.Id  : "MSS-100";
                 byte[] buffer = CreateEmergencyDestroyPacket(missileId);
 
                 bool ackReceived = false;
@@ -496,5 +577,44 @@ namespace OCC.ViewModels
                 }
             });
         }
+
+        // ㅇㅅㅇ
+        private PointLatLng? _batteryPos;      // null ⇒ 아직 안 받은 상태
+        public PointLatLng? BatteryPos
+        {
+            get => _batteryPos;
+            private set
+            {
+                if (_batteryPos != value)
+                {
+                    _batteryPos = value;
+                    OnPropertyChanged();        // View 에 통보
+                }
+            }
+        }
+
+        /* 외부(시나리오)에서 한 번 호출 */
+        public void SetBatteryPos(double lat, double lon)
+        {
+            BatteryPos = new PointLatLng(lat, lon);
+        }
+
+        //public GMapMarker CreateMarker(PointLatLng pos, Brush fill, double size)
+        //{
+        //    return new GMapMarker(pos)
+        //    {
+        //        Shape = new Ellipse
+        //        {
+        //            Width = size,
+        //            Height = size,
+        //            Fill = fill,
+        //            Stroke = Brushes.Black,
+        //            StrokeThickness = 1.5,
+        //            Opacity = 0.9
+        //        },
+        //        Offset = new Point(-size / 2, -size / 2)
+        //    };
+        //}
+
     }
 }

@@ -149,7 +149,7 @@ bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& enga
         if (status_ == EngagementStatus::NotEngageable) {       //교전 불가능이었다가 교전 가능범위 내로 진입한 상태
             status_ = EngagementStatus::Engageable;
 			engagementStatus = (unsigned int)status_;
-			std::cout << "Aircraft has become engageable: " << aircraftId_ << std::endl;
+			//std::cout << "Aircraft has become engageable: " << aircraftId_ << std::endl;
 			return true; // 교전 가능 상태로 변경됨
         }   
         else {             // 이미 교전 가능 상태이므로 변경 없음

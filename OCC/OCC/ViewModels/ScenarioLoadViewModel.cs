@@ -43,7 +43,6 @@ namespace OCC.ViewModels
             ($"{Network.ATS}", "ATS"),
             ($"{Network.LCH}", "LCH"),
             ($"{Network.MSS}", "MSS"),
-
         };
 
         public ScenarioLoadViewModel()
@@ -132,9 +131,8 @@ namespace OCC.ViewModels
                 if (NavigationService == null)
                 {
                     Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
+                    return;
                 }
-                Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
-
 
                 var attackViewModel = new AttackViewModel(NavigationService);
                 // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
@@ -144,7 +142,7 @@ namespace OCC.ViewModels
                     var frame = mainWindow.FindName("MainFrame") as Frame;
                     if (frame != null)
                     {
-                        var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
+                        var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel, SelectedScenario.scenario_id);
                         frame.Navigate(attackDisplayPage);
                     }
                 }
@@ -259,6 +257,7 @@ namespace OCC.ViewModels
 
         private async void Quit()
         {
+            UdpReceiver.Stop();
             Debug.WriteLine("종료 요청");
             // 모든 서브시스템에 대해 비동기 요청을 병렬로 실행
             var tasks = subsystems.Select(subsystem =>
