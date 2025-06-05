@@ -142,7 +142,7 @@ namespace OCC.ViewModels
                     var frame = mainWindow.FindName("MainFrame") as Frame;
                     if (frame != null)
                     {
-                        var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
+                        var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel, SelectedScenario.scenario_id);
                         frame.Navigate(attackDisplayPage);
                     }
                 }

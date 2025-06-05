@@ -175,7 +175,7 @@ namespace OCC.ViewModels
                 }
             });
         }
-        public async Task<Coordinate?> GetScenarioInfoAsync()
+        public async Task<Coordinate?> GetScenarioInfoAsync(string scenarioId)
         {
             try
             {
@@ -183,20 +183,20 @@ namespace OCC.ViewModels
                 client.Timeout = TimeSpan.FromSeconds(3);
                 // 실제 SCN API 주소와 파라미터로 교체
                 string url = $"{Network.SCN}/scenario/info"; // 예시
-                var response = await client.GetAsync(url);
+                
+                // POST body 생성
+                var postData = new
+                {
+                    scenario_id = scenarioId
+                };
+                var jsonBody = JsonConvert.SerializeObject(postData);
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+                
+                var response = await client.PostAsync(url, content);
                 if (!response.IsSuccessStatusCode)
                     return null;
 
                 string json = await response.Content.ReadAsStringAsync();
-
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                var postData = new
-                {
-                    scenario_id = scenarioId  // 여기에 시나리오 선택할 때 id 넘겨받기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                };
-                var json = JsonConvert.SerializeObject(postData);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // 예시: Coordinate 객체로 역직렬화
                 var coord = JsonConvert.DeserializeObject<Coordinate>(json);

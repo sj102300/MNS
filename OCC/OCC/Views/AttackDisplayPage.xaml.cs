@@ -34,6 +34,8 @@ namespace OCC.Views
         private readonly Dictionary<string, GMapMarker> _aircraftMarkers = new();
         private readonly Dictionary<string, GMapMarker> _missileMarkers = new();
         private GMapMarker _batteryMarker;
+        private string _scenarioId;
+
 
         //public AttackDisplayPage()
         //{
@@ -43,22 +45,23 @@ namespace OCC.Views
         //    Loaded += AttackDisplayPage_Loaded;
         //    InitializeMap();
         //}
-        public AttackDisplayPage(AttackViewModel viewModel)
+        public AttackDisplayPage(AttackViewModel viewModel, string scenarioId)
         {
             InitializeComponent();
             _viewModel = viewModel;
             DataContext = _viewModel;
+            _scenarioId = scenarioId;
             // Loaded 이벤트를 통해 NavigationService를 설정
             Loaded += AttackDisplayPage_Loaded;
             InitializeMap();
 
-            _viewModel.AircraftList.Aircrafts.CollectionChanged += (s, e) => UpdateMarkers();
-            _viewModel.MissileList.Missiles.CollectionChanged += (s, e) => UpdateMarkers();
-            _viewModel.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(AttackViewModel.BatteryPos))
-                    UpdateMarkers();                     // BatteryPos 최초 세팅 시
-            };
+            //_viewModel.AircraftList.Aircrafts.CollectionChanged += (s, e) => UpdateMarkers();
+            //_viewModel.MissileList.Missiles.CollectionChanged += (s, e) => UpdateMarkers();
+            //_viewModel.PropertyChanged += (s, e) =>
+            //{
+            //    if (e.PropertyName == nameof(AttackViewModel.BatteryPos))
+            //        UpdateMarkers();                     // BatteryPos 최초 세팅 시
+            //};
 
             Debug.WriteLine($"AttackDisplayPage DataContext type: {DataContext?.GetType().Name}");
             Debug.WriteLine($"AttackDisplayPage에 전달된 ViewModel] HashCode: {viewModel.GetHashCode()}");
@@ -78,7 +81,7 @@ namespace OCC.Views
             //}
 
             //async로 시나리오 정보 가져오기
-            getScenarioInfo();
+            getScenarioInfo(_scenarioId);
             // GMapControl에 포커스 강제 부여
             mapControl.Focus();
 
@@ -108,15 +111,15 @@ namespace OCC.Views
                 e.Handled = true; 
             };
         }
-        private async void getScenarioInfo()
+        private async void getScenarioInfo(string scenarioId)
         {
-            var coord = await _viewModel.GetScenarioInfoAsync();
+            var coord = await _viewModel.GetScenarioInfoAsync(scenarioId);
             if (coord != null)
             {
                 mapControl.Position = new PointLatLng(coord.latitude, coord.longitude);
                 _viewModel.SetBatteryPos(coord.latitude, coord.longitude);
                 // 항공기 마커 생성
-                UpdateMarkers();
+                //UpdateMarkers();
             }
             else
             {
@@ -130,64 +133,64 @@ namespace OCC.Views
 
 
         // ㅇㅅㅇ
-        private void UpdateMarkers()
-        {
-            Debug.WriteLine($"[DEBUG] Aircraft count: {_viewModel.AircraftList.Aircrafts.Count}");
-            Debug.WriteLine($"[DEBUG] Missile  count: {_viewModel.MissileList.Missiles.Count}");
-            Debug.WriteLine($"[DEBUG] BatteryPos set?: {_viewModel.BatteryPos != null}");
+        //private void UpdateMarkers()
+        //{
+        //    Debug.WriteLine($"[DEBUG] Aircraft count: {_viewModel.AircraftList.Aircrafts.Count}");
+        //    Debug.WriteLine($"[DEBUG] Missile  count: {_viewModel.MissileList.Missiles.Count}");
+        //    Debug.WriteLine($"[DEBUG] BatteryPos set?: {_viewModel.BatteryPos != null}");
 
-            /* ────────── 1) 포대 마커 (고정, 최초 1회) ────────── */
-            if (_viewModel.BatteryPos is PointLatLng bp)
-            {
-                if (_batteryMarker == null)
-                {
-                    _batteryMarker = CreateMarker(bp, Brushes.Green, 16);
-                    mapControl.Markers.Add(_batteryMarker);
-                }
-                else
-                    _batteryMarker.Position = bp;   // (이동 없는 경우라 사실상 그대로)
-            }
+        //    /* ────────── 1) 포대 마커 (고정, 최초 1회) ────────── */
+        //    if (_viewModel.BatteryPos is PointLatLng bp)
+        //    {
+        //        if (_batteryMarker == null)
+        //        {
+        //            _batteryMarker = CreateMarker(bp, Brushes.Green, 16);
+        //            mapControl.Markers.Add(_batteryMarker);
+        //        }
+        //        else
+        //            _batteryMarker.Position = bp;   // (이동 없는 경우라 사실상 그대로)
+        //    }
 
-            /* ────────── 2) 항공기 동기화 ────────── */
-            // 제거 대상
-            var liveAircraftIds = _viewModel.AircraftList.Aircrafts.Select(a => a.AircraftId).ToHashSet();
-            foreach (var id in _aircraftMarkers.Keys.Except(liveAircraftIds).ToList())
-            {
-                mapControl.Markers.Remove(_aircraftMarkers[id]);
-                _aircraftMarkers.Remove(id);
-            }
-            // 추가/이동
-            foreach (var ac in _viewModel.AircraftList.Aircrafts)
-            {
-                if (!_aircraftMarkers.TryGetValue(ac.AircraftId, out var mk))
-                {
-                    mk = CreateMarker(default, Brushes.Red, 12);
-                    _aircraftMarkers[ac.AircraftId] = mk;
-                    mapControl.Markers.Add(mk);
-                }
-                mk.Position = new PointLatLng(ac.Latitude, ac.Longitude);
+        //    /* ────────── 2) 항공기 동기화 ────────── */
+        //    // 제거 대상
+        //    var liveAircraftIds = _viewModel.AircraftList.Aircrafts.Select(a => a.AircraftId).ToHashSet();
+        //    foreach (var id in _aircraftMarkers.Keys.Except(liveAircraftIds).ToList())
+        //    {
+        //        mapControl.Markers.Remove(_aircraftMarkers[id]);
+        //        _aircraftMarkers.Remove(id);
+        //    }
+        //    // 추가/이동
+        //    foreach (var ac in _viewModel.AircraftList.Aircrafts)
+        //    {
+        //        if (!_aircraftMarkers.TryGetValue(ac.AircraftId, out var mk))
+        //        {
+        //            mk = CreateMarker(default, Brushes.Red, 12);
+        //            _aircraftMarkers[ac.AircraftId] = mk;
+        //            mapControl.Markers.Add(mk);
+        //        }
+        //        mk.Position = new PointLatLng(ac.Latitude, ac.Longitude);
 
-                Debug.WriteLine($"[A/C] {ac.AircraftId}  LAT:{ac.Latitude}  LON:{ac.Longitude}");
-            }
+        //        Debug.WriteLine($"[A/C] {ac.AircraftId}  LAT:{ac.Latitude}  LON:{ac.Longitude}");
+        //    }
 
-            /* ────────── 3) 미사일 동기화 ────────── */
-            var liveMissileIds = _viewModel.MissileList.Missiles.Select(m => m.MissileId).ToHashSet();
-            foreach (var id in _missileMarkers.Keys.Except(liveMissileIds).ToList())
-            {
-                mapControl.Markers.Remove(_missileMarkers[id]);
-                _missileMarkers.Remove(id);
-            }
-            foreach (var ms in _viewModel.MissileList.Missiles)
-            {
-                if (!_missileMarkers.TryGetValue(ms.MissileId, out var mk))
-                {
-                    mk = CreateMarker(default, Brushes.Blue, 10);
-                    _missileMarkers[ms.MissileId] = mk;
-                    mapControl.Markers.Add(mk);
-                }
-                mk.Position = new PointLatLng(ms.Latitude, ms.Longitude);
-            }
-        }
+        //    /* ────────── 3) 미사일 동기화 ────────── */
+        //    var liveMissileIds = _viewModel.MissileList.Missiles.Select(m => m.MissileId).ToHashSet();
+        //    foreach (var id in _missileMarkers.Keys.Except(liveMissileIds).ToList())
+        //    {
+        //        mapControl.Markers.Remove(_missileMarkers[id]);
+        //        _missileMarkers.Remove(id);
+        //    }
+        //    foreach (var ms in _viewModel.MissileList.Missiles)
+        //    {
+        //        if (!_missileMarkers.TryGetValue(ms.MissileId, out var mk))
+        //        {
+        //            mk = CreateMarker(default, Brushes.Blue, 10);
+        //            _missileMarkers[ms.MissileId] = mk;
+        //            mapControl.Markers.Add(mk);
+        //        }
+        //        mk.Position = new PointLatLng(ms.Latitude, ms.Longitude);
+        //    }
+        //}
 
         private static GMapMarker CreateMarker(PointLatLng pos, Brush fill, double size)
         {
