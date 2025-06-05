@@ -23,14 +23,13 @@ namespace OCC.Views
     public partial class AircraftLogPage : Page
     {
 
-        private AttackViewModel _viewModel;
-
         public AircraftLogPage(AttackViewModel viewModel)
         {
             InitializeComponent();
             //// NavigationService를 ViewModel에 전달
-            _viewModel = viewModel;
-            DataContext = _viewModel;
+            DataContext = viewModel;
+            Debug.WriteLine($"[AircraftLogPage에 전달된 ViewModel] HashCode: {viewModel.GetHashCode()}");
+            Debug.WriteLine($"[AircraftLogPage] DataContext: {DataContext?.GetType().FullName}");
 
 #if false
             Loaded += (_, __) =>

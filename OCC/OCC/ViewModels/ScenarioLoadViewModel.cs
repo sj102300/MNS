@@ -38,10 +38,12 @@ namespace OCC.ViewModels
         private readonly List<(string url, string id)> subsystems = new()
         {
             ($"http://192.168.2.66:8080", "TCC"),
-            ($"{Network.MFR}", "MFR"),
-            ($"{Network.ATS}", "ATS"),
-            ($"{Network.LCH}", "LCH"),
-            ($"{Network.MSS}", "MSS"),
+            //($"{Network.TCC}", "TCC"),
+            //($"{Network.MFR}", "MFR"),
+            //($"{Network.ATS}", "ATS"),
+            //($"{Network.LCH}", "LCH"),
+            //($"{Network.MSS}", "MSS"),
+
         };
 
         public ScenarioLoadViewModel()
@@ -124,46 +126,51 @@ namespace OCC.ViewModels
 
         private void NavigateToAttackDisplayPage()
         {
-            // AttackViewModel 하나 생성
-            if(NavigationService == null)
+            Application.Current.Dispatcher .Invoke(() =>
             {
-                Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
-            }
-            var attackViewModel = new AttackViewModel(NavigationService);
-            // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
-            if (mainWindow != null)
-            {
-                var frame = mainWindow.FindName("MainFrame") as Frame;
-                if (frame != null)
+                // AttackViewModel 하나 생성
+                if (NavigationService == null)
                 {
-                    var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
-                    frame.Navigate(attackDisplayPage);
+                    Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
                 }
-            }
+                Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
 
-            // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
-            var aircraftLogPage = new OCC.Views.AircraftLogPage(attackViewModel);
-            var aircraftLogWindow = new Window
-            {
-                Title = "Aircraft Log",
-                Width = 600,
-                Height = 800,
-                Content = aircraftLogPage
-            };
-            aircraftLogWindow.Show();
 
-            // MissileLogPage를 Window에 담아서 띄우고 ViewModel 할당
-            var missileLogPage = new OCC.Views.MissileLogPage(attackViewModel);
-            var missileLogWindow = new Window
-            {
-                Title = "Missile Log",
-                Width = 600,
-                Height = 800,
-                Content = missileLogPage
-            };
-            missileLogWindow.Show();
+                var attackViewModel = new AttackViewModel(NavigationService);
+                // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
+                var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+                if (mainWindow != null)
+                {
+                    var frame = mainWindow.FindName("MainFrame") as Frame;
+                    if (frame != null)
+                    {
+                        var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
+                        frame.Navigate(attackDisplayPage);
+                    }
+                }
+                // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
+                var aircraftLogPage = new OCC.Views.AircraftLogPage(attackViewModel);
+                var aircraftLogWindow = new Window
+                {
+                    Title = "Aircraft Log",
+                    Width = 600,
+                    Height = 800,
+                    Content = aircraftLogPage
+                };
+                aircraftLogWindow.Show();
 
+                // MissileLogPage를 Window에 담아서 띄우고 ViewModel 할당
+                var missileLogPage = new OCC.Views.MissileLogPage(attackViewModel);
+                var missileLogWindow = new Window
+                {
+                    Title = "Missile Log",
+                    Width = 600,
+                    Height = 800,
+                    Content = missileLogPage
+                };
+                missileLogWindow.Show();
+           });
+            
         }
 
         private async void Start()
