@@ -19,7 +19,7 @@
         <!--상단 항공기 정보 출력 (식별자, 위도 경도 고도, 상태, impactpoint의 위도 경도 고도)-->
 
         <DataGrid Grid.Row="0"
-          ItemsSource="{Binding MissileList.Missiles}"
+          ItemsSource="{Binding MissileList}"
           SelectedItem="{Binding SelectedMissile, Mode=TwoWay}"
           AutoGenerateColumns="False"
           CanUserAddRows="False"
@@ -29,7 +29,7 @@
           HeadersVisibility="Column"
           RowHeaderWidth="0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="식별자" Binding="{Binding MissileId}" Width="*" />
+                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" Width="*" />
                 <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
                 <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
                 <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />

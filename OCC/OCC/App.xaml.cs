@@ -29,7 +29,6 @@ public partial class App : Application
         ServiceProvider = services.BuildServiceProvider();
 
         base.OnStartup(e);
-
     }
 }
 
