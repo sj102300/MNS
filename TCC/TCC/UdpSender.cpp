@@ -30,8 +30,8 @@ bool TCC::UdpSender::init() {
     }
 
     targetAddr_.sin_family = AF_INET;
-    targetAddr_.sin_port = htons(9999);
-	targetAddr_.sin_addr.s_addr = inet_addr("192.168.2.195"); // occ의 서버 주소
+    targetAddr_.sin_port = htons(9001);
+	targetAddr_.sin_addr.s_addr = inet_addr("192.168.2.194"); // occ의 서버 주소
 
     return true;
 }
