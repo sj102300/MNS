@@ -78,6 +78,12 @@ bool EngagementManager::mappingMissileToAircraft(std::string & aircraftId, std::
 
 bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::string targetMissileId) {
 
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+	std::cout << "EngagementManager::engagementSuccess() called" << std::endl;
+	std::cout << "Target Aircraft ID: " << targetAircraftId << std::endl;
+	std::cout << "Target Missile ID: " << targetMissileId << std::endl;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
 	auto it = missileToAircraft_.find(targetMissileId);
 	if (it == missileToAircraft_.end()) {		//사용한 미사일이 아님
 		return false;
@@ -281,7 +287,7 @@ bool EngagementManager::EngagableAircraftQueue::popQueue(std::string& aircraftId
 	std::lock_guard<std::mutex>lock(mtx_);
 	if (queue.empty())
 		return false;
-	std::cout << queue.size() << " aircrafts in queue\n";
+	//std::cout << queue.size() << " aircrafts in queue\n";
 	aircraftId = queue.front();
 	queue.pop();
 	set.erase(aircraftId);

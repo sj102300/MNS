@@ -70,13 +70,13 @@ bool TCC::UdpMulticastSender::init() {
 
 void TCC::UdpMulticastSender::sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
 
-	std::cout << "sendLaunchCommand() called with commandId: " << commandId
-		<< ", aircraftId: " << aircraftId
-		<< ", missileId: " << missileId
-		<< ", impactPoint: (" << impactPoint.latitude_ << ", "
-		<< impactPoint.longitude_ << ", "
-		<< impactPoint.altitude_ << ")"
-		<< std::endl;
+	//std::cout << "sendLaunchCommand() called with commandId: " << commandId
+	//	<< ", aircraftId: " << aircraftId
+	//	<< ", missileId: " << missileId
+	//	<< ", impactPoint: (" << impactPoint.latitude_ << ", "
+	//	<< impactPoint.longitude_ << ", "
+	//	<< impactPoint.altitude_ << ")"
+	//	<< std::endl;
     char* buffer = new char[100];
     //헤더 붙이기
     int headerSize = serializeHeader(buffer, EventCode::launchCommand, sizeof(LaunchCommandBody));
@@ -112,11 +112,10 @@ bool TCC::UdpMulticastSender::sendUntilReceiveAck(const char* buffer, int length
     sockaddr_in fromAddr;
     int fromLen = sizeof(fromAddr);
 
-    for (int attempt = 0; attempt < 10; ++attempt) {
+    for (int attempt = 0; attempt < 1; ++attempt) {
         // 송신
-		std::cout << "Attempt " << attempt + 1 << " to send data..." << std::endl;
+		//std::cout << "Attempt " << attempt + 1 << " to send data..." << std::endl;
 		if (sendByteData(buffer, length) < 0) {
-			std::cerr << "sendByteData failed on attempt " << attempt + 1 << std::endl;
 			continue;
         }
         // 수신 시도
