@@ -15,11 +15,10 @@ namespace OCC.ViewModels
         public ICommand NavigateToScenarioCreateCommand { get; }
         public ICommand NavigateToScenarioLoadCommand { get; }
 
-        private readonly NavigationService _navigationService;
 
         public InitViewModel(NavigationService navigationService)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            NavigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
             NavigateToScenarioCreateCommand = new RelayCommand<object>(
                 execute: _ => NavigateToScenarioCreate(),
@@ -30,20 +29,21 @@ namespace OCC.ViewModels
                 execute: _ => NavigateToScenarioLoad(),
                 canExecute: _ => true
             );
+            
         }
 
         private void NavigateToScenarioCreate()
         {
             // ScenarioCreatePage.xaml로 이동
             Uri uri = new Uri("/Views/ScenarioCreatePage.xaml", UriKind.Relative);
-            _navigationService.Navigate(uri);
+            NavigationService.Navigate(uri);
         }
 
         private void NavigateToScenarioLoad()
         {
             // ScenarioLoadPage.xaml로 이동
             Uri uri = new Uri("/Views/ScenarioLoadPage.xaml", UriKind.Relative);
-            _navigationService.Navigate(uri);
+            NavigationService.Navigate(uri);
         }
 
         //private void NavigateToAttackDisplayPage()

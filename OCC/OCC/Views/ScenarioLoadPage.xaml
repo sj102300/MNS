@@ -22,13 +22,13 @@
         <!-- 좌측: 시나리오 목록 -->
         <ui:Card Grid.Row="0" Grid.Column="0"
                  Background="#23262E"
-                 Margin="0,0,16,0"
+                 Margin="12"
                  Padding="18"
                  VerticalAlignment="Stretch"
                  HorizontalAlignment="Stretch">
             <DockPanel LastChildFill="True">
                 <!-- 상단: 뒤로가기 버튼 -->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0">
                     <ui:Button Command="{Binding GoBackCommand}"
                                Width="110"
                                Height="36"

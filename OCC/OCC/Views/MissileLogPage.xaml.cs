@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OCC.ViewModels;
 
 namespace OCC.Views
 {
@@ -20,9 +21,12 @@ namespace OCC.Views
     /// </summary>
     public partial class MissileLogPage : Page
     {
-        public MissileLogPage()
+        private AttackViewModel _viewModel;
+        public MissileLogPage(AttackViewModel viewModel)
         {
             InitializeComponent();
+            _viewModel = viewModel;
+            DataContext = _viewModel;
         }
     }
 }

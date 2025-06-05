@@ -25,6 +25,9 @@ using System.Xml.Linq;
 using static OCC.Models.FireMode;
 using System.Reflection.PortableExecutable;
 using System.Windows.Media;
+using OCC.Views;
+using System.Windows.Controls;
+
 
 namespace OCC.ViewModels
 {
@@ -50,6 +53,8 @@ namespace OCC.ViewModels
         }
         // AircraftList 프로퍼티 추가
         public AircraftList AircraftList { get; } = new AircraftList();
+
+        public MissileList MissileList { get; } = new MissileList();
 
         private AircraftWithIp _selectedAircraft;
         public AircraftWithIp SelectedAircraft
@@ -101,7 +106,7 @@ namespace OCC.ViewModels
             );
 
             EmergencyDestroyCommand = new RelayCommand<object>(
-                execute: _ => sendEmergencyDestroy(),
+                execute: _ => SendEmergencyDestroyPacketAsync(SelectedMissile),
                 canExecute: _ => true
             );
 
@@ -282,7 +287,7 @@ namespace OCC.ViewModels
         /// <summary>
         /// 비상폭파 명령용 새로운 더미 패킷 생성: 명령코드 202, body 길이 28, 비상폭파 명령 식별자, 미사일 식별자
         /// </summary>
-        private byte[] CreateEmergencyDestroyPacket()
+        private byte[] CreateEmergencyDestroyPacket(string missileId)
         {
             List<byte> packet = new List<byte>();
 
@@ -297,8 +302,7 @@ namespace OCC.ViewModels
             byte[] destroyIdBytes = Encoding.ASCII.GetBytes(destroyId.PadRight(20, '\0'));
             packet.AddRange(destroyIdBytes);
 
-            // 4. 미사일 식별자 (8Byte, 예: "MSS-0000")
-            string missileId = "MSS-0001";
+            // 4. 미사일 식별자 (8Byte, 예: "MSS-0000")missileId
             byte[] missileIdBytes = Encoding.ASCII.GetBytes(missileId.PadRight(8, '\0'));
             packet.AddRange(missileIdBytes);
 
@@ -306,20 +310,10 @@ namespace OCC.ViewModels
 
             return packet.ToArray();
         }
-        /// <summary>
-        /// 비상폭파 명령: 새 데이터 패킷 (명령코드:202, 비상폭파 패킷)
-        /// </summary>
-        private void sendEmergencyDestroy()
-        {
-            Debug.WriteLine("비상폭파 명령 전송 시작");
-            byte[] packet = CreateEmergencyDestroyPacket();
-            using var udpClient = new UdpClient();
-            udpClient.Send(packet, packet.Length, Network.TCCHost, Network.TCCHostPort);
-            Console.WriteLine("EmergencyDestroyCommand Dummy Packet 전송!");
-        }
+
         public void StartReceiving()
         {
-            UdpReceiver.Start(AircraftList);
+            UdpReceiver.Start(AircraftList, MissileList);
         }
 
         private readonly List<(string url, string id)> subsystems = new()
@@ -327,9 +321,9 @@ namespace OCC.ViewModels
             ($"http://192.168.2.66:8080", "TCC"),
             //($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
-            ($"{Network.MFR}", "MFR")
-            //($"{Network.MSS}", "MSS"),
-            //($"{Network.LCH}", "LCH"),
+            ($"{Network.MFR}", "MFR"),
+            ($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
         };
         private async void Quit()
         {
@@ -353,8 +347,33 @@ namespace OCC.ViewModels
                 );
                 if (result == MessageBoxResult.OK)
                 {
-                    GoInitPage();
-                    //NavigationService.Navigate(new Uri("Views/InitPage.xaml", UriKind.Relative));
+                    //InitPage로 네비게이션
+                    if (NavigationService != null)
+                    {
+                        var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+                        if (mainWindow != null)
+                        {
+                            var frame = mainWindow.FindName("MainFrame") as Frame;
+                            if (frame != null)
+                            {
+                                var initPage = new OCC.Views.InitPage(NavigationService);
+                                frame.Navigate(initPage);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("NavigationService가 설정되지 않았습니다.");
+                    }
+
+                    var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+                    foreach (var win in Application.Current.Windows.OfType<Window>().ToList())
+                    {
+                        if (win != currentWindow)
+                        {
+                            win.Close();
+                        }
+                    }
                 }
             }
             else
@@ -390,10 +409,89 @@ namespace OCC.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
+                //MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
                 return false;
             }
         }
+        public Missile _selectedMissile { get; set; }
+        public Missile SelectedMissile
+        {
+            get => _selectedMissile;
+            set
+            {
+                if (_selectedMissile != value)
+                {
+                    _selectedMissile = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
+        private void SendEmergencyDestroyPacketAsync(Missile missile)
+        {
+            if(missile == null)
+            {
+                MessageBox.Show("미사일을 선택하세요!");
+                return;
+            }
+            Task.Run(async () =>
+            {
+                const int CommandCode = 200;
+                const int BodyLength = 4;
+                const int RetryCount = 10;
+                const int RetryIntervalMs = 100;
+
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(Network.TCCHost), Network.TCCHostPort);
+                IPEndPoint localEP = new IPEndPoint(IPAddress.Any, 0);
+
+                using var udpClient = new UdpClient();
+                udpClient.Client.ReceiveTimeout = RetryIntervalMs;
+
+                string missileId = missile != null ? missile.MissileId  : "MSS-100";
+                byte[] buffer = CreateEmergencyDestroyPacket(missileId);
+
+                bool ackReceived = false;
+
+                for (int i = 0; i < RetryCount; i++)
+                {
+                    try
+                    {
+                        // 2. 송신
+                        udpClient.Send(buffer, buffer.Length, remoteEP);
+                        Debug.WriteLine($"[{i + 1}] 발사 모드 변경 패킷 전송! (모드: {FireMode})");
+
+                        // 3. 수신 대기
+                        var response = udpClient.Receive(ref localEP);
+                        if (response != null && response.Length > 0)
+                        {
+                            ackReceived = true;
+                            Debug.WriteLine("ACK 수신 완료!");
+                            break;
+                        }
+                    }
+                    catch (SocketException ex)
+                    {
+                        Debug.WriteLine($"[{i + 1}] ACK 수신 실패: {ex.Message}");
+                    }
+
+                    await Task.Delay(RetryIntervalMs);
+                }
+
+                // 4. ACK 수신 시 모드 전환
+                if (ackReceived)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        //할거없나?
+                        Debug.WriteLine(FireMode);
+                        MessageBox.Show($"ACK 수신 → 비상 폭파 명령 송신 완료: {missileId}");
+                    });
+                }
+                else
+                {
+                    MessageBox.Show($"ACK 미수신 → 비상 폭파 명령 송신 실패: {missileId}");
+                }
+            });
+        }
     }
 }

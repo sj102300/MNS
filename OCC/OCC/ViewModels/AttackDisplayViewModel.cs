@@ -84,10 +84,10 @@ namespace OCC.ViewModels
         {
             ("http://192.168.2.66:8080", "TCC"),
             //($"{Network.TCC}", "TCC"),
-            //($"{Network.MSS}", "MSS"),
-            //($"{Network.ATS}", "ATS"),
-            //($"{Network.LCH}", "LCH"),
-            //($"{Network.MFR}", "MFR")
+            ($"{Network.ATS}", "ATS"),
+            ($"{Network.MFR}", "MFR"),
+            ($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
         };
 
         private async Task<bool> SendQuitSignalAsync(string targetUrl, string subsystemId)
@@ -115,8 +115,6 @@ namespace OCC.ViewModels
                 return false;
             }
         }
-
-
         private async void Quit()
         {
             Debug.WriteLine("종료 요청");
@@ -139,7 +137,7 @@ namespace OCC.ViewModels
                 );
                 if (result == MessageBoxResult.OK)
                 {
-                    GoInitPage(); // InitPage로 이동
+
                 }
             }
             else

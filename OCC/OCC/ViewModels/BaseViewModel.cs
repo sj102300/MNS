@@ -43,29 +43,6 @@ namespace OCC.ViewModels
             }
         }
 
-        public void GoInitPage()
-        {
-            // InitPage로 네비게이션
-            //NavigationService.Navigate(new OCC.Views.InitPage(NavigationService));
-            ////if (NavigationService != null)
-            ////{
-            ////    NavigationService.Navigate(new Uri("/Views/InitPage.xaml", UriKind.Relative));
-            ////}
-            ////else
-            ////{
-            ////    Debug.WriteLine("NavigationService가 설정되지 않았습니다.");
-            ////}
-
-            // AircraftLogWindow와 MissileLogWindow 닫기
-            foreach (var win in System.Windows.Application.Current.Windows.OfType<System.Windows.Window>().ToList())
-            {
-                if (win.GetType().Name == "Aircraft Log" || win.GetType().Name == "Missile Log")
-                {
-                    win.Close();
-                }
-            }
-        }
-
         // [CallerMemberName] : 이 함수를 호출한 대상에 대한 이름을 인자로 받음
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

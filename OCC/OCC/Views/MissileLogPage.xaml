@@ -19,7 +19,8 @@
         <!--상단 항공기 정보 출력 (식별자, 위도 경도 고도, 상태, impactpoint의 위도 경도 고도)-->
 
         <DataGrid Grid.Row="0"
-          ItemsSource="{Binding AircraftList}"
+          ItemsSource="{Binding MissileList.Missiles}"
+          SelectedItem="{Binding SelectedMissile, Mode=TwoWay}"
           AutoGenerateColumns="False"
           CanUserAddRows="False"
           CanUserDeleteRows="False"
@@ -28,14 +29,11 @@
           HeadersVisibility="Column"
           RowHeaderWidth="0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="식별자" Binding="{Binding aircraft_id}" Width="*" />
-                <DataGridTextColumn Header="위도" Binding="{Binding start_point.latitude}" Width="*" />
-                <DataGridTextColumn Header="경도" Binding="{Binding start_point.longitude}" Width="*" />
-                <DataGridTextColumn Header="고도" Binding="{Binding start_point.altitude}" Width="*" />
-                <DataGridTextColumn Header="상태" Binding="{Binding status}" Width="*" />
-                <DataGridTextColumn Header="Impact 위도" Binding="{Binding impact_point.latitude}" Width="*" />
-                <DataGridTextColumn Header="Impact 경도" Binding="{Binding impact_point.longitude}" Width="*" />
-                <DataGridTextColumn Header="Impact 고도" Binding="{Binding impact_point.altitude}" Width="*" />
+                <DataGridTextColumn Header="식별자" Binding="{Binding MissileId}" Width="*" />
+                <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
+                <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
+                <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />
+                <DataGridTextColumn Header="상태" Binding="{Binding Status}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
 
