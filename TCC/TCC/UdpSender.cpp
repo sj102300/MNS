@@ -31,7 +31,7 @@ bool TCC::UdpSender::init() {
 
     targetAddr_.sin_family = AF_INET;
     targetAddr_.sin_port = htons(9001);
-	targetAddr_.sin_addr.s_addr = inet_addr("192.168.2.194"); // occ의 서버 주소
+	targetAddr_.sin_addr.s_addr = inet_addr("192.168.2.195"); // occ의 서버 주소
 
     return true;
 }
@@ -96,12 +96,12 @@ bool TCC::UdpSender::sendMissileData(UdpMulticastReceiver::MissileMSG& data) {
         return false;
     }
 
-    std::cout << u8"--------------미사일 데이터 송신-----------" << "\n";
-    std::cout << u8"ID : " << data.missileId << "\n";
-    std::cout << u8"Status : " << data.status_ << "\n";
-    std::cout << u8"위도 : " << data.location_.latitude_ << "\n";
-    std::cout << u8"경도 : " << data.location_.longitude_ << "\n";
-    std::cout << u8"고도 : " << data.location_.altitude_ << "\n";
+    //std::cout << u8"--------------미사일 데이터 송신-----------" << "\n";
+    //std::cout << u8"ID : " << data.missileId << "\n";
+    //std::cout << u8"Status : " << data.status_ << "\n";
+    //std::cout << u8"위도 : " << data.location_.latitude_ << "\n";
+    //std::cout << u8"경도 : " << data.location_.longitude_ << "\n";
+    //std::cout << u8"고도 : " << data.location_.altitude_ << "\n";
     return true;
 }
 
