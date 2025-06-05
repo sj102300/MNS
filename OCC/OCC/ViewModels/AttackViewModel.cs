@@ -51,6 +51,8 @@ namespace OCC.ViewModels
         // AircraftList 프로퍼티 추가
         public AircraftList AircraftList { get; } = new AircraftList();
 
+        public MissileList MissileList { get; } = new MissileList();
+
         private AircraftWithIp _selectedAircraft;
         public AircraftWithIp SelectedAircraft
         {
@@ -315,29 +317,19 @@ namespace OCC.ViewModels
 
             return packet.ToArray();
         }
-        /// <summary>
-        /// 비상폭파 명령: 새 데이터 패킷 (명령코드:202, 비상폭파 패킷)
-        /// </summary>
-        //private void sendEmergencyDestroy()
-        //{
-        //    Debug.WriteLine("비상폭파 명령 전송 시작");
-        //    byte[] packet = CreateEmergencyDestroyPacket();
-        //    using var udpClient = new UdpClient();
-        //    udpClient.Send(packet, packet.Length, Network.TCCHost, Network.TCCHostPort);
-        //    Console.WriteLine("EmergencyDestroyCommand Dummy Packet 전송!");
-        //}
+
         public void StartReceiving()
         {
-            UdpReceiver.Start(AircraftList);
+            UdpReceiver.Start(AircraftList, MissileList);
         }
 
         private readonly List<(string url, string id)> subsystems = new()
         {
             ($"http://192.168.2.66:8080", "TCC"),
             ($"{Network.ATS}", "ATS"),
-            ($"{Network.MFR}", "MFR")
-            //($"{Network.MSS}", "MSS"),
-            //($"{Network.LCH}", "LCH"),
+            ($"{Network.MFR}", "MFR"),
+            ($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
         };
         private async void Quit()
         {
@@ -423,12 +415,10 @@ namespace OCC.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
+                //MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
                 return false;
             }
         }
-        public MissileList MissileList { get; } = new MissileList();
-
         public Missile _selectedMissile { get; set; }
         public Missile SelectedMissile
         {
@@ -499,10 +489,8 @@ namespace OCC.ViewModels
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         //할거없나?
-#if true
                         Debug.WriteLine(FireMode);
                         MessageBox.Show($"ACK 수신 → 비상 폭파 명령 송신 완료: {missileId}");
-#endif 
                     });
                 }
                 else

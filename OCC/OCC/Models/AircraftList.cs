@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,6 @@ namespace OCC.Models
 
     public class AircraftList
     {
-        public List<AircraftWithIp> Aircrafts { get; } = new List<AircraftWithIp>();
+        public ObservableCollection<AircraftWithIp> Aircrafts { get; } = new ObservableCollection<AircraftWithIp>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,12 +10,12 @@ namespace OCC.Models
     public class Missile
     {
         public string MissileId { get; set; } // 최대 8자
-        double Latitude { get; set; }
-        double Longitude { get; set; }
-        double Altitude { get; set; }
-        public int Status { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public double Altitude { get; set; }
+        public uint Status { get; set; }
 
-        public Missile(string missileId, double latitude, double longitude, double altitude, int status)
+        public Missile(string missileId, double latitude, double longitude, double altitude, uint status)
         {
             MissileId = missileId.Length > 8 ? missileId.Substring(0, 8) : missileId;
             Latitude = latitude;
@@ -25,15 +26,10 @@ namespace OCC.Models
     }
     public class MissileList
     {
-        public List<Missile> Missiles { get; } = new List<Missile>();
-        //    public List<AircraftWithIp> Aircrafts { get; } = new List<AircraftWithIp>();
+        public ObservableCollection<Missile> Missiles { get; } = new ObservableCollection<Missile>();
         public void AddMissile(Missile missile)
         {
             Missiles.Add(missile);
-        }
-        public void RemoveMissile(string missileId)
-        {
-            Missiles.RemoveAll(m => m.MissileId == missileId);
         }
     }
 }

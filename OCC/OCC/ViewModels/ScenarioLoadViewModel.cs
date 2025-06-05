@@ -40,8 +40,8 @@ namespace OCC.ViewModels
             ($"http://192.168.2.66:8080", "TCC"),
             ($"{Network.MFR}", "MFR"),
             ($"{Network.ATS}", "ATS"),
-            //($"{Network.LCH}", "LCH"),
-            //($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
+            ($"{Network.MSS}", "MSS"),
         };
 
         public ScenarioLoadViewModel()
@@ -114,7 +114,6 @@ namespace OCC.ViewModels
                     {
                         ScenarioCollection.Add(scenario);
                     }
-
                 });
             }
             catch (Exception ex)
@@ -144,15 +143,15 @@ namespace OCC.ViewModels
             }
 
             // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
-            //var aircraftLogPage = new OCC.Views.AircraftLogPage(attackViewModel);
-            //var aircraftLogWindow = new Window
-            //{
-            //    Title = "Aircraft Log",
-            //    Width = 600,
-            //    Height = 800,
-            //    Content = aircraftLogPage
-            //};
-            //aircraftLogWindow.Show();
+            var aircraftLogPage = new OCC.Views.AircraftLogPage(attackViewModel);
+            var aircraftLogWindow = new Window
+            {
+                Title = "Aircraft Log",
+                Width = 600,
+                Height = 800,
+                Content = aircraftLogPage
+            };
+            aircraftLogWindow.Show();
 
             // MissileLogPage를 Window에 담아서 띄우고 ViewModel 할당
             var missileLogPage = new OCC.Views.MissileLogPage(attackViewModel);
@@ -200,7 +199,6 @@ namespace OCC.ViewModels
                 if (result == MessageBoxResult.OK)
                 {
                     NavigateToAttackDisplayPage();
-
                 }
             }
             else
@@ -274,7 +272,7 @@ namespace OCC.ViewModels
                 );
                 if (result == MessageBoxResult.OK)
                 {
-                    NavigationService?.GoBack();
+                    //NavigationService?.GoBack();
                     //NavigateToScenarioCreate();
                 }
             }
@@ -311,7 +309,7 @@ namespace OCC.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
+                //MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
                 return false;
             }
         }
