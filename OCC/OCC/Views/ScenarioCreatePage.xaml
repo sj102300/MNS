@@ -106,7 +106,7 @@
                       FontWeight="Bold"
                       Margin="0,0,0,0"
                       Background="#181A20"
-                      Foreground="#4FC3F7"
+                      Foreground="#4FC3F7" 
                       BorderBrush="#4FC3F7"
                       Padding="10,2">
                     <ComboBox.Resources>

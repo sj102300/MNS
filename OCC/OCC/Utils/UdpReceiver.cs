@@ -11,14 +11,24 @@ using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Windows.Documents;
 using System.Windows;
-
+using System.Collections.ObjectModel;
 
 namespace OCC.Utils
 {
     public static class UdpReceiver
     {
-        public static void Start(AircraftList aircraftList, MissileList missileList)
+        private static UdpClient? udp;
+        private static CancellationTokenSource? cts;
+
+        public static event Action<string, double, double, double, uint, double, double, double> AircraftReceived;
+        public static event Action<string, double, double, double, uint> MissileReceived;
+
+        public static void Start(ObservableCollection<AircraftWithIp> aircraftList, Dictionary<string, AircraftWithIp> aircraftLookup,
+            ObservableCollection<Missile> missileList, Dictionary<string, Missile> missileLookup)
         {
+            cts = new CancellationTokenSource();
+            var token = cts.Token;
+
             Task.Run(() =>
             {
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.88"), 9001);        //승엽
@@ -29,25 +39,56 @@ namespace OCC.Utils
 
                 Debug.WriteLine("항공기 정보 수신 시작");
 
-                while (true)
+                try
                 {
-                    var remote = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] data = udp.Receive(ref remote);
+                    while (!token.IsCancellationRequested)
+                    {
+                        if (udp.Available > 0)
+                        {
+                            var remote = new IPEndPoint(IPAddress.Any, 0);
+                            byte[] data = udp.Receive(ref remote);
 
-                    uint cmd = BitConverter.ToUInt32(data, 0);
-                    if (cmd == 100)
-                    {
-                        ParseAircraft(data.Skip(8).ToArray(), aircraftList);
-                    }
-                    else if (cmd == 300)
-                    {
-                        ParseMissile(data.Skip(8).ToArray(), missileList);
+                            uint cmd = BitConverter.ToUInt32(data, 0);
+                            if (cmd == 100)
+                            {
+                                ParseAircraft(data.Skip(8).ToArray());
+                            }
+                            else if (cmd == 300)
+                            {
+                                ParseMissile(data.Skip(8).ToArray());
+                            }
+                        }
+                        else
+                        {
+                            Thread.Sleep(10);
+                        }
                     }
                 }
-            });
+                catch (ObjectDisposedException)
+                {
+                    // 소켓이 닫힐 때 예외 무시
+                }
+                finally
+                {
+                    udp?.Close();
+                    udp?.Dispose();
+                    udp = null;
+                }
+            }, token);
         }
 
-        private static void ParseAircraft(byte[] body, AircraftList list)
+        public static void Stop()
+        {
+            cts?.Cancel();
+            udp?.Close();
+            udp?.Dispose();
+            udp = null;
+            cts?.Dispose();
+            cts = null;
+            Debug.WriteLine("UdpReceiver 중지됨");
+        }
+
+        private static void ParseAircraft(byte[] body)
         {
             string id = Encoding.ASCII.GetString(body, 0, 8).Trim('\0');
             double lat = BitConverter.ToDouble(body, 8);
@@ -59,32 +100,11 @@ namespace OCC.Utils
             double ipLon = BitConverter.ToDouble(body, 48);
             double ipAlt = BitConverter.ToDouble(body, 56);
 
-            lock (list.Aircrafts)
-            {
-                var existing = list.Aircrafts.FirstOrDefault(a => a.AircraftId == id);
-                if (existing != null)
-                {
-                    existing.Latitude = lat;
-                    existing.Longitude = lon;
-                    existing.Altitude = alt;
-                    existing.IsEnemy = foe == 1;
-                    existing.Status = status;
-                    existing.IpLatitude = ipLat;
-                    existing.IpLongitude = ipLon;
-                    existing.IpAltitude = ipAlt;
-                }
-                else
-                {
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                       list.Aircrafts.Add(new AircraftWithIp(id, lat, lon, alt, foe == 1, status, ipLat, ipLon, ipAlt));
-                    }));
-                }
-                Debug.WriteLine($"[Aircraft] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, IP Lat: {ipLat:F6}, IP Lon: {ipLon:F6}, IP Alt: {ipAlt:F2}, Enemy: {foe == 1}, Status: {status}");
-            }
+            AircraftReceived?.Invoke(id, lat, lon, alt, status, ipLat, ipLon, ipAlt);
+            //Debug.WriteLine($"[Aircraft] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, IP Lat: {ipLat:F6}, IP Lon: {ipLon:F6}, IP Alt: {ipAlt:F2}, Enemy: {foe == 1}, Status: {status}");
         }
-        
-        private static void ParseMissile(byte[] body, MissileList list)
+
+        private static void ParseMissile(byte[] body)
         {
             string id = Encoding.ASCII.GetString(body, 0, 8).Trim('\0');
             uint status = BitConverter.ToUInt32(body, 8);
@@ -92,25 +112,8 @@ namespace OCC.Utils
             double lon = BitConverter.ToDouble(body, 20);
             double alt = BitConverter.ToDouble(body, 28);
 
-            lock (list.Missiles)
-            {
-                var existing = list.Missiles.FirstOrDefault(a => a.MissileId == id);
-                if (existing != null)
-                {
-                    existing.Latitude = lat;
-                    existing.Longitude = lon;
-                    existing.Altitude = alt;
-                    existing.Status = status;
-                }
-                else
-                {
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        list.Missiles.Add(new Missile(id, lat, lon, alt, status));
-                    }));
-                }
-                Debug.WriteLine($"[Missile] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, Status: {status}");
-            }
+            MissileReceived?.Invoke(id, lat, lon, alt, status);
+            //Debug.WriteLine($"[Missile] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, Status: {status}");
         }
 
     }
