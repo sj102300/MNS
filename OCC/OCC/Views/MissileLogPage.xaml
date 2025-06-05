@@ -33,7 +33,7 @@
                 <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
                 <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
                 <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />
-                <DataGridTextColumn Header="상태" Binding="{Binding Status}" Width="*" />
+                <DataGridTextColumn Header="상태" Binding="{Binding MissileStatusText}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
 

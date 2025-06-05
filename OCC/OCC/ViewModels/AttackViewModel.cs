@@ -57,6 +57,7 @@ namespace OCC.ViewModels
         public ObservableCollection<AircraftWithIp> AircraftList { get; } = new();
         private readonly Dictionary<string, AircraftWithIp> aircraftLookup = new();  // 빠른 검색을 위해
 
+
         public ObservableCollection<Missile> MissileList { get; } = new();
         private readonly Dictionary<string, Missile> missileLookup = new(); // 빠른 검색을 위해
 
@@ -98,11 +99,6 @@ namespace OCC.ViewModels
                 execute: _ => SendEmergencyDestroyPacketAsync(SelectedMissile),
                 canExecute: _ => true
             );
-
-            //SelectAircraftCommand = new RelayCommand<object>(
-            //    execute: param => selectAircraft(param),
-            //    canExecute: _ => true
-            //);
 
             StartReceiving();
         }

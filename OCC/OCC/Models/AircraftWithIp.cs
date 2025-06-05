@@ -9,6 +9,14 @@ namespace OCC.Models
 {
     public class AircraftWithIp : INotifyPropertyChanged
     {
+        public enum AircraftStatus
+        {
+            NotEngageable = 0,  // 교전 불가능
+            Engageable = 1, // 교전 가능
+            Engaging = 2,   // 교전 중
+            Success = 3,  //격추 성공
+        }
+
         public string Id { get; }  // 식별자는 불변
 
         private double latitude;
@@ -19,10 +27,32 @@ namespace OCC.Models
         private double ip_longitude;
         private double ip_altitude;
 
+        public string AircraftStatusText
+        {
+            get
+            {
+                return Status switch
+                {
+                    0 => "교전 불가능",
+                    1 => "교전 가능",
+                    2 => "교전 중",
+                    3 => "교전 성공",
+                    _ => "알 수 없음"
+                };
+            }
+        }
+
         public double Latitude { get => latitude; set { latitude = value; OnPropertyChanged(nameof(Latitude)); } }
         public double Longitude { get => longitude; set { longitude = value; OnPropertyChanged(nameof(Longitude)); } }
         public double Altitude { get => altitude; set { altitude = value; OnPropertyChanged(nameof(Altitude)); } }
-        public uint Status { get => status; set { status = value; OnPropertyChanged(nameof(Status)); } }
+        public uint Status
+        {
+            get => status; set
+            {
+                status = value; OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(AircraftStatusText)); // 상태 텍스트도 갱신
+            }
+        }
 
         public double IpLatitude
         {

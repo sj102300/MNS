@@ -9,6 +9,15 @@ namespace OCC.Models
 {
     public class Missile : INotifyPropertyChanged
     {
+        public enum MissileStatus
+        {
+            BeforeLaunch = 0,  // 발사전
+            InFlight = 1, // 비행중
+            HitSuccess = 2,   // 명중성공
+            EmergencyDestroy = 3,  // 비상폭파
+            SelfDestroy = 4 // 자폭
+        }
+
         public string Id { get; }  // 식별자는 불변
         private double latitude;
         private double longitude;
@@ -32,7 +41,26 @@ namespace OCC.Models
         public uint Status
         {
             get => status;
-            set { status = value; OnPropertyChanged(nameof(Status)); }
+            set
+            {
+                status = value; OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(MissileStatusText)); // 상태 텍스트도 갱신
+            }
+        }
+        public string MissileStatusText
+        {
+            get
+            {
+                return (MissileStatus)Status switch
+                {
+                    MissileStatus.BeforeLaunch => "발사전",
+                    MissileStatus.InFlight => "비행중",
+                    MissileStatus.HitSuccess => "명중성공",
+                    MissileStatus.EmergencyDestroy => "비상폭파",
+                    MissileStatus.SelfDestroy => "자폭",
+                    _ => "알 수 없음"
+                };
+            }
         }
         public Missile(string id)
         {

@@ -25,7 +25,7 @@
                 <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" />
                 <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" />
                 <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" />
-                <DataGridTextColumn Header="상태" Binding="{Binding Status}" Width="*" />
+                <DataGridTextColumn Header="상태" Binding="{Binding AircraftStatusText}" />
                 <DataGridTextColumn Header="IP 위도" Binding="{Binding IpLatitude}" />
                 <DataGridTextColumn Header="IP 경도" Binding="{Binding IpLongitude}" />
                 <DataGridTextColumn Header="IP 고도" Binding="{Binding IpAltitude}" />
