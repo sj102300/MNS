@@ -47,6 +47,7 @@ namespace OCC.Views
             Loaded += AttackDisplayPage_Loaded;
             InitializeMap();
             Debug.WriteLine($"AttackDisplayPage DataContext type: {DataContext?.GetType().Name}");
+            Debug.WriteLine($"AttackDisplayPage에 전달된 ViewModel] HashCode: {viewModel.GetHashCode()}");
 
 
         }

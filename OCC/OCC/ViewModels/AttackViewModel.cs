@@ -24,25 +24,27 @@ using Newtonsoft.Json;
 using System.Xml.Linq;
 using static OCC.Models.FireMode;
 using System.Reflection.PortableExecutable;
+using System.Windows.Media;
 
 namespace OCC.ViewModels
 {
     public class AttackViewModel : BaseViewModel
     {
-        private readonly FireMode _fireModeModel = new FireMode();
+        private FireModeType _fireMode = FireModeType.Auto;
+
         public FireMode.FireModeType FireMode
         {
-            get => _fireModeModel.Mode;
+            get => _fireMode;
             set
             {
-                if (_fireModeModel.Mode != value)
+                if (SetProperty(ref _fireMode, value))
                 {
-                    _fireModeModel.Mode = value;
                     Debug.WriteLine($"[ViewModel] FireMode 변경됨: {value}");
-                    OnPropertyChanged();
+                    Debug.WriteLine($"[ViewModel] ChangeModeText → {ChangeModeText}");
                     OnPropertyChanged(nameof(IsAutoFireMode));
                     OnPropertyChanged(nameof(IsManualFireMode));
                     OnPropertyChanged(nameof(ChangeModeText));
+                    OnPropertyChanged(nameof(ChangeModeButtonBackground));
                 }
             }
         }
@@ -67,6 +69,7 @@ namespace OCC.ViewModels
         public bool IsAutoFireMode => FireMode == Models.FireMode.FireModeType.Auto;
         public bool IsManualFireMode => FireMode == Models.FireMode.FireModeType.Manual;
         public string ChangeModeText => FireMode == FireModeType.Auto ? "자동 발사 모드 OFF" : "자동 발사 모드 ON";
+        public Brush ChangeModeButtonBackground => FireMode == FireModeType.Auto ? Brushes.LightGray : Brushes.Green;
 
         private static string commandId = "MF-2024052812304500"; // 예시 발사 명령 식별자
 
@@ -78,6 +81,8 @@ namespace OCC.ViewModels
 
         public AttackViewModel(NavigationService navigationService)
         {
+            Debug.WriteLine($"[AttackViewModel 생성됨] HashCode: {this.GetHashCode()}");
+
             NavigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
             QuitCommand = new RelayCommand<object>(
@@ -108,18 +113,6 @@ namespace OCC.ViewModels
             StartReceiving();
         }
 
-        //public event PropertyChangedEventHandler PropertyChanged;
-
-        //protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        //    => OnPropertyChanged(propertyName);
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            Debug.WriteLine($"[DEBUG] OnPropertyChanged 호출됨: {propertyName}");
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         // 기존 코드 유지
         private void SendFireModePacketAsync()
@@ -180,7 +173,6 @@ namespace OCC.ViewModels
                         FireMode = (FireMode == Models.FireMode.FireModeType.Auto)
                             ? Models.FireMode.FireModeType.Manual
                             : Models.FireMode.FireModeType.Auto;
-
 
 #if true
                         Debug.WriteLine(FireMode);
@@ -333,6 +325,7 @@ namespace OCC.ViewModels
         private readonly List<(string url, string id)> subsystems = new()
         {
             ($"http://192.168.2.66:8080", "TCC"),
+            //($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
             ($"{Network.MFR}", "MFR")
             //($"{Network.MSS}", "MSS"),

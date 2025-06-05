@@ -74,19 +74,20 @@
                          CornerRadius="8"/>
 
             <ui:Button Grid.Column="2"
+                       Content="{Binding ChangeModeText}"
                            Command="{Binding ChangeModeCommand}"
                            Width="150"
                            Height="40"
                            FontSize="15"
                             Margin="12"
-                       Name="ChangeModeBtn"
                             HorizontalAlignment="Right"
                            FontWeight="SemiBold"
-                           Background="#263238"
+                           Background="{Binding ChangeModeButtonBackground}"
                            Foreground="#FFFFFF"
                            CornerRadius="8">
-                <TextBlock Text="모드 전환" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                <!--<TextBlock Text="{Binding ChangeModeText, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+                <!--<TextBlock Text="{Binding ChangeModeText}" FontSize="15" Foreground="Red"/>-->
+                <!--<TextBlock Text="모드 전환" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+                <!--<TextBlock Text="{Binding ChangeModeText}" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
             </ui:Button>
         </Grid>
     </Grid>

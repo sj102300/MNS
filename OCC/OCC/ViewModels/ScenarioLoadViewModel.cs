@@ -37,8 +37,9 @@ namespace OCC.ViewModels
         private readonly List<(string url, string id)> subsystems = new()
         {
             ($"http://192.168.2.66:8080", "TCC"),
-            ($"{Network.MFR}", "MFR"),
-            ($"{Network.ATS}", "ATS"),
+            //($"{Network.TCC}", "TCC"),
+            //($"{Network.MFR}", "MFR"),
+            //($"{Network.ATS}", "ATS"),
             //($"{Network.LCH}", "LCH"),
             //($"{Network.MSS}", "MSS"),
         };
@@ -124,32 +125,37 @@ namespace OCC.ViewModels
 
         private void NavigateToAttackDisplayPage()
         {
-            // AttackViewModel 하나 생성
-            if(NavigationService == null)
+            Application.Current.Dispatcher .Invoke(() =>
             {
-                Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
-            }
-            var attackViewModel = new AttackViewModel(NavigationService);
-            // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
-            var currentWindow = Application.Current.Windows
-                                .OfType<Window>()
-                                .FirstOrDefault(w => w.IsActive);
-            if (currentWindow != null)
-            {
-                var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
-                currentWindow.Content = attackDisplayPage;
-            }
+                // AttackViewModel 하나 생성
+                if (NavigationService == null)
+                {
+                    Debug.WriteLine("AttackDisplayPage로 갈때 navigationService가 없습니다!");
+                }
+                var attackViewModel = new AttackViewModel(NavigationService);
 
-            // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
-            var aircraftLogPage = new OCC.Views.AircraftLogPage(attackViewModel);
-            var aircraftLogWindow = new Window
-            {
-                Title = "Aircraft Log",
-                Width = 600,
-                Height = 800,
-                Content = aircraftLogPage
-            };
-            aircraftLogWindow.Show();
+                // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
+                var currentWindow = Application.Current.Windows
+                                    .OfType<Window>()
+                                    .FirstOrDefault(w => w.IsActive);
+                if (currentWindow != null)
+                {
+                    var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
+                    currentWindow.Content = attackDisplayPage;
+                }
+
+                // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
+                var aircraftLogPage = new OCC.Views.AircraftLogPage(attackViewModel);
+                var aircraftLogWindow = new Window
+                {
+                    Title = "Aircraft Log",
+                    Width = 600,
+                    Height = 800,
+                    Content = aircraftLogPage
+                };
+                aircraftLogWindow.Show();
+            });
+            
 
             // MissileLogPage를 Window에 담아서 띄우고 ViewModel 할당
             //var missileLogPage = new OCC.Views.MissileLogPage
