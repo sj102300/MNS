@@ -1,0 +1,286 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using GMap.NET.MapProviders;
+using GMap.NET.WindowsPresentation;
+using GMap.NET;
+using OCC.Models;
+using OCC.ViewModels;
+using Newtonsoft.Json;
+using OCC.Utils;
+using System.Net.Http;
+using System.Collections.Specialized;
+using System.ComponentModel;
+
+namespace OCC.Views
+{
+    /// <summary>
+    /// AttackDisplayPage.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class AttackDisplayPage : Page
+    {
+        private AttackViewModel _viewModel;
+        // 마커 추가
+        private readonly Dictionary<string, GMapMarker> _aircraftMarkers = new();
+        private readonly Dictionary<string, GMapMarker> _ipMarkers = new();
+        private readonly Dictionary<string, GMapMarker> _missileMarkers = new();
+        private GMapMarker _batteryMarker;
+        private string _scenarioId;
+
+        public AttackDisplayPage(AttackViewModel viewModel, string scenarioId)
+        {
+            InitializeComponent();
+            _viewModel = viewModel;
+            DataContext = _viewModel;
+            _scenarioId = scenarioId;
+            // Loaded 이벤트를 통해 NavigationService를 설정
+            Loaded += AttackDisplayPage_Loaded;
+            InitializeMap();
+            _viewModel.AircraftList.CollectionChanged += AircraftList_CollectionChanged;
+            _viewModel.MissileList.CollectionChanged += MissileList_CollectionChanged;
+        }
+
+        private void AircraftList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (AircraftWithIp aircraft in e.NewItems)
+                {
+                    AddAircraftMarker(aircraft);
+                    AddIpMarker(aircraft);
+                    aircraft.PropertyChanged += Aircraft_PropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (AircraftWithIp aircraft in e.OldItems)
+                {
+                    RemoveAircraftMarker(aircraft);
+                    aircraft.PropertyChanged -= Aircraft_PropertyChanged;
+                }
+            }
+        }
+
+        private void Aircraft_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is not AircraftWithIp aircraft) return;
+            if (e.PropertyName != nameof(AircraftWithIp.Latitude) && e.PropertyName != nameof(AircraftWithIp.Longitude))
+                return;
+
+            if (_aircraftMarkers.TryGetValue(aircraft.Id, out var marker))
+            {
+                marker.Position = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
+            }
+            if (_ipMarkers.TryGetValue(aircraft.Id, out var ipmarker))
+            {
+                ipmarker.Position = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
+            }
+        }
+
+        private void AddAircraftMarker(AircraftWithIp aircraft)
+        {
+            var marker = new GMapMarker(new PointLatLng(aircraft.Latitude, aircraft.Longitude))
+            {
+                Shape = new Ellipse
+                {
+                    Width = 16,
+                    Height = 16,
+                    Fill = Brushes.Red
+                },
+                Offset = new Point(-5, -5)
+            };
+            mapControl.Markers.Add(marker);
+            _aircraftMarkers[aircraft.Id] = marker;
+        }
+
+        private void AddIpMarker(AircraftWithIp aircraft)
+        {
+            var marker = new GMapMarker(new PointLatLng(aircraft.IpLatitude, aircraft.IpLongitude))
+            {
+                Shape = new Ellipse
+                {
+                    Width = 12,
+                    Height = 12,
+                    Fill = Brushes.Purple
+                },
+                Offset = new Point(-5, -5)
+            };
+            mapControl.Markers.Add(marker);
+            _ipMarkers[aircraft.Id] = marker;
+        }
+
+        private void RemoveAircraftMarker(AircraftWithIp aircraft)
+        {
+            if (_aircraftMarkers.TryGetValue(aircraft.Id, out var marker))
+            {
+                mapControl.Markers.Remove(marker);
+                _aircraftMarkers.Remove(aircraft.Id);
+            }
+            if (_ipMarkers.TryGetValue(aircraft.Id, out var ipmarker))
+            {
+                mapControl.Markers.Remove(ipmarker);
+                _ipMarkers.Remove(aircraft.Id);
+            }
+        }
+
+        private void MissileList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (Missile missile in e.NewItems)
+                {
+                    AddMissileMarker(missile);
+                    missile.PropertyChanged += Missile_PropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (Missile missile in e.OldItems)
+                {
+                    RemoveMissileMarker(missile);
+                    missile.PropertyChanged -= Missile_PropertyChanged;
+                }
+            }
+        }
+
+        private void Missile_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is not Missile missile) return;
+            if (e.PropertyName != nameof(Missile.Latitude) && e.PropertyName != nameof(Missile.Longitude))
+                return;
+
+            if (_missileMarkers.TryGetValue(missile.Id, out var marker))
+            {
+                marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
+            }
+        }
+
+        private void AddMissileMarker(Missile missile)
+        {
+            var marker = new GMapMarker(new PointLatLng(missile.Latitude, missile.Longitude))
+            {
+                Shape = new Ellipse
+                {
+                    Width = 16,
+                    Height = 16,
+                    Fill = Brushes.Blue
+                },
+                Offset = new Point(-5, -5)
+            };
+
+            mapControl.Markers.Add(marker);
+            _missileMarkers[missile.Id] = marker;
+        }
+
+        private void RemoveMissileMarker(Missile missile)
+        {
+            if (_missileMarkers.TryGetValue(missile.Id, out var marker))
+            {
+                mapControl.Markers.Remove(marker);
+                _missileMarkers.Remove(missile.Id);
+            }
+        }
+
+        private void AttackDisplayPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            //async로 시나리오 정보 가져오기
+            getScenarioInfo(_scenarioId);
+            // GMapControl에 포커스 강제 부여
+            mapControl.Focus();
+        }
+
+        private void InitializeMap()
+        {
+            // config map
+            mapControl.MapProvider = GMapProviders.GoogleMap;
+            //getScenarioInfo()에서 Position 초기화함
+            //mapControl.Position = new PointLatLng(37.5665, 126.9780);
+            mapControl.MinZoom = 2;
+            mapControl.MaxZoom = 18;
+            mapControl.Zoom = 12;
+            mapControl.ShowCenter = false;
+            mapControl.CanDragMap = true;
+            mapControl.MouseWheelZoomType = MouseWheelZoomType.MousePositionAndCenter;
+            mapControl.DragButton = MouseButton.Left;
+            //mapControl.MouseLeftButtonDown += mapControl_MouseLeftButtonDown;
+            //mapControl.MouseLeftButtonUp += mapControl_MouseLeftButtonUp;
+
+            mapControl.PreviewMouseWheel += (s, e) =>
+            {
+                if (e.Delta > 0)
+                    mapControl.Zoom = Math.Min(mapControl.Zoom + 1, mapControl.MaxZoom);
+                else
+                    mapControl.Zoom = Math.Max(mapControl.Zoom - 1, mapControl.MinZoom);
+                e.Handled = true; 
+            };
+        }
+        private async void getScenarioInfo(string scenarioId)
+        {
+            var coord = await _viewModel.GetScenarioInfoAsync(scenarioId);
+            if (coord != null)
+            {
+                mapControl.Position = new PointLatLng(coord.latitude, coord.longitude);
+                _viewModel.SetBatteryPos(coord.latitude, coord.longitude);
+                // 항공기 마커 생성
+                UpdateMarkers();
+            }
+            else
+            {
+                mapControl.Position = new PointLatLng(37.5665, 126.9780);
+            }
+        }
+
+
+        // ㅇㅅㅇ
+        private void UpdateMarkers()
+        {
+            //Debug.WriteLine($"[DEBUG] Aircraft count: {_viewModel.AircraftList.Aircrafts.Count}");
+            //Debug.WriteLine($"[DEBUG] Missile  count: {_viewModel.MissileList.Missiles.Count}");
+            Debug.WriteLine($"[DEBUG] BatteryPos set?: {_viewModel.BatteryPos != null}");
+
+            /* ────────── 1) 포대 마커 (고정, 최초 1회) ────────── */
+            if (_viewModel.BatteryPos is PointLatLng bp)
+            {
+                if (_batteryMarker == null)
+                {
+                    _batteryMarker = CreateMarker(bp, Brushes.Green, 16);
+                    mapControl.Markers.Add(_batteryMarker);
+                }
+                else
+                    _batteryMarker.Position = bp;   // (이동 없는 경우라 사실상 그대로)
+            }
+        }
+
+        private static GMapMarker CreateMarker(PointLatLng pos, Brush fill, double size)
+        {
+            return new GMapMarker(pos)
+            {
+                Shape = new Ellipse
+                {
+                    Width = size,
+                    Height = size,
+                    Fill = fill,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 1.5,
+                    Opacity = 0.9
+                },
+                Offset = new Point(-size / 2, -size / 2)
+            };
+        }
+
+    }
+}
