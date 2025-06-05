@@ -8,6 +8,7 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using Newtonsoft.Json;
@@ -39,8 +40,8 @@ namespace OCC.ViewModels
             ($"http://192.168.2.66:8080", "TCC"),
             ($"{Network.MFR}", "MFR"),
             ($"{Network.ATS}", "ATS"),
-            //($"{Network.LCH}", "LCH"),
-            //($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
+            ($"{Network.MSS}", "MSS"),
         };
 
         public ScenarioLoadViewModel()
@@ -113,7 +114,6 @@ namespace OCC.ViewModels
                     {
                         ScenarioCollection.Add(scenario);
                     }
-
                 });
             }
             catch (Exception ex)
@@ -131,13 +131,15 @@ namespace OCC.ViewModels
             }
             var attackViewModel = new AttackViewModel(NavigationService);
             // 현재 활성 창에 AttackDisplayPage를 띄우고 ViewModel 할당
-            var currentWindow = Application.Current.Windows
-                                .OfType<Window>()
-                                .FirstOrDefault(w => w.IsActive);
-            if (currentWindow != null)
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+            if (mainWindow != null)
             {
-                var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
-                currentWindow.Content = attackDisplayPage;
+                var frame = mainWindow.FindName("MainFrame") as Frame;
+                if (frame != null)
+                {
+                    var attackDisplayPage = new OCC.Views.AttackDisplayPage(attackViewModel);
+                    frame.Navigate(attackDisplayPage);
+                }
             }
 
             // AircraftLogPage를 Window에 담아서 띄우고 ViewModel 할당
@@ -152,18 +154,16 @@ namespace OCC.ViewModels
             aircraftLogWindow.Show();
 
             // MissileLogPage를 Window에 담아서 띄우고 ViewModel 할당
-            //var missileLogPage = new OCC.Views.MissileLogPage
-            //{
-            //    DataContext = attackViewModel
-            //};
-            //var missileLogWindow = new Window
-            //{
-            //    Title = "Missile Log",
-            //    Width = 600,
-            //    Height = 800,
-            //    Content = missileLogPage
-            //};
-            //missileLogWindow.Show();
+            var missileLogPage = new OCC.Views.MissileLogPage(attackViewModel);
+            var missileLogWindow = new Window
+            {
+                Title = "Missile Log",
+                Width = 600,
+                Height = 800,
+                Content = missileLogPage
+            };
+            missileLogWindow.Show();
+
         }
 
         private async void Start()
@@ -272,6 +272,7 @@ namespace OCC.ViewModels
                 );
                 if (result == MessageBoxResult.OK)
                 {
+                    //NavigationService?.GoBack();
                     //NavigateToScenarioCreate();
                 }
             }
@@ -308,7 +309,7 @@ namespace OCC.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
+                //MessageBox.Show($"[OCC] {subsystemId}예외 발생: {ex.Message}");
                 return false;
             }
         }

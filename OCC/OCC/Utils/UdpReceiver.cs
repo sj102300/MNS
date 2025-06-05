@@ -9,12 +9,15 @@ using OCC.Models;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.Windows.Documents;
+using System.Windows;
+
 
 namespace OCC.Utils
 {
     public static class UdpReceiver
     {
-        public static void Start(AircraftList aircraftList)
+        public static void Start(AircraftList aircraftList, MissileList missileList)
         {
             Task.Run(() =>
             {
@@ -36,7 +39,7 @@ namespace OCC.Utils
                     }
                     else if (cmd == 300)
                     {
-                        //ParseMissile();
+                        ParseMissile(data.Skip(8).ToArray(), missileList);
                     }
                 }
             });
@@ -70,40 +73,43 @@ namespace OCC.Utils
                 }
                 else
                 {
-                    list.Aircrafts.Add(new AircraftWithIp(id, lat, lon, alt, foe == 1, status, ipLat, ipLon, ipAlt));
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                       list.Aircrafts.Add(new AircraftWithIp(id, lat, lon, alt, foe == 1, status, ipLat, ipLon, ipAlt));
+                    }));
                 }
                 Debug.WriteLine($"[Aircraft] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, IP Lat: {ipLat:F6}, IP Lon: {ipLon:F6}, IP Alt: {ipAlt:F2}, Enemy: {foe == 1}, Status: {status}");
             }
         }
         
-        //private void ParseMissile(byte[] body)
-        //{
-        //    string id = Encoding.ASCII.GetString(body, 0, 8).Trim('\0');
-        //    double lat = BitConverter.ToDouble(body, 8);
-        //    double lon = BitConverter.ToDouble(body, 16);
-        //    double alt = BitConverter.ToDouble(body, 24);
-        //    uint status = BitConverter.ToUInt32(body, 32);
+        private static void ParseMissile(byte[] body, MissileList list)
+        {
+            string id = Encoding.ASCII.GetString(body, 0, 8).Trim('\0');
+            uint status = BitConverter.ToUInt32(body, 8);
+            double lat = BitConverter.ToDouble(body, 12);
+            double lon = BitConverter.ToDouble(body, 20);
+            double alt = BitConverter.ToDouble(body, 28);
 
-        //    var found = missileList.FirstOrDefault(m => m.Id == id);
-        //    if (found != null)
-        //    {
-        //        found.Latitude = lat;
-        //        found.Longitude = lon;
-        //        found.Altitude = alt;
-        //        found.Status = status;
-        //    }
-        //    else
-        //    {
-        //        missileList.Add(new Missile
-        //        {
-        //            Id = id,
-        //            Latitude = lat,
-        //            Longitude = lon,
-        //            Altitude = alt,
-        //            Status = status
-        //        });
-        //    }
-        //}
+            lock (list.Missiles)
+            {
+                var existing = list.Missiles.FirstOrDefault(a => a.MissileId == id);
+                if (existing != null)
+                {
+                    existing.Latitude = lat;
+                    existing.Longitude = lon;
+                    existing.Altitude = alt;
+                    existing.Status = status;
+                }
+                else
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        list.Missiles.Add(new Missile(id, lat, lon, alt, status));
+                    }));
+                }
+                Debug.WriteLine($"[Missile] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, Status: {status}");
+            }
+        }
 
     }
 
