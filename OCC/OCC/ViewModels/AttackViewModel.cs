@@ -29,6 +29,8 @@ using OCC.Views;
 using System.Windows.Controls;
 using GMap.NET;
 using System.Collections.ObjectModel;
+using GMap.NET.WindowsPresentation;
+using System.Windows.Shapes;
 
 
 namespace OCC.ViewModels
@@ -58,9 +60,9 @@ namespace OCC.ViewModels
         public ObservableCollection<AircraftWithIp> AircraftList { get; } = new();
         private readonly Dictionary<string, AircraftWithIp> aircraftLookup = new();  // 빠른 검색을 위해
 
-
         public ObservableCollection<Missile> MissileList { get; } = new();
         private readonly Dictionary<string, Missile> missileLookup = new(); // 빠른 검색을 위해
+
 
         public bool IsAutoFireMode => FireMode == Models.FireMode.FireModeType.Auto;
         public bool IsManualFireMode => FireMode == Models.FireMode.FireModeType.Manual;
@@ -199,12 +201,9 @@ namespace OCC.ViewModels
                 string json = await response.Content.ReadAsStringAsync();
 
                 // 예시: Coordinate 객체로 역직렬화
-                var coord = JsonConvert.DeserializeObject<Coordinate>(json);
-                Debug.WriteLine($"-----------------------{coord.latitude}------{coord.longitude}---------------------");
-                Debug.WriteLine("-------------------------------------------------------------");
-                Debug.WriteLine("-------------------------------------------------------------");
-                Debug.WriteLine("-------------------------------------------------------------");
-                return coord;
+                var coord = JsonConvert.DeserializeObject<ScenarioInfo>(json);
+                //Debug.WriteLine($"-----------------------{coord.coordinate.latitude}------{coord.coordinate.longitude}---------------------");
+                return coord.coordinate;
             }
             catch
             {
@@ -594,7 +593,25 @@ namespace OCC.ViewModels
         /* 외부(시나리오)에서 한 번 호출 */
         public void SetBatteryPos(double lat, double lon)
         {
-        BatteryPos = new PointLatLng(lat, lon);
+            BatteryPos = new PointLatLng(lat, lon);
         }
+
+        //public GMapMarker CreateMarker(PointLatLng pos, Brush fill, double size)
+        //{
+        //    return new GMapMarker(pos)
+        //    {
+        //        Shape = new Ellipse
+        //        {
+        //            Width = size,
+        //            Height = size,
+        //            Fill = fill,
+        //            Stroke = Brushes.Black,
+        //            StrokeThickness = 1.5,
+        //            Opacity = 0.9
+        //        },
+        //        Offset = new Point(-size / 2, -size / 2)
+        //    };
+        //}
+
     }
 }
