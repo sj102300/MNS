@@ -17,7 +17,7 @@
     </Grid.RowDefinitions>
         
     <!-- 상단: 항공기 정보 표 -->
-        <DataGrid Grid.Row="0" ItemsSource="{Binding AircraftList.Aircrafts}"
+        <DataGrid Grid.Row="0" ItemsSource="{Binding AircraftList}"
           SelectedItem="{Binding SelectedAircraft, Mode=TwoWay}"
           AutoGenerateColumns="False">
             <DataGrid.Columns>
