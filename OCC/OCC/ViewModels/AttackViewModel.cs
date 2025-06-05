@@ -327,6 +327,9 @@ namespace OCC.ViewModels
         };
         private async void Quit()
         {
+            // 소켓 닫기
+            OCC.Utils.UdpReceiver.Stop();
+
             Debug.WriteLine("종료 요청");
             // 모든 서브시스템에 대해 비동기 요청을 병렬로 실행
             var tasks = subsystems.Select(subsystem =>

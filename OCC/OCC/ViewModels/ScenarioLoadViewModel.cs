@@ -39,10 +39,10 @@ namespace OCC.ViewModels
         {
             ($"http://192.168.2.66:8080", "TCC"),
             //($"{Network.TCC}", "TCC"),
-            //($"{Network.MFR}", "MFR"),
-            //($"{Network.ATS}", "ATS"),
-            //($"{Network.LCH}", "LCH"),
-            //($"{Network.MSS}", "MSS"),
+            ($"{Network.MFR}", "MFR"),
+            ($"{Network.ATS}", "ATS"),
+            ($"{Network.LCH}", "LCH"),
+            ($"{Network.MSS}", "MSS"),
 
         };
 

@@ -17,6 +17,7 @@ namespace OCC.Utils
 {
     public static class UdpReceiver
     {
+        private static UdpClient? _udp;
         public static void Start(AircraftList aircraftList, MissileList missileList)
         {
             Task.Run(() =>
@@ -24,14 +25,14 @@ namespace OCC.Utils
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
-                using var udp = new UdpClient(ep);
+                _udp = new UdpClient(ep);
 
                 Debug.WriteLine("항공기 정보 수신 시작");
 
                 while (true)
                 {
                     var remote = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] data = udp.Receive(ref remote);
+                    byte[] data = _udp.Receive(ref remote);
 
                     uint cmd = BitConverter.ToUInt32(data, 0);
                     if (cmd == 100)
@@ -44,6 +45,24 @@ namespace OCC.Utils
                     }
                 }
             });
+        }
+
+        public static void Stop()
+        {
+            if (_udp != null)
+            {
+                try
+                {
+                    _udp.Close();
+                    _udp.Dispose();
+                    Debug.WriteLine("[UdpReceiver] 소켓 닫힘");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[UdpReceiver] 소켓 닫기 예외: {ex.Message}");
+                }
+                _udp = null;
+            }
         }
 
         private static void ParseAircraft(byte[] body, AircraftList list)
