@@ -27,6 +27,7 @@ using System.Reflection.PortableExecutable;
 using System.Windows.Media;
 using OCC.Views;
 using System.Windows.Controls;
+using GMap.NET;
 
 
 namespace OCC.ViewModels
@@ -204,8 +205,22 @@ namespace OCC.ViewModels
                     return null;
 
                 string json = await response.Content.ReadAsStringAsync();
+
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                var postData = new
+                {
+                    scenario_id = scenarioId  // 여기에 시나리오 선택할 때 id 넘겨받기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                };
+                var json = JsonConvert.SerializeObject(postData);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                 // 예시: Coordinate 객체로 역직렬화
                 var coord = JsonConvert.DeserializeObject<Coordinate>(json);
+                Debug.WriteLine($"-----------------------{coord.latitude}------{coord.longitude}---------------------");
+                Debug.WriteLine("-------------------------------------------------------------");
+                Debug.WriteLine("-------------------------------------------------------------");
+                Debug.WriteLine("-------------------------------------------------------------");
                 return coord;
             }
             catch
@@ -492,6 +507,27 @@ namespace OCC.ViewModels
                     MessageBox.Show($"ACK 미수신 → 비상 폭파 명령 송신 실패: {missileId}");
                 }
             });
+        }
+
+        // ㅇㅅㅇ
+        private PointLatLng? _batteryPos;      // null ⇒ 아직 안 받은 상태
+        public PointLatLng? BatteryPos
+        {
+            get => _batteryPos;
+            private set
+            {
+                if (_batteryPos != value)
+                {
+                    _batteryPos = value;
+                    OnPropertyChanged();        // View 에 통보
+                }
+            }
+        }
+
+        /* 외부(시나리오)에서 한 번 호출 */
+        public void SetBatteryPos(double lat, double lon)
+        {
+        BatteryPos = new PointLatLng(lat, lon);
         }
     }
 }
