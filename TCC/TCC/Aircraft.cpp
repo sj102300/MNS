@@ -19,7 +19,6 @@ void Aircraft::updatePosition(TCC::Position& newLocation) {
 }
 
 namespace {
-
     constexpr double PI = 3.14159265358979323846;
     constexpr double EARTH_RADIUS_KM = 6371.0;
     constexpr double DEG_TO_RAD = PI / 180.0;
@@ -45,8 +44,8 @@ namespace {
 
 void Aircraft::calcDirVec(const TCC::Position& newPos) {
     // 항공기 위치 - 새로운 위치 (방향 벡터 계산)
-    double dx = pos_.longitude_ - newPos.longitude_;
-    double dy = pos_.latitude_ - newPos.latitude_;
+    double dx = newPos.longitude_ - pos_.longitude_;
+    double dy = newPos.latitude_ - pos_.latitude_;
 
     // 벡터 크기 계산 (정규화 필요)
     double magnitude = std::sqrt(dx * dx + dy * dy);
@@ -68,10 +67,11 @@ void Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
     double vt = 1.0; // 항공기 속도 (km/s)
     double vm = 2.0; // 미사일 속도 (km/s)
 
-    //if (dirVec_.isZeroVector()) {
-    //    impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
-    //    return;
-    //}
+    if (dirVec_.isZeroVector()) {
+        impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
+		std::cout << "impossible to intercept: zero direction vector" << std::endl;
+        return;
+    }
 
     // 1. 위치 평면 좌표로 변환
     double tx, ty, mx, my;
