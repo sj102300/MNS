@@ -86,7 +86,7 @@ namespace OCC.Views
             }
             if (_ipMarkers.TryGetValue(aircraft.Id, out var ipmarker))
             {
-                ipmarker.Position = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
+                ipmarker.Position = new PointLatLng(aircraft.IpLatitude, aircraft.IpLongitude);
             }
         }
 
