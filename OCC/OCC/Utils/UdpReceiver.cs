@@ -35,7 +35,7 @@ namespace OCC.Utils
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
-                _udp = new UdpClient(ep);
+                using var udp = new UdpClient(ep);
 
                 Debug.WriteLine("항공기 정보 수신 시작");
 
