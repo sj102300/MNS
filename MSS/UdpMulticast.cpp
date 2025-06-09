@@ -125,7 +125,7 @@ void UdpMulticast::run() {
                         << u8"Altitude: " << missile_->MissileLoc.altitude << "\n\n";
                 }
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 

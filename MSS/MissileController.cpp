@@ -88,7 +88,7 @@ void MissileController::updatePosition(float speed_kmps) {
 	auto now = std::chrono::steady_clock::now();
 	double elapsed = std::chrono::duration<double>(now - launch_time_).count();
 
-	if (elapsed > estimatedTimeToImpact_ + 2.0) {
+	if (elapsed > estimatedTimeToImpact_ + 10.0) {
 		std::cout << u8"Estimated time to impact: " << estimatedTimeToImpact_ << "s" << std::endl;
 		std::cout << u8"Elapsed time since launch: " << elapsed << "s" << std::endl;
 		std::cout << u8"[Missile] 예상 충돌 시간 초과 - 자폭!\n";

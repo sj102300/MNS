@@ -150,7 +150,7 @@ int main() {
             missileMap.clear();
 
             // 미사일 생성
-            for (int i = 0; i < 3; ++i) {
+            for (int i = 0; i < 6; ++i) {
                 auto missile = std::make_shared<Missile>();
 
                 std::string id = "MSS-" + std::to_string(100 + i);
