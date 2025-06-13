@@ -75,7 +75,7 @@ namespace OCC.Views
             mapControl.Position = new PointLatLng(37.5665, 126.9780);
             mapControl.MinZoom = 2;
             mapControl.MaxZoom = 18;
-            mapControl.Zoom = 12;
+            mapControl.Zoom = 7;
             mapControl.ShowCenter = false;
             mapControl.CanDragMap = true;
             mapControl.MouseWheelZoomType = MouseWheelZoomType.MousePositionAndCenter;
@@ -120,16 +120,37 @@ namespace OCC.Views
                 if (_viewModel.HandleMapClick(coordinate))
                 {
                     // 마커 추가
+                    double markerSize = 15;
+                    string markerText = (_viewModel.EndPoint == null) ? "S" : "E"; // 첫번째는 S, 두번째는 E
+
+                    var markerShape = new Grid
+                    {
+                        Width = markerSize,
+                        Height = markerSize
+                    };
+                    markerShape.Children.Add(new Ellipse
+                    {
+                        Width = markerSize,
+                        Height = markerSize,
+                        Stroke = Brushes.Black,
+                        StrokeThickness = 2,
+                        Fill = _viewModel.GetMarkerColor()
+                    });
+                    markerShape.Children.Add(new TextBlock
+                    {
+                        Text = markerText,
+                        Foreground = Brushes.White,
+                        FontWeight = FontWeights.Bold,
+                        FontSize = 13,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        TextAlignment = TextAlignment.Center
+                    });
+
                     GMapMarker marker = new GMapMarker(position)
                     {
-                        Shape = new Ellipse
-                        {
-                            Width = 15,
-                            Height = 15,
-                            Stroke = Brushes.Black,
-                            StrokeThickness = 2,
-                            Fill = _viewModel.GetMarkerColor()
-                        }
+                        Shape = markerShape,
+                        Offset = new Point(-markerSize / 2, -markerSize / 2)
                     };
                     mapControl.Markers.Add(marker);
 
@@ -138,30 +159,54 @@ namespace OCC.Views
                     {
                         Debug.WriteLine($"StartPoint: {_viewModel.StartPoint?.latitude}, {_viewModel.StartPoint?.longitude}");
                         Debug.WriteLine($"EndPoint: {_viewModel.EndPoint?.latitude}, {_viewModel.EndPoint?.longitude}");
-                        // WPF의 PathGeometry를 사용하여 선 생성
-                        var pathGeometry = new PathGeometry();
-                        var pathFigure = new PathFigure
-                        {
-                            StartPoint = new Point(_viewModel.StartPoint.longitude, _viewModel.StartPoint.latitude),
-                            Segments = new PathSegmentCollection
-                            {
-                                new LineSegment(new Point(_viewModel.EndPoint.longitude, _viewModel.EndPoint.latitude), true)
-                            }
-                        };
-                        pathGeometry.Figures.Add(pathFigure);
 
-                        // GMapMarker로 변환하여 추가
-                        GMapMarker routeMarker = new GMapMarker(new PointLatLng(_viewModel.StartPoint.latitude, _viewModel.StartPoint.longitude))
+                        // 마커 반지름(픽셀)
+                        double markerRadiusPx = markerSize / 2.0;
+
+                        // 지도상에서 1픽셀이 몇 미터인지 계산
+                        // (지도 확대/축소에 따라 달라짐)
+                        double metersPerPixel = mapControl.MapProvider.Projection.GetGroundResolution(
+                            (int)mapControl.Zoom, position.Lat);
+
+                        // 시작점과 끝점
+                        var startLatLng = new PointLatLng(_viewModel.StartPoint.latitude, _viewModel.StartPoint.longitude);
+                        var endLatLng = new PointLatLng(_viewModel.EndPoint.latitude, _viewModel.EndPoint.longitude);
+
+                        // 방향 벡터(단위 벡터)
+                        double dx = endLatLng.Lng - startLatLng.Lng;
+                        double dy = endLatLng.Lat - startLatLng.Lat;
+                        double length = Math.Sqrt(dx * dx + dy * dy);
+                        if (length == 0) length = 1; // 0 division 방지
+                        dx /= length;
+                        dy /= length;
+
+                        // 마커 반지름만큼 이동(위/경도 단위)
+                        double offsetMeter = markerRadiusPx * metersPerPixel;
+
+                        // 위도 1도는 약 111,320m, 경도 1도는 위도에 따라 다름
+                        double latOffset = (offsetMeter / 111320.0) * dy;
+                        double lngOffset = (offsetMeter / (111320.0 * Math.Cos(startLatLng.Lat * Math.PI / 180))) * dx;
+
+                        // 시작점/끝점에서 offset만큼 이동한 좌표
+                        var startEdge = new PointLatLng(startLatLng.Lat + latOffset, startLatLng.Lng + lngOffset);
+                        var endEdge = new PointLatLng(endLatLng.Lat - latOffset, endLatLng.Lng - lngOffset);
+
+                        // GMapRoute를 사용해 선 그리기 (테두리~테두리)
+                        var points = new List<PointLatLng> { startEdge, endEdge };
+                        var route = new GMapRoute(points)
                         {
-                            Shape = new Path
+                            Shape = new System.Windows.Shapes.Path
                             {
-                                Data = pathGeometry,
                                 Stroke = _viewModel.GetMarkerColor(),
-                                StrokeThickness = 2
+                                StrokeThickness = 2,
+                                StrokeDashArray = new DoubleCollection { 4, 4 }
                             }
                         };
+                        mapControl.Markers.Add(route);            
 
-                        mapControl.Markers.Add(routeMarker);
+                        // 시작점과 끝점 초기화
+                        _viewModel.StartPoint = null;
+                        _viewModel.EndPoint = null;
                     }
                 }
             }

@@ -171,10 +171,6 @@ namespace OCC.ViewModels
 
                     ScenarioData.aircraft_list.Add(aircraft);
                     AircraftList.Add(aircraft);
-
-                    // 시작점과 끝점 초기화
-                    _startPoint = null;
-                    _endPoint = null;
                 }
             }
             else if (SelectedItem == "포대")
@@ -198,9 +194,9 @@ namespace OCC.ViewModels
         {
             return SelectedItem switch
             {
-                "아군" => Brushes.Blue,
+                "아군" => Brushes.CornflowerBlue,
                 "적군" => Brushes.Red,
-                "포대" => Brushes.Green,
+                "포대" => Brushes.ForestGreen,
                 _ => Brushes.Black
             };
         }
