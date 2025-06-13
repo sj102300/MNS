@@ -18,10 +18,11 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- 좌측: 지도 및 정보 -->
-        <ui:Card Grid.Row="0" Grid.Column="0"
+        <ui:Card Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
                  Background="#23262E"
                  Margin="0,0,16,0"
                  Padding="12"
@@ -89,71 +90,95 @@
         <ui:Card Grid.Row="0" Grid.Column="1"
                  Background="#23262E"
                  Padding="24"
-                 VerticalAlignment="Center"
-                 HorizontalAlignment="Center">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="180">
-                <TextBlock Text="대상 선택"
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Foreground="#4FC3F7"
-                        Margin="10"
-                        HorizontalAlignment="Center"/>
-                <ComboBox ItemsSource="{Binding Items}" 
-                      SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
-                      Width="160"
-                      Height="40"
-                      FontSize="15"
-                      FontWeight="Bold"
-                      Margin="0,0,0,0"
-                      Background="#181A20"
-                      Foreground="#4FC3F7" 
-                      BorderBrush="#4FC3F7"
-                      Padding="10,2">
-                    <ComboBox.Resources>
-                        <!-- 라운드 테두리 -->
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="10"/>
-                        </Style>
-                        <!-- 드롭다운 아이콘 색상 -->
-                        <Style TargetType="ToggleButton">
-                            <Setter Property="Foreground" Value="#4FC3F7"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                        </Style>
-                        <!-- 드롭다운 아이템 하이라이트 -->
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Foreground" Value="#4FC3F7"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="#263238"/>
-                                    <Setter Property="Foreground" Value="#4FC3F7"/>
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#37474F"/>
-                                    <Setter Property="Foreground" Value="#4FC3F7"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ComboBox.Resources>
-                </ComboBox>
-                <TextBlock Text="{Binding SelectedItem}" 
-                    HorizontalAlignment="Center" 
-                    Margin="0,0,0,18" 
-                    FontSize="15"
-                    FontWeight="Bold"
-                    Foreground="{Binding MarkerColor}"/>
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch">
+            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="1"
+                            Orientation="Vertical"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch" >
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center" >
+                        <TextBlock Text="선택 대상 : "
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Foreground="#FFFFFF"
+                                TextAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="2"
+                                Text="{Binding SelectedItem}" 
+                                HorizontalAlignment="Center" 
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Foreground="{Binding MarkerColor}"/>
+                    </StackPanel>
+
+                    <ComboBox ItemsSource="{Binding Items}" 
+                            SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+                            FontSize="15"
+                            FontWeight="Bold"
+                            Margin="20,10,20,20"
+                            Background="#181A20"
+                            Foreground="#4FC3F7" 
+                            BorderBrush="#4FC3F7"
+                            Padding="10,2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch" >
+                        <ComboBox.Resources>
+                            <!-- 라운드 테두리 -->
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="10"/>
+                            </Style>
+                            <!-- 드롭다운 아이콘 색상 -->
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Foreground" Value="#4FC3F7"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Style>
+                            <!-- 드롭다운 아이템 하이라이트 -->
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="#4FC3F7"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#263238"/>
+                                        <Setter Property="Foreground" Value="#4FC3F7"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#37474F"/>
+                                        <Setter Property="Foreground" Value="#4FC3F7"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ComboBox.Resources>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+
+        <ui:Card Grid.Row="1" Grid.Column="1"
+                 Background="#23262E"
+                 Padding="24"
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch">
+            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
                 <ui:Button Content="저장"
-                    Command="{Binding SaveCommand}"
-                    Width="160"
-                    Height="40"
-                    Appearance="Primary"
-                    FontSize="15"
-                    FontWeight="SemiBold"
-                    Margin="10"
-                    Background="#263238"
-                    Foreground="#FFFFFF"
-                    CornerRadius="8"/>
-            </StackPanel>
+                        Command="{Binding SaveCommand}"
+                        Appearance="Primary"
+                        FontSize="30"
+                        FontWeight="Bold"
+                        Margin="20"
+                        Background="#263238"
+                        Foreground="#FFFFFF"
+                        CornerRadius="8"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch" />  
+            </Grid>
         </ui:Card>
     </Grid>
 </Page>
