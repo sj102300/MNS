@@ -3,8 +3,12 @@
 #include "UdpSender.h"
 #include "EngagementManager.h"
 
-AircraftManager::AircraftManager(TCC::Position& batteryLocation) : batteryLocation_(batteryLocation) {
-
+AircraftManager::AircraftManager() {
+	batteryLoc_ = { 0, 0, 0 }; // 초기 배터리 위치 설정
+	isRunning_ = false;
+	engagementManager_ = nullptr;
+	sender_ = nullptr;
+	workThread_ = std::thread();
 }
 
 AircraftManager::~AircraftManager() {
@@ -14,12 +18,13 @@ AircraftManager::~AircraftManager() {
 	aircrafts_.clear();       // map 자체는 자동 소멸되지만 명시적으로 비워줘도 OK
 }
 
-bool AircraftManager::init(TCC::UdpSender* sender, EngagementManager* engagementManager) {
+bool AircraftManager::init(TCC::UdpSender* sender, EngagementManager* engagementManager, TCC::Position &batteryLoc) {
 	if (sender == nullptr || engagementManager == nullptr) {
 		return false;
 	}
 	engagementManager_ = engagementManager;
 	sender_ = sender;
+	batteryLoc_ = batteryLoc;
 	return true;
 }
 
@@ -67,13 +72,15 @@ Aircraft* AircraftManager::getAircraft(std::string& aircraftId) {
 
 void AircraftManager::judgeEngagable() {
 
+	std::cout << "AircraftManager judgeEngagable() called" << std::endl;
+
 	NewAircraftWithIP newAircraftWithIp;
 
 	while (isRunning_) {
 		if (popNewAircraftQueue(newAircraftWithIp.aircraftData_)) {
 
 			if (!isExistAircraft(newAircraftWithIp.aircraftData_.aircraftId_)) {
-				addAircraft(newAircraftWithIp.aircraftData_);
+				addAircraft(newAircraftWithIp.aircraftData_); 
 			}
 
 			Aircraft* targetAircraft = aircrafts_[newAircraftWithIp.aircraftData_.aircraftId_];
@@ -82,7 +89,7 @@ void AircraftManager::judgeEngagable() {
 			if (targetAircraft->isEnemy()) {
 				/*std::cout << newAircraftWithIp.aircraftData_.aircraftId_
 					<< " is enemy aircraft. Not engageable." << std::endl;	*/
-				if (targetAircraft->hasBecomeEngageable(batteryLocation_, newAircraftWithIp.engagementStatus_, newAircraftWithIp.impactPoint_)) {
+				if (targetAircraft->hasBecomeEngageable(batteryLoc_, newAircraftWithIp.engagementStatus_)) {
 					
 					std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 					std::cout << newAircraftWithIp.aircraftData_.aircraftId_

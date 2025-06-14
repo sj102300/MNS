@@ -21,10 +21,12 @@ namespace OCC.Utils
         private static CancellationTokenSource? cts;
 
         public static event Action<string, double, double, double, uint, double, double, double> AircraftReceived;
+        public static event Action<string, string, string, double,double, double> ImpactPointReceived;
         public static event Action<string, double, double, double, uint> MissileReceived;
 
         public static void Start(ObservableCollection<AircraftWithIp> aircraftList, Dictionary<string, AircraftWithIp> aircraftLookup,
-            ObservableCollection<Missile> missileList, Dictionary<string, Missile> missileLookup)
+            ObservableCollection<Missile> missileList, Dictionary<string, Missile> missileLookup,
+            ObservableCollection<ImpactPoint> impactPointList, Dictionary<string, ImpactPoint> impactPointLookup)
         {
             cts = new CancellationTokenSource();
             var token = cts.Token;
@@ -32,8 +34,8 @@ namespace OCC.Utils
             Task.Run(() =>
             {
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.88"), 9001);        //승엽
-                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
-                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
+                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
+                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
                 using var udp = new UdpClient(ep);
 
@@ -52,6 +54,10 @@ namespace OCC.Utils
                             if (cmd == 100)
                             {
                                 ParseAircraft(data.Skip(8).ToArray());
+                            }
+                            else if(cmd == 201)
+                            {
+                                ParseLaunchCommand(data.Skip(8).ToArray());
                             }
                             else if (cmd == 300)
                             {
@@ -101,6 +107,42 @@ namespace OCC.Utils
 
             AircraftReceived?.Invoke(id, lat, lon, alt, status, ipLat, ipLon, ipAlt);
             //Debug.WriteLine($"[Aircraft] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, IP Lat: {ipLat:F6}, IP Lon: {ipLon:F6}, IP Alt: {ipAlt:F2}, Enemy: {foe == 1}, Status: {status}");
+        }
+
+        private static void ParseLaunchCommand(byte[] body)
+        {
+
+            Debug.WriteLine("발사 수신");
+
+            int offset = 0;
+
+            string launchCommandId = Encoding.ASCII.GetString(body, offset, 20).Trim('\0', ' ');
+            offset += 20;
+
+            string aircraftId = Encoding.ASCII.GetString(body, offset, 8).Trim('\0', ' ');
+            offset += 8;
+
+            string missileId = Encoding.ASCII.GetString(body, offset, 8).Trim('\0', ' ');
+            offset += 8;
+
+            double impactLat = BitConverter.ToDouble(body, offset);
+            offset += 8;
+
+            double impactLon = BitConverter.ToDouble(body, offset);
+            offset += 8;
+
+            double impactAlt = BitConverter.ToDouble(body, offset);
+            offset += 8;
+
+            ImpactPointReceived?.Invoke(launchCommandId, aircraftId, missileId, impactLat, impactLon, impactAlt);
+
+            Debug.WriteLine($"[LaunchCommand]");
+            Debug.WriteLine($"  발사명령 식별자: {launchCommandId}");
+            Debug.WriteLine($"  항공기 식별자  : {aircraftId}");
+            Debug.WriteLine($"  미사일 식별자  : {missileId}");
+            Debug.WriteLine($"  목표 위도      : {impactLat}°");
+            Debug.WriteLine($"  목표 경도      : {impactLon}°");
+            Debug.WriteLine($"  목표 고도      : {impactAlt} km");
         }
 
         private static void ParseMissile(byte[] body)

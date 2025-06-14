@@ -41,8 +41,8 @@ namespace OCC.ViewModels
             //($"{Network.TCC}", "TCC"),
             ($"{Network.MFR}", "MFR"),
             ($"{Network.ATS}", "ATS"),
-            ($"{Network.LCH}", "LCH"),
-            ($"{Network.MSS}", "MSS"),
+            //($"{Network.LCH}", "LCH"),
+            //($"{Network.MSS}", "MSS"),
         };
 
         public ScenarioLoadViewModel()
@@ -194,17 +194,19 @@ namespace OCC.ViewModels
             // 결과 집계
             if (results.All(r => r))
             {
-                // 모두 성공
-                var result = MessageBox.Show(
-                    $"[OCC] 모든 서브시스템에 시나리오({scenarioId}) 시작 신호 전송 완료",
-                    "시작 완료",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information
-                );
-                if (result == MessageBoxResult.OK)
-                {
-                    NavigateToAttackDisplayPage();
-                }
+                NavigateToAttackDisplayPage();
+
+                //// 모두 성공
+                //var result = MessageBox.Show(
+                //    $"[OCC] 모든 서브시스템에 시나리오({scenarioId}) 시작 신호 전송 완료",
+                //    "시작 완료",
+                //    MessageBoxButton.OK,
+                //    MessageBoxImage.Information
+                //);
+                //if (result == MessageBoxResult.OK)
+                //{
+                //    NavigateToAttackDisplayPage();
+                //}
             }
             else
             {

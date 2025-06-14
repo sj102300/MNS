@@ -55,7 +55,6 @@ void Aircraft::calcDirVec(const TCC::Position& newPos) {
     dirVec_.dx_ = dx / magnitude;
     dirVec_.dy_ = dy / magnitude;
 
-	//std::cout << "calcDirVec: " << "dx: " << dirVec_.dx_ << ", dy: " << dirVec_.dy_ << std::endl;
     return;
 }
 
@@ -63,14 +62,14 @@ void Aircraft::getImpactPoint(TCC::Position &impactPoint) {
     impactPoint = impactPoint_;
 }
 
-void Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
+bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
     double vt = 1.0; // 항공기 속도 (km/s)
     double vm = 2.0; // 미사일 속도 (km/s)
 
     if (dirVec_.isZeroVector()) {
         impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
 		std::cout << "impossible to intercept: zero direction vector" << std::endl;
-        return;
+        return false;
     }
 
     // 1. 위치 평면 좌표로 변환
@@ -87,7 +86,7 @@ void Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
     if (discriminant < 0) {
 		std::cout << "impossible to intercept: discriminant < 0" << std::endl;
         impactPoint_ = { -200, -200, 10 };   // 수학적으로 요격 불가능
-        return;
+        return false;
     }
 
     double sqrtD = std::sqrt(discriminant);
@@ -97,7 +96,7 @@ void Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
     if (t < 0) {
 		std::cout << "impossible to intercept: t < 0" << std::endl;
         impactPoint_ = { -200, -200, 10 };       //과거에 요격했어야함.
-        return;
+        return false;
     }
 
     // 4. Impact point 계산 (평면 x,y)
@@ -106,32 +105,24 @@ void Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
 
     // 5. 위경도로 되돌리기
     impactPoint_ = xyToLatLon(batteryLoc, impact_x, impact_y, pos_.altitude_);
+
+    return true;
 }
 
 //return value: NotEngagable -> Engageable 상태로 변화했으면 true. EngagementManager에게 알려주어야 할 경우에만 push
-bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus, TCC::Position& impactPoint) {
+//교전 가능 범위내로 들어왔는지만 판단.
+bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus) {
 
     engagementStatus = (unsigned int)status_;
-    //if (status_ == EngagementStatus::Engaging || status_ == EngagementStatus::Destroyed) {
-    //    return false;
-    //}
-
-    calcImpactPoint(batteryLoc);
-    impactPoint = impactPoint_;
-
-	//std::cout << "aircraftId: " << aircraftId_ 
-	//	<<" pos: (" << pos_.latitude_ << ", " << pos_.longitude_ << ", " << pos_.altitude_ << ")"
-	//	<< " dirVec: (" << dirVec_.dx_ << ", " << dirVec_.dy_ << ")"
-	//	<< " isEnemy: " << (isEnemy_ ? "true" : "false")
-	//	<< " status: " << status_
-	//	<< " impactPoint: (" << impactPoint_.latitude_ << ", " << impactPoint_.longitude_ << ", " << impactPoint_.altitude_ << ")"
-	//	<< std::endl;
+    if (status_ == EngagementStatus::Engaging || status_ == EngagementStatus::Destroyed) {
+        return false; // 이미 교전 중이거나 격추된 상태
+    }
 
     // 위도와 경도를 라디안으로 변환
     double lat1 = batteryLoc.latitude_ * DEG_TO_RAD;
     double lon1 = batteryLoc.longitude_ * DEG_TO_RAD;
-    double lat2 = impactPoint_.latitude_ * DEG_TO_RAD;
-    double lon2 = impactPoint_.longitude_ * DEG_TO_RAD;
+    double lat2 = pos_.latitude_ * DEG_TO_RAD;
+    double lon2 = pos_.longitude_ * DEG_TO_RAD;
 
     // Haversine 거리 계산
     double dLat = lat2 - lat1;
@@ -145,11 +136,11 @@ bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& enga
     double distanceKm = EARTH_RADIUS_KM * c;
 
     // 100km 이내, 교전 가능
-    if (distanceKm <= 100.0) {
+    if (distanceKm <= 130.0) {
         if (status_ == EngagementStatus::NotEngageable) {       //교전 불가능이었다가 교전 가능범위 내로 진입한 상태
             status_ = EngagementStatus::Engageable;
 			engagementStatus = (unsigned int)status_;
-			//std::cout << "Aircraft has become engageable: " << aircraftId_ << std::endl;
+			std::cout << "Aircraft has become engageable: " << aircraftId_ << std::endl;
 			return true; // 교전 가능 상태로 변경됨
         }   
         else {             // 이미 교전 가능 상태이므로 변경 없음

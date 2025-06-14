@@ -31,6 +31,7 @@ using GMap.NET;
 using System.Collections.ObjectModel;
 using GMap.NET.WindowsPresentation;
 using System.Windows.Shapes;
+using System.ComponentModel.Design;
 
 
 namespace OCC.ViewModels
@@ -59,7 +60,8 @@ namespace OCC.ViewModels
 
         public ObservableCollection<AircraftWithIp> AircraftList { get; } = new();
         private readonly Dictionary<string, AircraftWithIp> aircraftLookup = new();  // 빠른 검색을 위해
-
+        public ObservableCollection<ImpactPoint> ImpactPointList { get; } = new();
+        private readonly Dictionary<string, ImpactPoint> impactPointLookup = new();  // 빠른 검색을 위해
         public ObservableCollection<Missile> MissileList { get; } = new();
         private readonly Dictionary<string, Missile> missileLookup = new(); // 빠른 검색을 위해
 
@@ -69,7 +71,7 @@ namespace OCC.ViewModels
         public string ChangeModeText => FireMode == FireModeType.Auto ? "자동 발사 모드 OFF" : "자동 발사 모드 ON";
         public Brush ChangeModeButtonBackground => FireMode == FireModeType.Auto ? Brushes.LightGray : Brushes.Green;
 
-        private static string commandId = "MF-2024052812304500"; // 예시 발사 명령 식별자
+        //private static string commandId = "MF-2024052812304500"; // 예시 발사 명령 식별자
 
         public ICommand QuitCommand { get; }
         public ICommand ChangeModeCommand { get; }
@@ -89,7 +91,7 @@ namespace OCC.ViewModels
             );
 
             ManualFireCommand = new RelayCommand<object>(
-                execute: _ => SendManualFirePacketAsync(commandId, SelectedAircraft),
+                execute: _ => SendManualFirePacketAsync(SelectedAircraft),
                 canExecute: _ => true // 필요시 조건 추가
             );
 
@@ -126,7 +128,7 @@ namespace OCC.ViewModels
                 List<byte> packet = new List<byte>();
                 packet.AddRange(BitConverter.GetBytes((UInt32)CommandCode));
                 packet.AddRange(BitConverter.GetBytes((UInt32)BodyLength));
-                UInt32 modeValue = (FireMode == Models.FireMode.FireModeType.Auto) ? 0u : 1u;
+                UInt32 modeValue = (FireMode == Models.FireMode.FireModeType.Auto) ? 1u : 0u;
                 packet.AddRange(BitConverter.GetBytes(modeValue));
                 byte[] buffer = packet.ToArray();
 
@@ -210,8 +212,16 @@ namespace OCC.ViewModels
                 return null;
             }
         }
+        private static string GenerateLaunchCommandId()
+        {
+            // 현재 날짜 및 시간 가져오기
+            DateTime now = DateTime.Now;
 
-        private void SendManualFirePacketAsync(string commandId, AircraftWithIp aircraft)
+            // "MF-" + yyyyMMddHHmmssfff 형식으로 포맷
+            return "MF-" + now.ToString("yyyyMMddHHmmssfff");
+        }
+
+        private void SendManualFirePacketAsync(AircraftWithIp aircraft)
         {
             if(aircraft == null)
             {
@@ -220,6 +230,7 @@ namespace OCC.ViewModels
             }
             Task.Run(async () =>
             {
+                string commandId = GenerateLaunchCommandId();
                 const int CommandCode = 201;
                 const int BodyLength = 28;
                 const int RetryCount = 10;
@@ -312,7 +323,8 @@ namespace OCC.ViewModels
         {
             UdpReceiver.AircraftReceived += OnAircraftReceived;
             UdpReceiver.MissileReceived += OnMissileReceived;
-            UdpReceiver.Start(AircraftList, aircraftLookup, MissileList, missileLookup);
+            UdpReceiver.ImpactPointReceived += OnImpactPointReceived;
+            UdpReceiver.Start(AircraftList, aircraftLookup, MissileList, missileLookup, ImpactPointList, impactPointLookup);
         }
 
         private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
@@ -338,6 +350,30 @@ namespace OCC.ViewModels
                     };
                     MissileList.Add(newMissile);
                     missileLookup[id] = newMissile;
+                }
+            });
+        }
+        private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (impactPointLookup.TryGetValue(commandId, out var ip))
+                {
+                    ip.Latitude = lat;
+                    ip.Longitude = lon;
+                    ip.Altitude = alt;
+                }
+                else
+                {
+                    // 새로운 미사일 정보가 들어온 경우
+                    var newIP = new ImpactPoint(commandId)
+                    {
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                    };
+                    ImpactPointList.Add(newIP);
+                    impactPointLookup[commandId] = newIP;
                 }
             });
         }
@@ -387,8 +423,8 @@ namespace OCC.ViewModels
             //($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
             ($"{Network.MFR}", "MFR"),
-            ($"{Network.MSS}", "MSS"),
-            ($"{Network.LCH}", "LCH"),
+            //($"{Network.MSS}", "MSS"),
+            //($"{Network.LCH}", "LCH"),
         };
         private async void Quit()
         {

@@ -85,6 +85,32 @@ const int TCC::UdpSender::serializeAircraftSender(char* buffer, AircraftManager:
     return 64; // 총 직렬화된 body바이트 수
 }
 
+bool TCC::UdpSender::sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
+
+    char* buffer = new char[100];
+    //헤더 붙이기
+    //commandCode 201, bodyLength 60
+    int headerSize = serializeHeader(buffer, 201, 60);
+    int bodySize = serializeLaunchCommandBody(buffer + headerSize, commandId, aircraftId, missileId, impactPoint);
+
+    //ACK구현하기..
+    if (sendByteData(buffer, headerSize + bodySize) < 0) {
+        return false;
+    }
+
+    return true;
+
+}
+
+const int TCC::UdpSender::serializeLaunchCommandBody(char* buffer, std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
+	std::memset(buffer + 0, 0, 20);
+	std::memcpy(buffer + 0, commandId.c_str(), 20);
+	std::memcpy(buffer + 20, aircraftId.c_str(), 8);
+	std::memcpy(buffer + 28, missileId.c_str(), 8);
+	std::memcpy(buffer + 36, &impactPoint, sizeof(TCC::Position));
+	return 60; // 총 직렬화된 body바이트 수
+}
+
 bool TCC::UdpSender::sendMissileData(UdpMulticastReceiver::MissileMSG& data) {
 
     char buffer[44];
@@ -116,13 +142,13 @@ const int TCC::UdpSender::serializeMissileSender(char* buffer, UdpMulticastRecei
     return 36; // 총 직렬화된 body바이트 수
 }
 
-const int TCC::UdpSender::serializeEmergencySender(char* buffer, std::string commandId, std::string missileId) {
-    std::memset(buffer + 0, 0, 20);
-    std::memcpy(buffer + 0, &commandId, 20);
-    std::memcpy(buffer + 20, &missileId, 8);
-
-    return 28; // 총 직렬화된 body바이트 수
-}
+//const int TCC::UdpSender::serializeEmergencySender(char* buffer, std::string commandId, std::string missileId) {
+//    std::memset(buffer + 0, 0, 20);
+//    std::memcpy(buffer + 0, &commandId, 20);
+//    std::memcpy(buffer + 20, &missileId, 8);
+//
+//    return 28; // 총 직렬화된 body바이트 수
+//}
 
 //bool TCC::UdpSender::sendEmergencyDestroy(std::string commandId, std::string missileId) {
 //

@@ -23,7 +23,7 @@ public:
 	EngagementManager();
 	void start();
 	void stop();
-	bool init(TCC::UdpSender* sender, AircraftManager* aircraftManager, TCC::UdpMulticastSender* multisender, MissileManager* missileManager);
+	bool init(TCC::UdpSender* sender, AircraftManager* aircraftManager, TCC::UdpMulticastSender* multisender, MissileManager* missileManager, TCC::Position &batteryLoc);
 	bool engagementSuccess(std::string targetAircraftId, std::string targetMissileId);
 	bool isHitTarget(std::string& missileId);
 	unsigned int changeMode(unsigned int mode);
@@ -63,6 +63,7 @@ private:
 	AircraftManager* aircraftManager_;
 	std::unordered_map<std::string, std::string> missileToAircraft_; // 미사일 : 키 , 항공기 : value
 	std::thread workThread_;
+	TCC::Position batteryLoc_;
 
 	std::atomic<unsigned int> mode_;
 	EngagableAircraftQueue engagableAircrafts_;

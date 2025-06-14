@@ -15,7 +15,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.Background>
-            <ImageBrush ImageSource="C:\Users\user\Documents\MNS\OCC\OCC\images\background-img.png"/>
+            <ImageBrush ImageSource="C:\Users\user\source\repos\MNS\OCC\OCC\images\background-img.png"/>
         </Grid.Background>
 
         <!-- 흐릿한 회색 오버레이 -->

@@ -29,8 +29,11 @@ namespace TCC{
         bool sendMissileData(UdpMulticastReceiver::MissileMSG& data);
         const int serializeMissileSender(char* buffer, UdpMulticastReceiver::MissileMSG& data);
 
-        bool sendEmergencyDestroy(std::string commnadId, std::string missileId);
-        const int serializeEmergencySender(char* buffer, std::string commnadId, std::string missileId);
+        /*bool sendEmergencyDestroy(std::string commnadId, std::string missileId);
+        const int serializeEmergencySender(char* buffer, std::string commnadId, std::string missileId);*/
+
+		bool sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint);
+		const int serializeLaunchCommandBody(char* buffer, std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint);
 
     private:
         std::string ip_;

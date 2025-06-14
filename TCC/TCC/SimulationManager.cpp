@@ -119,12 +119,12 @@ bool SimulationManager::createObjects(TCC::Position& batteryLocation) {
 	multiReceiver_ = new TCC::UdpMulticastReceiver("239.0.0.1", 9000);		//192.168.2.190ìœ¼ë¡œ ìˆ˜ì‹ 
 	udpSender_ = new TCC::UdpSender("192.168.2.200", 9000);					//OCC êµì „ë§
 	multiSender_ = new TCC::UdpMulticastSender("239.0.0.1", 9000);			//192.168.2.194ë¡œ ì†¡ì‹ 
-	aircraftManager_ = new AircraftManager(batteryLocation);
+	aircraftManager_ = new AircraftManager();
 	engagementManager_ = new EngagementManager();
 	missileManager_ = new MissileManager(udpSender_, engagementManager_);
 	udpReceiver_ = new TCC::UdpReceiver("192.168.2.189", 9999);				//TCC êµì „ë§
 
-	if (!aircraftManager_->init(udpSender_, engagementManager_)) {
+	if (!aircraftManager_->init(udpSender_, engagementManager_, batteryLocation)) {
 		std::cout << "aircraftManager init() Failed\n";
 		return false;
 	}
@@ -136,7 +136,7 @@ bool SimulationManager::createObjects(TCC::Position& batteryLocation) {
 		std::cout << "udpSender init() Failed\n";
 		return false;
 	}
-	if (!engagementManager_->init(udpSender_, aircraftManager_, multiSender_, missileManager_)) {
+	if (!engagementManager_->init(udpSender_, aircraftManager_, multiSender_, missileManager_, batteryLocation)) {
 		std::cout << "engagement manager init() Failed\n";
 		return false;
 	}

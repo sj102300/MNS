@@ -50,6 +50,28 @@ namespace OCC.Views
             InitializeMap();
             _viewModel.AircraftList.CollectionChanged += AircraftList_CollectionChanged;
             _viewModel.MissileList.CollectionChanged += MissileList_CollectionChanged;
+            _viewModel.ImpactPointList.CollectionChanged += ImpactPointList_CollectionChanged;
+        }
+
+        private void ImpactPointList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (ImpactPoint ip in e.NewItems)
+                {
+                    AddIpMarker(ip);
+                    ip.PropertyChanged += ImpactPoint_PropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (ImpactPoint ip in e.OldItems)
+                {
+                    RemoveIpMarker(ip);
+                    ip.PropertyChanged -= ImpactPoint_PropertyChanged;
+                }
+            }
         }
 
         private void AircraftList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -59,7 +81,6 @@ namespace OCC.Views
                 foreach (AircraftWithIp aircraft in e.NewItems)
                 {
                     AddAircraftMarker(aircraft);
-                    AddIpMarker(aircraft);
                     aircraft.PropertyChanged += Aircraft_PropertyChanged;
                 }
             }
@@ -84,9 +105,16 @@ namespace OCC.Views
             {
                 marker.Position = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
             }
-            if (_ipMarkers.TryGetValue(aircraft.Id, out var ipmarker))
+        }
+        private void ImpactPoint_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is not ImpactPoint ip) return;
+            if (e.PropertyName != nameof(ImpactPoint.Latitude) && e.PropertyName != nameof(ImpactPoint.Longitude))
+                return;
+
+            if (_ipMarkers.TryGetValue(ip.Id, out var marker))
             {
-                ipmarker.Position = new PointLatLng(aircraft.IpLatitude, aircraft.IpLongitude);
+                marker.Position = new PointLatLng(ip.Latitude, ip.Longitude);
             }
         }
 
@@ -106,9 +134,9 @@ namespace OCC.Views
             _aircraftMarkers[aircraft.Id] = marker;
         }
 
-        private void AddIpMarker(AircraftWithIp aircraft)
+        private void AddIpMarker(ImpactPoint ip)
         {
-            var marker = new GMapMarker(new PointLatLng(aircraft.IpLatitude, aircraft.IpLongitude))
+            var marker = new GMapMarker(new PointLatLng(ip.Latitude, ip.Longitude))
             {
                 Shape = new Ellipse
                 {
@@ -119,7 +147,7 @@ namespace OCC.Views
                 Offset = new Point(-5, -5)
             };
             mapControl.Markers.Add(marker);
-            _ipMarkers[aircraft.Id] = marker;
+            _ipMarkers[ip.Id] = marker;
         }
 
         private void RemoveAircraftMarker(AircraftWithIp aircraft)
@@ -129,10 +157,14 @@ namespace OCC.Views
                 mapControl.Markers.Remove(marker);
                 _aircraftMarkers.Remove(aircraft.Id);
             }
-            if (_ipMarkers.TryGetValue(aircraft.Id, out var ipmarker))
+        }
+
+        private void RemoveIpMarker(ImpactPoint ip)
+        {
+            if (_ipMarkers.TryGetValue(ip.Id, out var ipmarker))
             {
                 mapControl.Markers.Remove(ipmarker);
-                _ipMarkers.Remove(aircraft.Id);
+                _ipMarkers.Remove(ip.Id);
             }
         }
 

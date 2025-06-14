@@ -4,7 +4,7 @@
 #include "UdpMulticastSender.h"
 
 EngagementManager::EngagementManager() : sender_(nullptr), multisender_(nullptr), aircraftManager_(nullptr), missileManager_(nullptr),
-isRunning_(false), isChanged_(false), mode_(Mode::Auto) {
+isRunning_(false), isChanged_(false), mode_(Mode::Auto), batteryLoc_({ -200, -200, 10 }) {
 
 }
 
@@ -18,13 +18,14 @@ EngagementManager::~EngagementManager() {
 	missileManager_ = nullptr;
 }
 
-bool EngagementManager::init(TCC::UdpSender* sender, AircraftManager* aircraftManager, TCC::UdpMulticastSender* multisender, MissileManager* missileManager) {
+bool EngagementManager::init(TCC::UdpSender* sender, AircraftManager* aircraftManager, TCC::UdpMulticastSender* multisender, MissileManager* missileManager, TCC::Position&batteryLoc) {
 	if (sender == nullptr || aircraftManager == nullptr || multisender == nullptr || missileManager == nullptr)
 		return false;
 	sender_ = sender;
 	aircraftManager_ = aircraftManager;
 	multisender_ = multisender;
 	missileManager_ = missileManager;
+	batteryLoc_ = batteryLoc;
 	return true;
 }
 
@@ -207,18 +208,27 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 		return false;
 	}
 
-	TCC::Position impactPoint;
 	if (!aircraft->isEngagable()) {
 		std::cout << "--------------------------------" << std::endl;
 		std::cout << "Aircraft is notEngageable" << std::endl;
-		aircraft->getImpactPoint(impactPoint);
-		std::cout << "lati: " << impactPoint.latitude_
-			<< "longi: " << impactPoint.longitude_
-			<< "alti: " << impactPoint.altitude_
-			<< std::endl;
 		std::cout << "--------------------------------" << std::endl;
 		return false;		//교전 불가능 한 항공기임.
 	}
+
+	if (!aircraft->calcImpactPoint(batteryLoc_)) {
+		std::cout << "--------------------------------" << std::endl;
+		std::cout << "Failed to calculate impact point." << std::endl;
+		std::cout << "--------------------------------" << std::endl;
+		aircraft->updateStatus(Aircraft::EngagementStatus::NotEngageable);
+		return false;
+	};
+
+	TCC::Position impactPoint;
+	aircraft->getImpactPoint(impactPoint);
+	std::cout << "lati: " << impactPoint.latitude_
+		<< "longi: " << impactPoint.longitude_
+		<< "alti: " << impactPoint.altitude_
+		<< std::endl;
 
 	std::string missileId;
 	if (!mappingMissileToAircraft(aircraftId, missileId)) {
@@ -229,9 +239,9 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 	};
 
 	unsigned int engagementStatus = aircraft->updateStatus(Aircraft::EngagementStatus::Engaging);
-	aircraft->getImpactPoint(impactPoint);
 
 	multisender_->sendLaunchCommand(commandId, aircraftId, missileId, impactPoint);
+	sender_->sendLaunchCommand(commandId, aircraftId, missileId, impactPoint);
 
 	std::cout << "==================================" << std::endl;
 	std::cout << "launchMissile(): " << commandId << " " << aircraftId << " " << missileId <<" success" << std::endl;
