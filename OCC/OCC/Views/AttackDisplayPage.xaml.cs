@@ -120,6 +120,7 @@ namespace OCC.Views
 
         private void AddAircraftMarker(AircraftWithIp aircraft)
         {
+            double markerSize = 20; 
             var marker = new GMapMarker(new PointLatLng(aircraft.Latitude, aircraft.Longitude))
             {
                 Shape = new Ellipse
@@ -128,7 +129,7 @@ namespace OCC.Views
                     Height = 16,
                     Fill = Brushes.Red
                 },
-                Offset = new Point(-5, -5)
+                Offset = new Point(-markerSize / 2, -markerSize / 2)
             };
             mapControl.Markers.Add(marker);
             _aircraftMarkers[aircraft.Id] = marker;
