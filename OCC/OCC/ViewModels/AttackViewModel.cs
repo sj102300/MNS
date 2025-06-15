@@ -338,6 +338,12 @@ namespace OCC.ViewModels
                     };
                     MissileList.Add(newMissile);
                     missileLookup[id] = newMissile;
+
+                    // missile_id 기준으로 MissileList 정렬
+                    var sorted = MissileList.OrderBy(m => m.Id).ToList();
+                    MissileList.Clear();
+                    foreach (var m in sorted)
+                        MissileList.Add(m);
                 }
             });
         }
