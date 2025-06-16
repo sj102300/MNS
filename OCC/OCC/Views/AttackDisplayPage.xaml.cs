@@ -80,7 +80,7 @@ namespace OCC.Views
             {
                 foreach (AircraftWithIp aircraft in e.NewItems)
                 {
-                    AddAircraftMarker(aircraft);
+                    AddImageAircraftMarker(aircraft); // 이미지 마커로 변경된 상태(테스트 필요)
                     aircraft.PropertyChanged += Aircraft_PropertyChanged;
                 }
             }
@@ -118,9 +118,10 @@ namespace OCC.Views
             }
         }
 
+        //기존 항공기 마커 추가 메서드
         private void AddAircraftMarker(AircraftWithIp aircraft)
         {
-            double markerSize = 20; 
+            double markerSize = 20;
             var marker = new GMapMarker(new PointLatLng(aircraft.Latitude, aircraft.Longitude))
             {
                 Shape = new Ellipse
@@ -134,6 +135,58 @@ namespace OCC.Views
             mapControl.Markers.Add(marker);
             _aircraftMarkers[aircraft.Id] = marker;
         }
+
+        //항공기 이미지 마커 변경 메서드
+        private void AddImageAircraftMarker(AircraftWithIp aircraft)
+        {
+            double markerSize = 24;  // 아이콘 크기 조정
+
+            // Grid로 이미지와 텍스트를 겹치게 배치
+            var markerGrid = new Grid
+            {
+                Width = markerSize,
+                Height = markerSize + 16 // 텍스트 공간 확보
+            };
+
+            // 항공기 이미지
+            var image = new Image
+            {
+                Width = markerSize,
+                Height = markerSize,
+                Source = new BitmapImage(new Uri(
+                    @"C:\Users\user\Documents\MNS\OCC\OCC\images\Aircraft.png",
+                    UriKind.Absolute)),
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            markerGrid.Children.Add(image);
+
+            // 식별자 텍스트 (아래쪽에 표시)
+            var text = new TextBlock
+            {
+                Text = aircraft.Id,
+                Foreground = Brushes.White,
+                FontWeight = FontWeights.Bold,
+                FontSize = 12,
+                Background = new SolidColorBrush(Color.FromArgb(180, 30, 30, 30)),
+                Padding = new Thickness(2, 0, 2, 0),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                TextAlignment = TextAlignment.Center
+            };
+            markerGrid.Children.Add(text);
+
+            var marker = new GMapMarker(new PointLatLng(aircraft.Latitude, aircraft.Longitude))
+            {
+                Shape = markerGrid,
+                Offset = new Point(-markerSize / 2, -markerSize / 2)
+            };
+
+            mapControl.Markers.Add(marker);
+            _aircraftMarkers[aircraft.Id] = marker;
+        }
+
 
         private void AddIpMarker(ImpactPoint ip)
         {
@@ -175,7 +228,7 @@ namespace OCC.Views
             {
                 foreach (Missile missile in e.NewItems)
                 {
-                    AddMissileMarker(missile);
+                    AddImageMissileMarker(missile); // 이미지 마커로 변경된 상태(테스트 필요)
                     missile.PropertyChanged += Missile_PropertyChanged;
                 }
             }
@@ -202,6 +255,7 @@ namespace OCC.Views
             }
         }
 
+        //기존 미사일 마커 메서드
         private void AddMissileMarker(Missile missile)
         {
             var marker = new GMapMarker(new PointLatLng(missile.Latitude, missile.Longitude))
@@ -218,6 +272,57 @@ namespace OCC.Views
             mapControl.Markers.Add(marker);
             _missileMarkers[missile.Id] = marker;
         }
+
+        //미사일 이미지 마커 변경 메서드
+        private void AddImageMissileMarker(Missile missile)
+        {
+            double markerSize = 24;  // 마커 이미지 크기 조정
+            string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\missile.png";
+
+            // Grid로 이미지와 텍스트를 겹치게 배치
+            var markerGrid = new Grid
+            {
+                Width = markerSize,
+                Height = markerSize + 16 // 텍스트 공간 확보
+            };
+
+            // 미사일 이미지
+            var image = new Image
+            {
+                Width = markerSize,
+                Height = markerSize,
+                Source = new BitmapImage(new Uri(imgPath, UriKind.Absolute)),
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            markerGrid.Children.Add(image);
+
+            // 식별자 텍스트 (아래쪽에 표시)
+            var text = new TextBlock
+            {
+                Text = missile.Id,
+                Foreground = Brushes.White,
+                FontWeight = FontWeights.Bold,
+                FontSize = 12,
+                Background = new SolidColorBrush(Color.FromArgb(180, 30, 30, 30)),
+                Padding = new Thickness(2, 0, 2, 0),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                TextAlignment = TextAlignment.Center
+            };
+            markerGrid.Children.Add(text);
+
+            var marker = new GMapMarker(new PointLatLng(missile.Latitude, missile.Longitude))
+            {
+                Shape = markerGrid,
+                Offset = new Point(-markerSize / 2, -markerSize / 2)
+            };
+
+            mapControl.Markers.Add(marker);
+            _missileMarkers[missile.Id] = marker;
+        }
+
 
         private void RemoveMissileMarker(Missile missile)
         {
