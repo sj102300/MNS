@@ -4,11 +4,17 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:OCC.Views"
+      xmlns:conv="clr-namespace:OCC.Converters"
+      xmlns:wgif="http://wpfanimatedgif.codeplex.com"
       xmlns:ui="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
       mc:Ignorable="d" 
       Background="#1A1D23"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MissileLogPage">
+
+    <Page.Resources>
+        <conv:VisualStateToGifConverter x:Key="VisualStateToGifConverter"/>
+    </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -45,24 +51,31 @@
             </Grid.ColumnDefinitions>
 
             <!-- 왼쪽 3/4 영역: 3x2 표 -->
-            <Grid Grid.Column="0" Margin="20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <!-- 6칸 예시 (내용은 필요에 따라 채우세요) -->
-                <Border Grid.Row="0" Grid.Column="0" BorderBrush="Gray" BorderThickness="1"/>
-                <Border Grid.Row="0" Grid.Column="1" BorderBrush="Gray" BorderThickness="1"/>
-                <Border Grid.Row="0" Grid.Column="2" BorderBrush="Gray" BorderThickness="1"/>
-                <Border Grid.Row="1" Grid.Column="0" BorderBrush="Gray" BorderThickness="1"/>
-                <Border Grid.Row="1" Grid.Column="1" BorderBrush="Gray" BorderThickness="1"/>
-                <Border Grid.Row="1" Grid.Column="2" BorderBrush="Gray" BorderThickness="1"/>
-            </Grid>
+            <ListView Grid.Column="0"
+                      ItemsSource="{Binding MissileList}"
+                      Margin="20"
+                      HorizontalContentAlignment="Stretch"
+                      BorderThickness="0">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="3" Rows="2"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" Margin="6" Padding="5" Width="140" Height="120">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="13" TextAlignment="Center" />
+                                <TextBlock Text="{Binding MissileStatusText}" FontSize="12" Margin="0,2,0,2" TextAlignment="Center"/>
+                                <Image Width="60" Height="60"
+                                       Loaded="Image_Loaded"
+                                       Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}}"
+                                       Stretch="UniformToFill"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
 
             <!-- 오른쪽 1/4 영역: 필요시 컨텐츠 추가 -->
             <StackPanel Grid.Column="1" Margin="12"

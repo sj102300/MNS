@@ -86,8 +86,8 @@ namespace OCC.ViewModels
             //($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
             ($"{Network.MFR}", "MFR"),
-            //($"{Network.MSS}", "MSS"),
-            //($"{Network.LCH}", "LCH"),
+            ($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
         };
 
         private async Task<bool> SendQuitSignalAsync(string targetUrl, string subsystemId)

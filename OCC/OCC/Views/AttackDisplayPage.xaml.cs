@@ -154,7 +154,7 @@ namespace OCC.Views
                 Width = markerSize,
                 Height = markerSize,
                 Source = new BitmapImage(new Uri(
-                    @"C:\Users\user\Documents\MNS\OCC\OCC\images\Aircraft.png",
+                    @"C:\Users\user\source\repos\MnS_LSY\OCC\OCC\images\Aircraft.png",
                     UriKind.Absolute)),
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 VerticalAlignment = VerticalAlignment.Top,
@@ -277,7 +277,7 @@ namespace OCC.Views
         private void AddImageMissileMarker(Missile missile)
         {
             double markerSize = 24;  // 마커 이미지 크기 조정
-            string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\missile.png";
+            string imgPath = @"C:\Users\user\source\repos\MnS_LSY\OCC\OCC\images\missile.png";
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid

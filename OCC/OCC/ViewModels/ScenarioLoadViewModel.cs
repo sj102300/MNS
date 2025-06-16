@@ -37,12 +37,12 @@ namespace OCC.ViewModels
         // 서브시스템 정보
         private readonly List<(string url, string id)> subsystems = new()
         {
-            //($"http://192.168.2.77:8080", "TCC"),
-            ($"{Network.TCC}", "TCC"),
+            ($"http://192.168.2.66:8080", "TCC"),
+            //($"{Network.TCC}", "TCC"),
             ($"{Network.MFR}", "MFR"),
             ($"{Network.ATS}", "ATS"),
-            //($"{Network.LCH}", "LCH"),
-            //($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
+            ($"{Network.MSS}", "MSS"),
         };
 
         public ScenarioLoadViewModel()
