@@ -371,7 +371,7 @@ namespace OCC.ViewModels
                 }
                 else
                 {
-                    // 새로운 미사일 정보가 들어온 경우
+                    // 새로운 정보가 들어온 경우
                     var newIP = new ImpactPoint(commandId)
                     {
                         Latitude = lat,
@@ -384,7 +384,7 @@ namespace OCC.ViewModels
             });
         }
 
-        private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, double iplat, double iplon, double ipalti)
+        private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -394,6 +394,7 @@ namespace OCC.ViewModels
                     ac.Longitude = lon;
                     ac.Altitude = alt;
                     ac.Status = status;
+                    ac.Foe = foe;
                     ac.IpLatitude = iplat;
                     ac.IpLongitude = iplon;
                     ac.IpAltitude = ipalti;
@@ -407,6 +408,7 @@ namespace OCC.ViewModels
                         Longitude = lon,
                         Altitude = alt,
                         Status = status,
+                        Foe = foe,
                         IpLatitude = iplat,
                         IpLongitude = iplon,
                         IpAltitude = ipalti
@@ -429,8 +431,8 @@ namespace OCC.ViewModels
             ($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
             ($"{Network.MFR}", "MFR"),
-            //($"{Network.MSS}", "MSS"),
-            //($"{Network.LCH}", "LCH"),
+            ($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
         };
         private async void Quit()
         {
@@ -610,7 +612,7 @@ namespace OCC.ViewModels
                     {
                         //할거없나?
                         Debug.WriteLine(FireMode);
-                        MessageBox.Show($"ACK 수신 → 비상 폭파 명령 송신 완료: {missileId}");
+                        //MessageBox.Show($"ACK 수신 → 비상 폭파 명령 송신 완료: {missileId}");
                     });
                 }
                 else
