@@ -20,7 +20,7 @@ namespace OCC.Utils
         private static UdpClient? udp;
         private static CancellationTokenSource? cts;
 
-        public static event Action<string, double, double, double, uint, double, double, double> AircraftReceived;
+        public static event Action<string, double, double, double, uint, uint, double, double, double> AircraftReceived;
         public static event Action<string, string, string, double,double, double> ImpactPointReceived;
         public static event Action<string, double, double, double, uint> MissileReceived;
 
@@ -99,13 +99,13 @@ namespace OCC.Utils
             double lat = BitConverter.ToDouble(body, 8);
             double lon = BitConverter.ToDouble(body, 16);
             double alt = BitConverter.ToDouble(body, 24);
-            uint foe = BitConverter.ToUInt32(body, 32);
             uint status = BitConverter.ToUInt32(body, 36);
+            uint foe = BitConverter.ToUInt32(body, 32);
             double ipLat = BitConverter.ToDouble(body, 40);
             double ipLon = BitConverter.ToDouble(body, 48);
             double ipAlt = BitConverter.ToDouble(body, 56);
 
-            AircraftReceived?.Invoke(id, lat, lon, alt, status, ipLat, ipLon, ipAlt);
+            AircraftReceived?.Invoke(id, lat, lon, alt, status, foe, ipLat, ipLon, ipAlt);
             //Debug.WriteLine($"[Aircraft] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, IP Lat: {ipLat:F6}, IP Lon: {ipLon:F6}, IP Alt: {ipAlt:F2}, Enemy: {foe == 1}, Status: {status}");
         }
 
