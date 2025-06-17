@@ -36,6 +36,10 @@ namespace OCC.Views
         private readonly Dictionary<string, GMapMarker> _aircraftMarkers = new();
         private readonly Dictionary<string, GMapMarker> _ipMarkers = new();
         private readonly Dictionary<string, GMapMarker> _missileMarkers = new();
+        // 방향각을 계산할 때 사용
+        private readonly Dictionary<string, PointLatLng> _missilePrevPositions = new();
+        private readonly Dictionary<string, PointLatLng> _aircraftPrevPositions = new();
+
         private GMapMarker _batteryMarker;
         private string _scenarioId;
 
@@ -103,6 +107,24 @@ namespace OCC.Views
 
             if (_aircraftMarkers.TryGetValue(aircraft.Id, out var marker))
             {
+                // 이전 위치 가져오기
+                if (_aircraftPrevPositions.TryGetValue(aircraft.Id, out var prevPos))
+                {
+                    // bearing 계산 전에 이전 위치와 현재 위치가 다를 때만
+                    if (aircraft.Latitude != prevPos.Lat || aircraft.Longitude != prevPos.Lng)
+                    {
+                        double angle = CalculateBearing(prevPos.Lat, prevPos.Lng, aircraft.Latitude, aircraft.Longitude);
+                        RotateMarkerImage(marker, angle + 90);
+                        // bearing 계산 후에만 위치 갱신
+                        _aircraftPrevPositions[aircraft.Id] = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
+                    }
+                }
+                else
+                {
+                    // 최초 진입 시 이전 위치 등록만
+                    _aircraftPrevPositions[aircraft.Id] = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
+                }
+
                 marker.Position = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
             }
         }
@@ -115,6 +137,30 @@ namespace OCC.Views
             if (_ipMarkers.TryGetValue(ip.Id, out var marker))
             {
                 marker.Position = new PointLatLng(ip.Latitude, ip.Longitude);
+            }
+        }
+        
+        //방향각 계산 함수
+        private double CalculateBearing(double lat1, double lon1, double lat2, double lon2)
+        {
+            // 위도, 경도를 라디안으로 변환
+            double radLat1 = lat1 * Math.PI / 180.0;
+            double radLat2 = lat2 * Math.PI / 180.0;
+            double dLon = (lon2 - lon1) * Math.PI / 180.0;
+
+            double y = Math.Sin(dLon) * Math.Cos(radLat2);
+            double x = Math.Cos(radLat1) * Math.Sin(radLat2) -
+                       Math.Sin(radLat1) * Math.Cos(radLat2) * Math.Cos(dLon);
+            double bearing = Math.Atan2(y, x) * 180.0 / Math.PI;
+            return (bearing + 360.0) % 360.0; // 0~360도
+        }
+
+        // 마커 회전 함수
+        private void RotateMarkerImage(GMapMarker marker, double angle)
+        {
+            if (marker.Shape is Grid grid && grid.Children[0] is Image image)
+            {
+                image.RenderTransform = new RotateTransform(angle, image.Width / 2, image.Height / 2);
             }
         }
 
@@ -186,6 +232,7 @@ namespace OCC.Views
 
             mapControl.Markers.Add(marker);
             _aircraftMarkers[aircraft.Id] = marker;
+            _aircraftPrevPositions[aircraft.Id] = new PointLatLng(aircraft.Latitude, aircraft.Longitude); // 이전 위치 저장
         }
 
         //기존 IP 마커
@@ -244,6 +291,7 @@ namespace OCC.Views
             {
                 mapControl.Markers.Remove(marker);
                 _aircraftMarkers.Remove(aircraft.Id);
+                _aircraftPrevPositions.Remove(aircraft.Id); // 이전 위치 정보 제거
             }
         }
 
@@ -371,6 +419,29 @@ namespace OCC.Views
         private void Missile_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is not Missile missile) return;
+            
+            // 방향각 계산 및 마커 회전
+            if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
+            {
+                if (_missileMarkers.TryGetValue(missile.Id, out var marker))
+                {
+                    // 이전 위치 가져오기
+                    if (_missilePrevPositions.TryGetValue(missile.Id, out var prevPos))
+                    {
+                        // 이동이 있으면 방향각 계산
+                        if (missile.Latitude != prevPos.Lat || missile.Longitude != prevPos.Lng)
+                        {
+                            double angle = CalculateBearing(prevPos.Lat, prevPos.Lng, missile.Latitude, missile.Longitude);
+                            RotateMarkerImage(marker, angle);
+                        }
+                    }
+                    // 위치 갱신
+                    _missilePrevPositions[missile.Id] = new PointLatLng(missile.Latitude, missile.Longitude);
+
+                    marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
+                }
+            }
+            //여기까지
 
             if (e.PropertyName == nameof(Missile.Status))
             {
@@ -460,6 +531,7 @@ namespace OCC.Views
 
             mapControl.Markers.Add(marker);
             _missileMarkers[missile.Id] = marker;
+            _missilePrevPositions[missile.Id] = new PointLatLng(missile.Latitude, missile.Longitude); // 이전 미사일 위치 저장
         }
 
 
@@ -469,6 +541,7 @@ namespace OCC.Views
             {
                 mapControl.Markers.Remove(marker);
                 _missileMarkers.Remove(missile.Id);
+                _missilePrevPositions.Remove(missile.Id); // 이전 위치 정보 제거
             }
         }
 
