@@ -125,7 +125,7 @@ namespace OCC.ViewModels
 
         private void NavigateToAttackDisplayPage()
         {
-            Application.Current.Dispatcher .Invoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 // AttackViewModel 하나 생성
                 if (NavigationService == null)
