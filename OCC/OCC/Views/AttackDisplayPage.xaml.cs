@@ -155,7 +155,7 @@ namespace OCC.Views
                 Width = markerSize,
                 Height = markerSize,
                 Source = new BitmapImage(new Uri(
-                    @"C:\Users\user\source\repos\MnS_LSY\OCC\OCC\images\Aircraft.png",
+                    @"C:\Users\user\source\repos\MNS\OCC\OCC\images\Aircraft.png",
                     UriKind.Absolute)),
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 VerticalAlignment = VerticalAlignment.Top,
@@ -209,7 +209,7 @@ namespace OCC.Views
         private void AddImageIpMarker(ImpactPoint ip)
         {
             double markerSize = 20; // 아이콘 크기
-            string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\impactpoint.png"; // 실제 경로로 수정
+            string imgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\impactPoint.png"; // 실제 경로로 수정
 
             var image = new Image
             {
@@ -283,12 +283,12 @@ namespace OCC.Views
             if (missile_status == (uint)Missile.MissileStatus.HitSuccess)
             {
                 markerSize = 150;
-                destroyImgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\destroy.png";
+                destroyImgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\destroy.png";
             }
             else
             {
                 markerSize = 100;
-                destroyImgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\EmergencyDestroy.png"; // 비상폭파 또는 자폭용 이미지
+                destroyImgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\emergencyDestroy.png"; // 비상폭파 또는 자폭용 이미지
             }
             var image = new Image
             {
@@ -417,7 +417,7 @@ namespace OCC.Views
         {
 
             double markerSize = 35;  // 마커 이미지 크기 조정
-            string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\missile.png";
+            string imgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\missile.png";
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
@@ -573,7 +573,7 @@ namespace OCC.Views
         private static GMapMarker CreateBatteryImageMarker(PointLatLng pos, Brush fill, double size)
         {
             // battery.png 이미지 경로 (절대경로 또는 상대경로로 수정)
-            string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\battery.png";
+            string imgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\battery.png";
 
             var markerGrid = new Grid
             {

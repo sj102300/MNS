@@ -32,6 +32,8 @@ using System.Collections.ObjectModel;
 using GMap.NET.WindowsPresentation;
 using System.Windows.Shapes;
 using System.ComponentModel.Design;
+using System.Windows.Media.Imaging;
+using WpfAnimatedGif;
 
 
 namespace OCC.ViewModels
@@ -427,7 +429,7 @@ namespace OCC.ViewModels
 
         private readonly List<(string url, string id)> subsystems = new()
         {
-            ($"http://192.168.2.66:8080", "TCC"),
+            ($"http://192.168.2.64:8080", "TCC"),
             //($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
             ($"{Network.MFR}", "MFR"),
@@ -592,7 +594,7 @@ namespace OCC.ViewModels
                         var response = udpClient.Receive(ref localEP);
                         if (response != null && response.Length > 0)
                         {
-                            ackReceived = true;
+                            ackReceived = true; 
                             Debug.WriteLine("ACK 수신 완료!");
                             break;
                         }
@@ -642,6 +644,20 @@ namespace OCC.ViewModels
         {
             BatteryPos = new PointLatLng(lat, lon);
         }
+
+        //private void LoadGif(string relativePath)
+        //{
+        //    try
+        //    {
+        //        var uri = new Uri($"pack://application:,,,/{relativePath}", UriKind.Absolute);
+        //        var image = new BitmapImage(uri);
+        //        ImageBehavior.SetAnimatedSource(MissileGifImage, image);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"[GIF 로딩 실패] {ex.Message}");
+        //    }
+        //}
 
         //public GMapMarker CreateMarker(PointLatLng pos, Brush fill, double size)
         //{

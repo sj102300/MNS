@@ -24,7 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="images\self_explode.gif" />
+    <Resource Include="images\self_explode.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,13 +39,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="images\emergency_explode.gif" />
-    <Resource Include="images\hit_success.gif" />
-    <Resource Include="images\in_flight.gif" />
-    <Resource Include="images\launching.gif" />
-    <Resource Include="images\sample.gif" />
-    <Resource Include="images\unknown.gif" />
-    <Resource Include="images\waiting.gif" />
+    <Resource Include="images\emergency_explode.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\hit_success.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\in_flight.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\launching.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\sample.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\unknown.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\waiting.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>
