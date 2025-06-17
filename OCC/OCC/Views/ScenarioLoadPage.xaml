@@ -12,7 +12,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="4*" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -96,36 +96,33 @@
         <!-- 우측: 컨트롤 영역 -->
         <ui:Card Grid.Row="0" Grid.Column="1"
                  Background="#23262E"
-                 Padding="24"
                  VerticalAlignment="Center"
-                 HorizontalAlignment="Center">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="180">
+                 Margin="20"
+                 HorizontalAlignment="Stretch">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
                 <ui:Button Content="불러오기"
                            Command="{Binding LoadCommand}"
-                           Width="150"
-                           Height="40"
+                           Height="50"
+                           FontSize="20"
                            Appearance="Primary"
-                           FontSize="15"
                            FontWeight="SemiBold"
                            Background="#263238"
                            Foreground="#FFFFFF"
                            CornerRadius="8"
-                           Margin="0,0,0,10"/>
+                           Margin="0,0,0,20"/>
                 <ui:Button Content="시작"
                            Command="{Binding StartCommand}"
-                           Width="150"
-                           Height="40"
-                           FontSize="15"
+                           Height="50"
+                           FontSize="20"
                            FontWeight="SemiBold"
                            Background="#388E3C"
                            Foreground="#FFFFFF"
                            CornerRadius="8"
-                           Margin="0,0,0,10"/>
+                           Margin="0,0,0,20"/>
                 <ui:Button Content="종료"
                            Command="{Binding QuitCommand}"
-                           Width="150"
-                           Height="40"
-                           FontSize="15"
+                           Height="50"
+                           FontSize="20"
                            FontWeight="SemiBold"
                            Background="#B71C1C"
                            Foreground="#FFFFFF"
