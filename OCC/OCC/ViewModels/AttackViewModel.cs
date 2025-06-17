@@ -376,6 +376,8 @@ namespace OCC.ViewModels
                     // 새로운 정보가 들어온 경우
                     var newIP = new ImpactPoint(commandId)
                     {
+                        AircraftId = aircraftId,
+                        MissileId = missileId,
                         Latitude = lat,
                         Longitude = lon,
                         Altitude = alt,
