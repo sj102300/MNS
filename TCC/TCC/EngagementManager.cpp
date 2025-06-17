@@ -42,25 +42,25 @@ void EngagementManager::stop() {
 	cv_.notify_one();
 }
 
-void EngagementManager::makeAutoFireCommandId(std::string &commandId) {
+void EngagementManager::makeAutoFireCommandId(std::string& commandId) {
 	using namespace std::chrono;
 
 	// 현재 시간
 	auto now = system_clock::now();
 	auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
 
-	// time_t → tm 변환 (스레드 안전하게)
+	// time_t → tm 변환
 	std::time_t now_time_t = system_clock::to_time_t(now);
 	std::tm now_tm;
-	localtime_s(&now_tm, &now_time_t);  // Windows 안전한 버전
+	localtime_s(&now_tm, &now_time_t);  // Windows 안전 버전
 
 	// 문자열 생성
 	std::ostringstream oss;
-	oss << std::put_time(&now_tm, "%Y%m%d%H%M%S") << std::setw(3) << std::setfill('0') << ms.count();
+	oss << "AF-"  // 접두사
+		<< std::put_time(&now_tm, "%Y%m%d%H%M%S")
+		<< std::setw(3) << std::setfill('0') << ms.count();  // 밀리초
 
 	commandId = oss.str();
-
-	return;
 }
 
 bool EngagementManager::mappingMissileToAircraft(std::string & aircraftId, std::string& missileId) {
