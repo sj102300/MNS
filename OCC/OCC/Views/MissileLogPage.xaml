@@ -32,7 +32,7 @@
           CanUserAddRows="False"
           CanUserDeleteRows="False"
           IsReadOnly="True"
-          Margin="20"
+          Margin="12"
           HeadersVisibility="Column"
           RowHeaderWidth="0">
             <DataGrid.Columns>
@@ -50,7 +50,7 @@
             <ListView Grid.Column="0"
                       ItemsSource="{Binding MissileList}"
                       SelectedItem="{Binding SelectedMissile, Mode=TwoWay}"
-                      Margin="20" 
+                      Margin="12" 
                       BorderThickness="0">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
