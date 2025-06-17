@@ -155,7 +155,7 @@ namespace OCC.Views
                 Width = markerSize,
                 Height = markerSize,
                 Source = new BitmapImage(new Uri(
-                    @"C:\Users\user\Documents\MNS\OCC\OCC\images\Aircraft.png",
+                    @"C:\Users\user\source\repos\MnS_LSY\OCC\OCC\images\Aircraft.png",
                     UriKind.Absolute)),
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 VerticalAlignment = VerticalAlignment.Top,
@@ -415,6 +415,7 @@ namespace OCC.Views
         //미사일 이미지 마커 변경 메서드
         private void AddImageMissileMarker(Missile missile)
         {
+
             double markerSize = 35;  // 마커 이미지 크기 조정
             string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\missile.png";
 

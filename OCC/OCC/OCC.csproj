@@ -9,15 +9,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="NewFolder\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
-    <None Remove="NewFolder\**" />
-    <Page Remove="NewFolder\**" />
+    <Compile Remove="Models\AircraftInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\AircraftInfo.cs" />
-    <Compile Remove="Models\MissileIlist.cs" />
+    <None Remove="images\emergency_explode.gif" />
+    <None Remove="images\hit_success.gif" />
+    <None Remove="images\in_flight.gif" />
+    <None Remove="images\launching.gif" />
+    <None Remove="images\sample.gif" />
+    <None Remove="images\self_explode.gif" />
+    <None Remove="images\unknown.gif" />
+    <None Remove="images\waiting.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\self_explode.gif" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +33,17 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="WPF-UI" Version="4.0.2" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\emergency_explode.gif" />
+    <Resource Include="images\hit_success.gif" />
+    <Resource Include="images\in_flight.gif" />
+    <Resource Include="images\launching.gif" />
+    <Resource Include="images\sample.gif" />
+    <Resource Include="images\unknown.gif" />
+    <Resource Include="images\waiting.gif" />
   </ItemGroup>
 
 </Project>
