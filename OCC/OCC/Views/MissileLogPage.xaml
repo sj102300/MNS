@@ -54,7 +54,6 @@
             <ListView Grid.Column="0"
                       ItemsSource="{Binding MissileList}"
                       Margin="20"
-                      HorizontalContentAlignment="Stretch"
                       BorderThickness="0">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -69,7 +68,8 @@
                                 <TextBlock Text="{Binding MissileStatusText}" FontSize="12" Margin="0,2,0,2" TextAlignment="Center"/>
                                 <Image Width="60" Height="60"
                                        Loaded="Image_Loaded"
-                                       Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}}"
+                                       Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
+                                       TargetUpdated="Image_TargetUpdated"
                                        Stretch="UniformToFill"/>
                             </StackPanel>
                         </Border>

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace OCC.Models
 {
@@ -29,9 +31,23 @@ namespace OCC.Models
             get => status;
             set
             {
-                var old = status;
-                status = value;
-                UpdateVisualState(old, status);
+                var old = status; 
+                var newVal = value;
+
+                if(old != newVal)
+                {
+                    if (old == 0 && newVal == 1)
+                        VisualState = MissileVisualState.Launching;
+                    else if (old == 1 && newVal == 3)
+                        VisualState = MissileVisualState.PressingButton;
+                    else
+                        VisualState = (MissileVisualState)newVal;
+
+                    //OnPropertyChanged(nameof(VisualState));
+                    //Debug.Write("VisualState Changed");
+                }
+
+                status = newVal;
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(MissileStatusText));
             }
@@ -46,20 +62,6 @@ namespace OCC.Models
                 OnPropertyChanged(nameof(VisualState));
             }
         }
-
-        private void UpdateVisualState(uint oldStatus, uint newStatus)  // 상태 전이 검사
-        {
-            if (status == newStatus)
-                return; // 상태 변화 없으면 무시
-
-            if (oldStatus == 0 && newStatus == 1)
-                VisualState = MissileVisualState.Launching;
-            else if (oldStatus == 1 && newStatus == 3)
-                VisualState = MissileVisualState.PressingButton;
-            else
-                VisualState = (MissileVisualState)newStatus;
-        }
-
 
         public double Latitude
         {

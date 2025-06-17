@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Globalization;
 using System.Windows.Data;
 using OCC.Models;
+using System.Windows.Media.Imaging;
+using System.IO;
+using System.Diagnostics;
 
 namespace OCC.Converters
 {
