@@ -41,8 +41,8 @@ namespace OCC.ViewModels
             ($"{Network.TCC}", "TCC"),
             ($"{Network.MFR}", "MFR"),
             ($"{Network.ATS}", "ATS"),
-            //($"{Network.LCH}", "LCH"),
-            //($"{Network.MSS}", "MSS"),
+            ($"{Network.LCH}", "LCH"),
+            ($"{Network.MSS}", "MSS"),
         };
 
         public ScenarioLoadViewModel()

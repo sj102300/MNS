@@ -22,6 +22,7 @@ namespace OCC.Models
         private double latitude;
         private double longitude;
         private double altitude;
+        private uint foe;
         private uint status;
         private double ip_latitude;
         private double ip_longitude;
@@ -51,6 +52,14 @@ namespace OCC.Models
             {
                 status = value; OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(AircraftStatusText)); // 상태 텍스트도 갱신
+            }
+        }
+        public uint Foe
+        {
+            get => foe; set
+            {
+                foe = value; OnPropertyChanged(nameof(Foe));
+                OnPropertyChanged(nameof(Foe)); // 적 여부 갱신
             }
         }
 
