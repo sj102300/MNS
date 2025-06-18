@@ -11,10 +11,12 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OCC.Models;
+using OCC.Utils;
 using OCC.ViewModels;
 using WpfAnimatedGif;
 
@@ -46,16 +48,32 @@ namespace OCC.Views
                 {
                     var uri = new Uri($"pack://application:,,,/{gifPath}");
                     var imageSource = new BitmapImage(uri);
+                    // 기본 설정: 반복 재생
+                    ImageBehavior.SetRepeatBehavior(image, RepeatBehavior.Forever);
+
+                    if (gifPath.Contains("launching") || gifPath.Contains("self_explode") || gifPath.Contains("hit_success") || gifPath.Contains("emergency_explode"))
+                    {
+                        // Launching일 경우 한 번만 재생
+                        ImageBehavior.SetRepeatBehavior(image, new RepeatBehavior(1));
+                    }
+
                     ImageBehavior.SetAnimatedSource(image, imageSource);
 
                     ImageBehavior.AddAnimationCompletedHandler(image, (s, args) =>
                     {
                         if (image.DataContext is Missile missile)
                         {
-                            if (missile.VisualState == MissileVisualState.Launching)
-                                missile.VisualState = MissileVisualState.InFlight;
-                            else if (missile.VisualState == MissileVisualState.PressingButton)
-                                missile.VisualState = MissileVisualState.EmergencyExplode;
+                            switch (missile.VisualState)
+                            {
+                                case MissileVisualState.Launching:
+                                    missile.VisualState = MissileVisualState.InFlight;
+                                    break;
+                                case MissileVisualState.HitSuccess:
+                                case MissileVisualState.EmergencyExplode:
+                                case MissileVisualState.SelfExplode:
+                                    missile.VisualState = MissileVisualState.Done;
+                                    break;
+                            }
                         }
                     });
                     Debug.Write("Image_TargetUpdated() called");
@@ -72,18 +90,27 @@ namespace OCC.Views
             {
                 try
                 {
-                    var uri = new Uri($"pack://application:,,,/{gifPath}");
-                    var imageSource = new BitmapImage(uri);
+                    //var uri = new Uri($"pack://application:,,,/{gifPath}");
+                    //var imageSource = new BitmapImage(uri);
+                    var imageSource = GifCache.Get(gifPath); // ← 캐싱된 BitmapImage 재사용
+                    ImageBehavior.SetAnimatedSource(image, null);       // 이전 애니메이션 제거
                     ImageBehavior.SetAnimatedSource(image, imageSource);
 
                     ImageBehavior.AddAnimationCompletedHandler(image, (s, args) =>
                     {
                         if (image.DataContext is Missile missile)
                         {
-                            if (missile.VisualState == MissileVisualState.Launching)
-                                missile.VisualState = MissileVisualState.InFlight;
-                            else if (missile.VisualState == MissileVisualState.PressingButton)
-                                missile.VisualState = MissileVisualState.EmergencyExplode;
+                            switch (missile.VisualState)
+                            {
+                                case MissileVisualState.Launching:
+                                    missile.VisualState = MissileVisualState.InFlight;
+                                    break;
+                                case MissileVisualState.HitSuccess:
+                                case MissileVisualState.EmergencyExplode:
+                                case MissileVisualState.SelfExplode:
+                                    missile.VisualState = MissileVisualState.Done;
+                                    break;
+                            }
                         }
                     });
                     Debug.Write("Image_Loaded() called");

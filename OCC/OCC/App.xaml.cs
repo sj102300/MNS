@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Navigation;
 using Microsoft.Extensions.DependencyInjection;
+using OCC.Utils;
 using OCC.ViewModels;
 using Wpf.Ui.Appearance;
 
@@ -29,6 +30,8 @@ public partial class App : Application
         ServiceProvider = services.BuildServiceProvider();
 
         base.OnStartup(e);
+
+        //GifCache.PreloadAllGifs();  // 로딩 렉 심해서 GIF 캐싱
     }
 }
 
