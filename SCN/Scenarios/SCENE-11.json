@@ -1,0 +1,96 @@
+{
+  "aircraft_count": 6,
+  "aircraft_list": [
+    {
+      "aircraft_id": "ATS-0001",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.584037837093696,
+        "longitude": 127.00298309326172
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.5856702356572,
+        "longitude": 127.0187759399414
+      }
+    },
+    {
+      "aircraft_id": "ATS-0002",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.5960079285882,
+        "longitude": 127.00641632080078
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.57424269400916,
+        "longitude": 127.01053619384766
+      }
+    },
+    {
+      "aircraft_id": "ATS-0003",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.59301558619925,
+        "longitude": 127.0187759399414
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.5851261067801,
+        "longitude": 126.97208404541016
+      }
+    },
+    {
+      "aircraft_id": "ATS-0004",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.5960079285882,
+        "longitude": 127.04967498779297
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.57587530734239,
+        "longitude": 127.0077896118164
+      }
+    },
+    {
+      "aircraft_id": "ATS-0005",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.59274354910638,
+        "longitude": 127.0297622680664
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.576691600586436,
+        "longitude": 127.03868865966797
+      }
+    },
+    {
+      "aircraft_id": "ATS-0006",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.57397058830707,
+        "longitude": 127.06684112548828
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.56716762263009,
+        "longitude": 127.02632904052734
+      }
+    }
+  ],
+  "battery_location": {
+    "altitude": 10,
+    "latitude": 37.58267747761301,
+    "longitude": 127.04212188720703
+  },
+  "scenario_id": "SCENE-11",
+  "scenario_title": "적군6개 시나리오"
+}

@@ -1,0 +1,33 @@
+{
+    "scenario_id": "SCENE-99",
+    "scenario_title": "MFR 광역 탐지 + 추적 탐지 기능 테스트",
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "start_point": { "latitude": 49.000, "longitude": 50.000, "altitude": 10.0 },
+            "end_point":   { "latitude": 50.000, "longitude": 50.000, "altitude": 10.0 },
+            "friend_or_foe": "O"
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "start_point": { "latitude": 50.000, "longitude": 52.000, "altitude": 10.0 },
+            "end_point":   { "latitude": 50.000, "longitude": 50.000, "altitude": 10.0 },
+            "friend_or_foe": "E"
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "start_point": { "latitude": 53.000, "longitude": 50.000, "altitude": 10.0 },
+            "end_point":   { "latitude": 50.000, "longitude": 50.000, "altitude": 10.0 },
+            "friend_or_foe": "E"
+        },
+        {
+            "aircraft_id": "ATS-0004",
+            "start_point": { "latitude": 50.000, "longitude": 46.000, "altitude": 10.0 },
+            "end_point":   { "latitude": 50.000, "longitude": 50.000, "altitude": 10.0 },
+            "friend_or_foe": "E"
+        }
+    ],
+    "battery_location": {
+        "latitude": 50.000, "longitude": 50.000, "altitude": 10.0
+    }
+}
