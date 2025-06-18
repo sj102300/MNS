@@ -138,14 +138,13 @@ namespace OCC.Views
                 Height = markerSize + 5 // 텍스트 공간 확보
             };
 
-
             // 항공기 이미지
             var image = new Image
             {
                 Width = markerSize,
                 Height = markerSize,
                 Source = new BitmapImage(new Uri(
-                    @"C:\Users\user\source\repos\MNS\OCC\OCC\images\Aircraft.png",
+                    "pack://application:,,,/images/Aircraft.png",
                     UriKind.Absolute)),
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 VerticalAlignment = VerticalAlignment.Top,
@@ -183,7 +182,7 @@ namespace OCC.Views
         private void AddImageIpMarker(ImpactPoint ip)
         {
             double markerSize = 15; // 아이콘 크기
-            string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\impactpoint.png"; // 실제 경로로 수정
+            string imgPath = "pack://application:,,,/images/impactPoint.png";
 
             var image = new Image
             {
@@ -255,19 +254,20 @@ namespace OCC.Views
                 _missileMarkers.Remove(missile.Id);
             }
 
-            // destroy.png로 새 마커 생성
             double markerSize;
             string destroyImgPath;
+
             if (missile_status == (uint)Missile.MissileStatus.HitSuccess)
             {
                 markerSize = 150;
-                destroyImgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\destroy.png";
+                destroyImgPath = "pack://application:,,,/images/destroy.png";
             }
             else
             {
                 markerSize = 100;
-                destroyImgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\emergencyDestroy.png"; // 비상폭파 또는 자폭용 이미지
+                destroyImgPath = "pack://application:,,,/images/emergencyDestroy.png";
             }
+
             var image = new Image
             {
                 Width = markerSize,
@@ -386,7 +386,7 @@ namespace OCC.Views
         {
 
             double markerSize = 35;  // 마커 이미지 크기 조정
-            string imgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\missile.png";
+            string imgPath = "pack://application:,,,/images/missile.png"; // 리소스 경로
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
@@ -405,6 +405,7 @@ namespace OCC.Views
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
+
             markerGrid.Children.Add(image);
 
             // 식별자 텍스트 (아래쪽에 표시)
@@ -525,7 +526,7 @@ namespace OCC.Views
         private static GMapMarker CreateBatteryImageMarker(PointLatLng pos, Brush fill, double size)
         {
             // battery.png 이미지 경로 (절대경로 또는 상대경로로 수정)
-            string imgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\battery.png";
+            string imgPath = "pack://application:,,,/images/battery.png"; // 리소스 기반 경로
 
             var markerGrid = new Grid
             {
@@ -542,6 +543,7 @@ namespace OCC.Views
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
+
             markerGrid.Children.Add(image);
 
             return new GMapMarker(pos)
@@ -588,7 +590,9 @@ namespace OCC.Views
                     if (image != null)
                     {
                         double angle = CalculateBearing(aircraft.Latitude, aircraft.Longitude, _aircraftPrevPositions[aircraft.Id].Lat, _aircraftPrevPositions[aircraft.Id].Lng);
-                        image.RenderTransform = new RotateTransform(angle + 90, image.Width / 2, image.Height / 2);
+                        //image.RenderTransform = new RotateTransform(angle + 90, image.Width / 2, image.Height / 2);
+                        image.RenderTransformOrigin = new Point(0.5, 0.5);
+                        image.RenderTransform = new RotateTransform(angle + 90);
                     }
                 }
             }
@@ -605,7 +609,9 @@ namespace OCC.Views
                     if (image != null)
                     {
                         double angle = CalculateBearing(_missilePrevPositions[missile.Id].Lat, _missilePrevPositions[missile.Id].Lng, missile.Latitude, missile.Longitude);
-                        image.RenderTransform = new RotateTransform(angle, image.Width / 2, image.Height / 2);
+                        //image.RenderTransform = new RotateTransform(angle, image.Width / 2, image.Height / 2);
+                        image.RenderTransformOrigin = new Point(0.5, 0.5);
+                        image.RenderTransform = new RotateTransform(angle + 90);
                     }
                 }
             }
