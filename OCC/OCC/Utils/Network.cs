@@ -14,7 +14,7 @@ namespace OCC.Utils
         public static readonly string ATS = "http://192.168.2.44:8080";
         public static readonly string MSS = "http://192.168.2.22:8080";
         public static readonly string LCH = "http://192.168.2.11:8080";
-        public static readonly string TCCHost = "192.168.2.188";
+        public static readonly string TCCHost = "192.168.2.180";
         public static int TCCHostPort = 9999;
     }
 }

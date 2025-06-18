@@ -13,10 +13,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="images\Aircraft.png" />
+    <None Remove="images\background-img.png" />
+    <None Remove="images\battery.png" />
+    <None Remove="images\destroy.png" />
+    <None Remove="images\emergencyDestroy.png" />
     <None Remove="images\emergency_explode.gif" />
     <None Remove="images\hit_success.gif" />
+    <None Remove="images\impactPoint.png" />
     <None Remove="images\in_flight.gif" />
     <None Remove="images\launching.gif" />
+    <None Remove="images\missile.png" />
     <None Remove="images\sample.gif" />
     <None Remove="images\self_explode.gif" />
     <None Remove="images\unknown.gif" />
@@ -24,6 +31,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\Aircraft.png" />
+    <Resource Include="images\background-img.png" />
+    <Resource Include="images\battery.png" />
+    <Resource Include="images\destroy.png" />
+    <Resource Include="images\emergencyDestroy.png" />
+    <Resource Include="images\impactPoint.png" />
+    <Resource Include="images\missile.png" />
     <Resource Include="images\self_explode.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
