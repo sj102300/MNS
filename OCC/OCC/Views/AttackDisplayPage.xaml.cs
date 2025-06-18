@@ -23,6 +23,7 @@ using OCC.Utils;
 using System.Net.Http;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace OCC.Views
 {
@@ -36,8 +37,13 @@ namespace OCC.Views
         private readonly Dictionary<string, GMapMarker> _aircraftMarkers = new();
         private readonly Dictionary<string, GMapMarker> _ipMarkers = new();
         private readonly Dictionary<string, GMapMarker> _missileMarkers = new();
+        private readonly Dictionary<string, PointLatLng> _aircraftPrevPositions = new();
+        private readonly Dictionary<string, PointLatLng> _missilePrevPositions = new();
         private GMapMarker _batteryMarker;
         private string _scenarioId;
+
+        // 임계값: 위경도 변화가 이 값 이상일 때만 bearing 계산 (약 5~6m)
+        private const double PositionThreshold = 0.00005;
 
         public AttackDisplayPage(AttackViewModel viewModel, string scenarioId)
         {
@@ -101,6 +107,8 @@ namespace OCC.Views
             if (e.PropertyName != nameof(AircraftWithIp.Latitude) && e.PropertyName != nameof(AircraftWithIp.Longitude))
                 return;
 
+            UpdateAircraftMarkerDirection(aircraft);
+
             if (_aircraftMarkers.TryGetValue(aircraft.Id, out var marker))
             {
                 marker.Position = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
@@ -118,28 +126,10 @@ namespace OCC.Views
             }
         }
 
-        //기존 항공기 마커 추가 메서드
-        //private void AddAircraftMarker(AircraftWithIp aircraft)
-        //{
-        //    double markerSize = 20;
-        //    var marker = new GMapMarker(new PointLatLng(aircraft.Latitude, aircraft.Longitude))
-        //    {
-        //        Shape = new Ellipse
-        //        {
-        //            Width = 16,
-        //            Height = 16,
-        //            Fill = Brushes.Red
-        //        },
-        //        Offset = new Point(-markerSize / 2, -markerSize / 2)
-        //    };
-        //    mapControl.Markers.Add(marker);
-        //    _aircraftMarkers[aircraft.Id] = marker;
-        //}
-
         //항공기 이미지 마커 변경 메서드
         private void AddImageAircraftMarker(AircraftWithIp aircraft)
         {
-            double markerSize = 35;  // 아이콘 크기 조정
+            double markerSize = 40;  // 아이콘 크기 조정
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
@@ -148,7 +138,7 @@ namespace OCC.Views
                 Height = markerSize + 5 // 텍스트 공간 확보
             };
 
-            
+
             // 항공기 이미지
             var image = new Image
             {
@@ -186,30 +176,14 @@ namespace OCC.Views
 
             mapControl.Markers.Add(marker);
             _aircraftMarkers[aircraft.Id] = marker;
+            _aircraftPrevPositions[aircraft.Id] = new PointLatLng(aircraft.Latitude, aircraft.Longitude);
         }
-
-        //기존 IP 마커
-        //private void AddIpMarker(ImpactPoint ip)
-        //{
-        //    var marker = new GMapMarker(new PointLatLng(ip.Latitude, ip.Longitude))
-        //    {
-        //        Shape = new Ellipse
-        //        {
-        //            Width = 12,
-        //            Height = 12,
-        //            Fill = Brushes.Purple
-        //        },
-        //        Offset = new Point(-5, -5)
-        //    };
-        //    mapControl.Markers.Add(marker);
-        //    _ipMarkers[ip.Id] = marker;
-        //}
 
         //이미지 IP 마커 변경 메서드
         private void AddImageIpMarker(ImpactPoint ip)
         {
-            double markerSize = 20; // 아이콘 크기
-            string imgPath = @"C:\Users\user\source\repos\MNS\OCC\OCC\images\impactPoint.png"; // 실제 경로로 수정
+            double markerSize = 15; // 아이콘 크기
+            string imgPath = @"C:\Users\user\Documents\MNS\OCC\OCC\images\impactpoint.png"; // 실제 경로로 수정
 
             var image = new Image
             {
@@ -264,7 +238,11 @@ namespace OCC.Views
                 if (missile.Status == (uint)Missile.MissileStatus.BeforeLaunch)
                     marker.Shape.Visibility = Visibility.Collapsed;
                 else
+                {
                     marker.Shape.Visibility = Visibility.Visible;
+                    UpdateMissileMarkerDirection(missile);
+                }
+                    
             }
         }
 
@@ -315,8 +293,9 @@ namespace OCC.Views
 
             mapControl.Markers.Add(newMarker);
             _missileMarkers[missile.Id] = newMarker;
-            
-            if(missile_status != (uint)Missile.MissileStatus.HitSuccess){
+
+            if (missile_status != (uint)Missile.MissileStatus.HitSuccess)
+            {
                 // 3초 후 서서히 사라지는 애니메이션 적용
                 var timer = new System.Windows.Threading.DispatcherTimer
                 {
@@ -372,6 +351,14 @@ namespace OCC.Views
         {
             if (sender is not Missile missile) return;
 
+            if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
+            {
+                if (_missileMarkers.TryGetValue(missile.Id, out var marker))
+                {
+                    marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
+                }
+            }
+
             if (e.PropertyName == nameof(Missile.Status))
             {
                 UpdateMissileMarkerVisibility(missile);
@@ -382,7 +369,7 @@ namespace OCC.Views
                     missile.Status == (uint)Missile.MissileStatus.EmergencyDestroy)
                 {
                     ReplaceMissileMarkerWithDestroyed(missile, missile.Status);
-                } 
+                }
             }
 
             if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
@@ -393,24 +380,6 @@ namespace OCC.Views
                 }
             }
         }
-
-        //기존 미사일 마커 메서드
-        //private void AddMissileMarker(Missile missile)
-        //{
-        //    var marker = new GMapMarker(new PointLatLng(missile.Latitude, missile.Longitude))
-        //    {
-        //        Shape = new Ellipse
-        //        {
-        //            Width = 16,
-        //            Height = 16,
-        //            Fill = Brushes.Blue
-        //        },
-        //        Offset = new Point(-5, -5)
-        //    };
-
-        //    mapControl.Markers.Add(marker);
-        //    _missileMarkers[missile.Id] = marker;
-        //}
 
         //미사일 이미지 마커 변경 메서드
         private void AddImageMissileMarker(Missile missile)
@@ -461,6 +430,7 @@ namespace OCC.Views
 
             mapControl.Markers.Add(marker);
             _missileMarkers[missile.Id] = marker;
+            _missilePrevPositions[missile.Id] = new PointLatLng(missile.Latitude, missile.Longitude);
         }
 
 
@@ -503,7 +473,7 @@ namespace OCC.Views
                     mapControl.Zoom = Math.Min(mapControl.Zoom + 1, mapControl.MaxZoom);
                 else
                     mapControl.Zoom = Math.Max(mapControl.Zoom - 1, mapControl.MinZoom);
-                e.Handled = true; 
+                e.Handled = true;
             };
         }
         private async void getScenarioInfo(string scenarioId)
@@ -535,7 +505,7 @@ namespace OCC.Views
             {
                 if (_batteryMarker == null)
                 {
-                    _batteryMarker = CreateBatteryImageMarker(bp, Brushes.Green, 40);
+                    _batteryMarker = CreateBatteryImageMarker(bp, Brushes.Green, 50);
                     mapControl.Markers.Add(_batteryMarker);
 
                     // 300km, 130km 원 추가
@@ -550,24 +520,6 @@ namespace OCC.Views
                     _batteryMarker.Position = bp;   // (이동 없는 경우라 사실상 그대로)
             }
         }
-
-        //기존 포대 마커
-        //private static GMapMarker CreateMarker(PointLatLng pos, Brush fill, double size)
-        //{
-        //    return new GMapMarker(pos)
-        //    {
-        //        Shape = new Ellipse
-        //        {
-        //            Width = size,
-        //            Height = size,
-        //            Fill = fill,
-        //            Stroke = Brushes.Black,
-        //            StrokeThickness = 1.5,
-        //            Opacity = 0.9
-        //        },
-        //        Offset = new Point(-size / 2, -size / 2)
-        //    };
-        //}
 
         // 포대 이미지 마커로 변경
         private static GMapMarker CreateBatteryImageMarker(PointLatLng pos, Brush fill, double size)
@@ -623,6 +575,53 @@ namespace OCC.Views
             };
 
             return polygon;
+        }
+
+        // 항공기 방향각 계산 및 회전 함수
+        private void UpdateAircraftMarkerDirection(AircraftWithIp aircraft)
+        {
+            if (_aircraftMarkers.TryGetValue(aircraft.Id, out var marker))
+            {
+                if (marker.Shape is Grid grid)
+                {
+                    var image = grid.Children.OfType<Image>().FirstOrDefault();
+                    if (image != null)
+                    {
+                        double angle = CalculateBearing(aircraft.Latitude, aircraft.Longitude, _aircraftPrevPositions[aircraft.Id].Lat, _aircraftPrevPositions[aircraft.Id].Lng);
+                        image.RenderTransform = new RotateTransform(angle + 90, image.Width / 2, image.Height / 2);
+                    }
+                }
+            }
+        }
+
+        // 미사일 방향각 계산 및 회전
+        private void UpdateMissileMarkerDirection(Missile missile)
+        {
+            if (_missileMarkers.TryGetValue(missile.Id, out var marker))
+            {
+                if (marker.Shape is Grid grid)
+                {
+                    var image = grid.Children.OfType<Image>().FirstOrDefault();
+                    if (image != null)
+                    {
+                        double angle = CalculateBearing(_missilePrevPositions[missile.Id].Lat, _missilePrevPositions[missile.Id].Lng, missile.Latitude, missile.Longitude);
+                        image.RenderTransform = new RotateTransform(angle, image.Width / 2, image.Height / 2);
+                    }
+                }
+            }
+        }
+
+        // bearing 계산 함수
+        private double CalculateBearing(double lat1, double lon1, double lat2, double lon2)
+        {
+            double radLat1 = lat1 * Math.PI / 180.0;
+            double radLat2 = lat2 * Math.PI / 180.0;
+            double dLon = (lon2 - lon1) * Math.PI / 180.0;
+            double y = Math.Sin(dLon) * Math.Cos(radLat2);
+            double x = Math.Cos(radLat1) * Math.Sin(radLat2) -
+                       Math.Sin(radLat1) * Math.Cos(radLat2) * Math.Cos(dLon);
+            double bearing = Math.Atan2(y, x) * 180.0 / Math.PI;
+            return (bearing + 360.0) % 360.0;
         }
 
     }
