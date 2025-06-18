@@ -9,6 +9,7 @@
 #include <utility>
 #include <thread>
 #include <chrono>
+#include <unordered_map>
 
 struct AircraftInfo {
     std::string id;
@@ -16,11 +17,6 @@ struct AircraftInfo {
     std::pair<double, double> finishPoint;
     std::pair<double, double> currentPoint;
     char IFF;
-};
-
-struct MissileInfo {
-    std::string id;
-    std::pair<double, double> currentPoint;
 };
 
 AircraftInfo parseArguments(int argc, char* argv[]) {
@@ -42,18 +38,7 @@ int main(int argc, char* argv[]) {
     try {
         AircraftInfo aircraft = parseArguments(argc, argv);
 
-        // 서버없이 테스트 하기 위한 더미데이터
-        /*
-        AircraftInfo aircraft;
-        aircraft.id = "ATS-0001";
-        aircraft.startPoint = { 2,2 };
-        aircraft.finishPoint = { 10,10 };
-        aircraft.currentPoint = aircraft.startPoint;
-        aircraft.IFF = 'E';
-        */
-
         AircraftCoordinate Aircraft;
-
         std::vector<double> startop = Aircraft.makeStartOpt(aircraft.startPoint, aircraft.finishPoint);
         Aircraft.initializeMultiSocket();
 
@@ -62,34 +47,34 @@ int main(int argc, char* argv[]) {
             return -1;
         }
 
-        while (true) { //격추 안될 시, 끝나는 로직 추가 필요 => endPoint를 무조건 지나가게 됨 => 이걸 이용하자 => 해결 완 ~
+        while (true) {
+            // 항공기 위치 이동 및 전송
             aircraft.currentPoint = Aircraft.makePoint(startop[0], startop[1], aircraft.currentPoint);
             Aircraft.sendAircraftInfo(aircraft.currentPoint, aircraft.id, aircraft.IFF);
+
+            // 도착 지점 도달 시 종료
             if (Aircraft.SurviveStatus(aircraft.currentPoint, aircraft.finishPoint)) exit(0);
-            
-            //미사일 격추 필요
-            //미사일 id, point에 각각의 값 넣기 -> 항공기의 currentPoint와 비교 -> 격추판정 (격추되면 성공정보 보내고 프로세스 종료)
-            ParsedMissileData missile = receiver.receiveMissile();
-            pair<double, double> MissilePoints = {missile.latitude, missile.longitude};
-            //미사일 통신 테스트용
-            if (missile.missileId.empty()) {
-                std::cerr << "미사일 데이터 없음 (missileId 비어 있음)\n";
-            }
-            else {
-                cout << "missile : " << MissilePoints.first << ", " << MissilePoints.second << endl;
-            }
-            if (ShootDowns(aircraft.currentPoint, MissilePoints)) {
-                // 격추성공 통신코드 넣어야 함 + 프로세스 종료해야 함
-                initializeMultiSenderSocket();
-                sendSuccessInfo(aircraft.id, missile.missileId);
-                while (true) {
-                    // 격추판단 테스트용
+
+            // 미사일 수신 및 격추 판정
+            auto missileMap = receiver.receiveAllMissiles();
+
+            for (const auto& [id, missile] : missileMap) {
+                std::pair<double, double> MissilePoints = { missile.latitude, missile.longitude };
+
+                std::cout << "[미사일 수신] ID: " << id
+                    << " 위치: (" << MissilePoints.first << ", " << MissilePoints.second << ")\n";
+
+                if (ShootDowns(aircraft.currentPoint, MissilePoints)) {
+                    initializeMultiSenderSocket();
                     sendSuccessInfo(aircraft.id, missile.missileId);
-                    cout << "격추완료" << endl;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                    //
+                    std::exit(0);
+
+                    /*while (true) {
+                        sendSuccessInfo(aircraft.id, missile.missileId);
+                        std::cout << "격추완료\n";
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    }*/
                 }
-                //exit(0);
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));

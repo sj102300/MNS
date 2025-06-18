@@ -3,7 +3,7 @@
 #include <cmath>
 
 // 지구 반경 (km)
-constexpr double EarthR = 6356.784;
+constexpr double EarthR = 6371.0;
 constexpr double pi = 3.14159265358979;
 
 // 도(degree)를 라디안(radian)으로 변환

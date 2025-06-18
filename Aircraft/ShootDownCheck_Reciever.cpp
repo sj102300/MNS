@@ -53,34 +53,31 @@ bool UdpMulticastReceiver::init(const std::string& multicast_address, int port) 
 }
 
 
-ParsedMissileData UdpMulticastReceiver::receiveMissile() {
-    ParsedMissileData latestMissile{};
+std::unordered_map<std::string, ParsedMissileData> UdpMulticastReceiver::receiveAllMissiles() {
+    std::unordered_map<std::string, ParsedMissileData> missiles;
     Missile rawPacket{};
     sockaddr_in senderAddr{};
     int senderLen = sizeof(senderAddr);
 
-    // 수신 큐에서 가능한 모든 패킷을 소모
     while (true) {
         int recvLen = recvfrom(sock_, reinterpret_cast<char*>(&rawPacket), sizeof(rawPacket), 0,
             (sockaddr*)&senderAddr, &senderLen);
+        if (recvLen <= 0) break;
+        if (rawPacket.eventCode != 3001) continue;
 
-        if (recvLen <= 0) break; // 수신할 게 없으면 탈출
-
-        if (rawPacket.eventCode != 3001) continue; // 유효한 이벤트 코드만 처리
-
-        // 최신 패킷을 계속 덮어쓰기
         std::string idStr(rawPacket.missileId, 8);
         auto nullPos = idStr.find('\0');
-        if (nullPos != std::string::npos) {
-            idStr.erase(nullPos);
-        }
+        if (nullPos != std::string::npos) idStr.erase(nullPos);
 
-        latestMissile.eventCode = rawPacket.eventCode;
-        latestMissile.missileId = idStr;
-        latestMissile.latitude = rawPacket.latitude;
-        latestMissile.longitude = rawPacket.longitude;
-        latestMissile.altitude = rawPacket.altitude;
+        ParsedMissileData data;
+        data.eventCode = rawPacket.eventCode;
+        data.missileId = idStr;
+        data.latitude = rawPacket.latitude;
+        data.longitude = rawPacket.longitude;
+        data.altitude = rawPacket.altitude;
+
+        missiles[idStr] = data;
     }
 
-    return latestMissile;
+    return missiles;
 }

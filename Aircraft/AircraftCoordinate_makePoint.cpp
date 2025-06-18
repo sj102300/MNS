@@ -4,7 +4,7 @@
 // #include <iostream>
 
 #define pi 3.14159265358979
-#define EarthR 6356.784
+#define EarthR 6371.0
 #define x first
 #define y second
 

@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include "Missile.h"
+#include <unordered_map>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -17,6 +18,8 @@ public:
 
     bool init(const std::string& multicast_address, int port);
     ParsedMissileData receiveMissile();  // 한방에 미사일 정보 반환
+    std::unordered_map<std::string, ParsedMissileData> receiveAllMissiles();
+
 
 private:
     SOCKET sock_;

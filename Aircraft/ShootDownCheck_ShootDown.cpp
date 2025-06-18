@@ -26,6 +26,6 @@ double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
 //오차범위 30m
 bool ShootDowns(std::pair<double,double> currentPoint, std::pair<double,double> missilePoint) {
     double Adistance = haversineDistance(currentPoint.x, currentPoint.y, missilePoint.x, missilePoint.y);
-    if (Adistance <= 1.0) return true; //1km 반경 격추 성공 판단
+    if (Adistance <= 0.15) return true; //1km 반경 격추 성공 판단
 	return false;
 }
