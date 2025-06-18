@@ -156,6 +156,36 @@ void UdpReceiver::run() {
 
                 break;
             }
+                     // ATS를 주기적으로 받기 위함임
+            case 1001: {
+                if (bodyLength < sizeof(AirCraftPacket) - 8) {
+                    std::cerr << u8"항공기 패킷 길이 부족\n";
+                    break;
+                }
+                AirCraftPacket acPacket;
+                memcpy(&acPacket, bodyPtr, sizeof(acPacket));
+
+                std::string aircraftId(acPacket.AtsId, strnlen(acPacket.AtsId, 8));
+                Location loc = acPacket.AtsLoc;
+                //Velocity vel = acPacket.AtsVelocity;
+
+                auto it = Aircraft_map_.find(aircraftId);
+                if (it != Aircraft_map_.end()) {
+                    // 기존 객체가 있으면 업데이트
+                    auto aircraft = it->second;
+                    aircraft->update(loc);
+                }
+                else {
+                    // 없으면 새 객체 만들어 추가
+                    auto newAircraft = std::make_shared<Aircraft>(aircraftId, loc);
+                    Aircraft_map_[aircraftId] = newAircraft;
+                }
+
+                std::cout << u8"[항공기 업데이트] ID: " << aircraftId
+                    << u8" → 위치: (" << loc.latitude << ", " << loc.longitude << ", " << loc.altitude << ")\n";
+            
+                break;
+            }
             default:
                 //std::cerr << u8"알 수 없는 이벤트 코드: " << eventCode << "\n";
                 break;
@@ -176,6 +206,6 @@ void UdpReceiver::close() {
     WSACleanup();
 }
 
-void UdpReceiver::setMissileMap(const std::unordered_map<std::string, std::shared_ptr<Missile>>& map) {
+void UdpReceiver::(const std::unordered_map<std::string, std::shared_ptr<Missile>>& map) {
     missile_map_ = map;
 }

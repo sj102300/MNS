@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include "IReceiver.h" // 이 부분 테스팅 위해 추가
 #include "Missile.h"
+#include "Aircraft.h"
 
 class UdpReceiver : public IReceiver {
 public:
@@ -39,4 +40,6 @@ private:
     int port_;
     std::shared_ptr<Missile> missile_;
     std::unordered_map<std::string, std::shared_ptr<Missile>> missile_map_;
+    std::shared_ptr<Aircraft> aircraft_;
+    std::unordered_map <std::string, std::shared_ptr<Aircraft>> Aircraft_map_;
 };

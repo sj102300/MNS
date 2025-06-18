@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Aircraft.cpp" />
     <ClCompile Include="Missile.cpp" />
     <ClCompile Include="MissileController.cpp" />
     <ClCompile Include="main.cpp" />
@@ -143,6 +144,7 @@
     <None Include="example.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Aircraft.h" />
     <ClInclude Include="Ireceiver.h" />
     <ClInclude Include="Isender.h" />
     <ClInclude Include="Missile.h" />

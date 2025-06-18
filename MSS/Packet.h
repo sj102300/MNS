@@ -58,3 +58,23 @@ struct OrderPacket {
     Location ImpactPoint;
 };
 #pragma pack(pop)
+
+
+// 미사일 유도 기능을 위한 항공기 정보 
+#pragma pack(push,1)
+struct AirCraftPacket {
+    unsigned int EventCode;
+    unsigned int BodyLength;
+    char AtsId[8];
+    Location AtsLoc;
+    unsigned int AtsIdentify;
+};
+#pragma pack(pop)
+
+// 속도를 계산하기위한 위도와 경도 변화량??
+#pragma pack(push,1)
+struct Velocity {
+    double dLatitudePerSec;
+    double dLongitudePerSec;
+};
+#pragma pack(pop)
