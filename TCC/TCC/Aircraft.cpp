@@ -43,17 +43,26 @@ namespace {
 }
 
 void Aircraft::calcDirVec(const TCC::Position& newPos) {
-    // 항공기 위치 - 새로운 위치 (방향 벡터 계산)
-    double dx = newPos.longitude_ - pos_.longitude_;
-    double dy = newPos.latitude_ - pos_.latitude_;
+    // 현재 위치(lat1, lon1)와 새로운 위치(lat2, lon2)를 라디안으로 변환
+    double lat1 = pos_.latitude_ * DEG_TO_RAD;
+    double lon1 = pos_.longitude_ * DEG_TO_RAD;
+    double lat2 = newPos.latitude_ * DEG_TO_RAD;
+    double lon2 = newPos.longitude_ * DEG_TO_RAD;
 
-    // 벡터 크기 계산 (정규화 필요)
-    double magnitude = std::sqrt(dx * dx + dy * dy);
-    if (magnitude == 0.0) return; // 방향 없음
+    // 경도 차이 계산
+    double dLon = lon2 - lon1;
 
-    // 정규화
-    dirVec_.dx_ = dx / magnitude;
-    dirVec_.dy_ = dy / magnitude;
+    // 방향 벡터의 x, y 성분 계산 (구면 삼각법 기반)
+    // x: 동쪽 방향 성분, y: 북쪽 방향 성분
+    double x = cos(lat2) * sin(dLon);
+    double y = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
+
+    // 크기 계산 후 정규화
+    double magnitude = std::sqrt(x * x + y * y);
+    if (magnitude == 0) return; // 같은 위치일 경우 방향 없음
+
+    dirVec_.dx_ = x / magnitude; // 단위 방향 벡터 (x 성분)
+    dirVec_.dy_ = y / magnitude; // 단위 방향 벡터 (y 성분)
 
     return;
 }
