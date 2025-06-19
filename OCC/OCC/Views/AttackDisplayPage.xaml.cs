@@ -184,7 +184,7 @@ namespace OCC.Views
         //항공기 이미지 마커 변경 메서드
         private void AddImageAircraftMarker(AircraftWithIp aircraft)
         {
-            double markerSize = 55;  // 아이콘 크기 조정
+            double markerSize = 50;  // 아이콘 크기 조정
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
@@ -236,7 +236,7 @@ namespace OCC.Views
         //이미지 IP 마커 변경 메서드
         private void AddImageIpMarker(ImpactPoint ip)
         {
-            double markerSize = 15; // 아이콘 크기
+            double markerSize = 10; // 아이콘 크기
             string imgPath = "pack://application:,,,/images/impactPoint.png";
 
             var image = new Image
@@ -314,12 +314,12 @@ namespace OCC.Views
 
             if (missile_status == 30)
             {
-                markerSize = 130;
+                markerSize = 60;
                 destroyImgPath = "pack://application:,,,/images/destroy.png";
             }
             else
             {
-                markerSize = 100;
+                markerSize = 60;
                 destroyImgPath = "pack://application:,,,/images/emergencyDestroy.png";
             }
 
@@ -376,7 +376,7 @@ namespace OCC.Views
             timer.Start();
             //if (missile_status != (uint)Missile.MissileStatus.HitSuccess)
             //{
-
+                // 사라지는 애니메이션 조건이 있다면 여기에 추가
             //}
         }
 
@@ -499,7 +499,7 @@ namespace OCC.Views
         private void AddImageMissileMarker(Missile missile)
         {
 
-            double markerSize = 55;  // 마커 이미지 크기 조정
+            double markerSize = 50;  // 마커 이미지 크기 조정
             string imgPath = "pack://application:,,,/images/missile.png"; // 리소스 경로
 
             // Grid로 이미지와 텍스트를 겹치게 배치
