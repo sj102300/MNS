@@ -391,7 +391,7 @@ namespace OCC.Views
                         if (route.Shape is System.Windows.Shapes.Path path)
                         {
                             path.Stroke = Brushes.Red;
-                            path.StrokeThickness = 4;
+                            path.StrokeThickness = 2;
                             path.StrokeDashArray = new DoubleCollection { 6, 4 };
                             path.Opacity = 0.8;
                         }
@@ -488,7 +488,7 @@ namespace OCC.Views
             var marker = new GMapMarker(new PointLatLng(missile.Latitude, missile.Longitude))
             {
                 Shape = markerGrid,
-                Offset = new Point(-(markerSize-10) / 2, -(markerSize-10) / 2)
+                Offset = new Point(-markerSize / 2, -markerSize / 2)
             };
 
             mapControl.Markers.Add(marker);
@@ -507,7 +507,7 @@ namespace OCC.Views
             route.Shape = new System.Windows.Shapes.Path
             {
                 Stroke = Brushes.Red,
-                StrokeThickness = 4,
+                StrokeThickness = 2,
                 StrokeDashArray = new DoubleCollection { 6, 4 },
                 Opacity = 0.8
             };
