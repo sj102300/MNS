@@ -34,8 +34,8 @@ struct InterceptResultPacket{
     unsigned int EvenetCode;
     unsigned int BodyLength;
     char EventId[20];
-    char MissileId[8];
     char AirCraftId[8];
+    char MissileId[8];
 };
 #pragma pack(pop)
 
@@ -60,7 +60,7 @@ struct OrderPacket {
 #pragma pack(pop)
 
 
-// ¹Ì»çÀÏ À¯µµ ±â´ÉÀ» À§ÇÑ Ç×°ø±â Á¤º¸ 
+// ë¯¸ì‚¬ì¼ ìœ ë„ ê¸°ëŠ¥ì„ ìœ„í•œ í•­ê³µê¸° ì •ë³´ 
 #pragma pack(push,1)
 struct AirCraftPacket {
     unsigned int EventCode;
@@ -71,7 +71,7 @@ struct AirCraftPacket {
 };
 #pragma pack(pop)
 
-// ¼Óµµ¸¦ °è»êÇÏ±âÀ§ÇÑ À§µµ¿Í °æµµ º¯È­·®??
+// ì†ë„ë¥¼ ê³„ì‚°í•˜ê¸°ìœ„í•œ ìœ„ë„ì™€ ê²½ë„ ë³€í™”ëŸ‰??
 #pragma pack(push,1)
 struct Velocity {
     double dLatitudePerSec;
