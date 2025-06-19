@@ -33,9 +33,9 @@ namespace OCC.Utils
 
             Task.Run(() =>
             {
-                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.99"), 9001);        //승엽
+                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.99"), 9001);        //승엽
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
-                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
+                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
                 using var udp = new UdpClient(ep);
 
