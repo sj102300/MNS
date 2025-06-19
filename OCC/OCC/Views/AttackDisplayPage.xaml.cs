@@ -259,7 +259,7 @@ namespace OCC.Views
 
             if (missile_status == (uint)Missile.MissileStatus.HitSuccess)
             {
-                markerSize = 150;
+                markerSize = 130;
                 destroyImgPath = "pack://application:,,,/images/destroy.png";
             }
             else
@@ -353,6 +353,7 @@ namespace OCC.Views
 
             if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
             {
+                UpdateMissileMarkerVisibility(missile);
                 if (_missileMarkers.TryGetValue(missile.Id, out var marker))
                 {
                     marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
@@ -361,7 +362,7 @@ namespace OCC.Views
 
             if (e.PropertyName == nameof(Missile.Status))
             {
-                UpdateMissileMarkerVisibility(missile);
+                //UpdateMissileMarkerVisibility(missile);
 
                 // 상태가 격추완료(HitSuccess)면 마커를 destroy.png로 교체
                 if (missile.Status == (uint)Missile.MissileStatus.HitSuccess ||
@@ -372,13 +373,13 @@ namespace OCC.Views
                 }
             }
 
-            if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
-            {
-                if (_missileMarkers.TryGetValue(missile.Id, out var marker))
-                {
-                    marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
-                }
-            }
+            //if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
+            //{
+            //    if (_missileMarkers.TryGetValue(missile.Id, out var marker))
+            //    {
+            //        marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
+            //    }
+            //}
         }
 
         //미사일 이미지 마커 변경 메서드
@@ -611,7 +612,8 @@ namespace OCC.Views
                         double angle = CalculateBearing(_missilePrevPositions[missile.Id].Lat, _missilePrevPositions[missile.Id].Lng, missile.Latitude, missile.Longitude);
                         //image.RenderTransform = new RotateTransform(angle, image.Width / 2, image.Height / 2);
                         image.RenderTransformOrigin = new Point(0.5, 0.5);
-                        image.RenderTransform = new RotateTransform(angle + 90);
+                        image.RenderTransform = new RotateTransform(angle);
+                        Debug.WriteLine($"{missile.Id} 미사일 방향각 조정 : {angle}");
                     }
                 }
             }
