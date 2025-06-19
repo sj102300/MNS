@@ -2,6 +2,8 @@
 #include "share.h"
 #include <string>
 
+//미사일로그창에서,, 유도중으로 바뀌게,, 메시지? 글자
+
 class Missile {
 public:
 	Missile(std::string id, TCC::Position pos_, int status, TCC::Position impact);
@@ -13,11 +15,13 @@ public:
 		EmergencyDestroyed = 3,        // 비상폭파(사용자가 비상폭파 명령 내림)
 		SelfDestroyed = 4,        // 자폭 (IP지났을 때 자동 폭파)
 		FollowUp = 5,				//유도 중
+		LaunchRequest = 6,			//발사 요청 중
 	};
 
 	bool checkId(std::string id);
 	bool isAvailable(unsigned int status, std::string& missileId);
 	void updateStatus(MissileStatus);
+	unsigned int getMissileStatus();
 	~Missile();
 
 private:

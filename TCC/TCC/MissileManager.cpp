@@ -58,6 +58,11 @@ Missile* MissileManager::selectMissile(const std::string& id) {
 void MissileManager::updateMissileStatus(const std::string& id, Missile::MissileStatus newStatus) {
     Missile* m = selectMissile(id);
     if (m) {
+        if (m->getMissileStatus() == Missile::MissileStatus::LaunchRequest) {
+            if (newStatus != Missile::MissileStatus::Fly) {
+                return;     //발사 요청 중일때 비행 상태로 변경된거 외에는 상태 업데이트 하면안됨
+            }
+        }
         m->updateStatus(newStatus);
         //std::cout << "Updated missile " << id << " to status " << (unsigned int)newStatus << "\n";
     }
@@ -86,7 +91,7 @@ void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg)
     //자폭한 경우
     if (msg.status_ == Missile::MissileStatus::SelfDestroyed) {
         std::string missileId(msg.missileId, 7);
-        engagementManager_->handleMissileDestroyed(missileId);
+        engagementManager_->handleMissileDestroyed(missileId, EngagementManager::DestroyType::SelfDestroy);
     }
 
   //  if (msg.status_ == 2) { // 2: 격추 성공
@@ -105,6 +110,18 @@ std::string MissileManager::findAvailableMissile() {
 	for (auto m : missiles_) {
 		if (m->isAvailable(0, missileId)) { // 사용가능한 미사일
 			//std::cout << "Found available missile: " << m->checkId("MSS-100") << "\n";
+            m->updateStatus(Missile::MissileStatus::LaunchRequest);
+            
+            std::thread([m]() {
+                //1초후에 실행
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+
+                if (m->getMissileStatus() != Missile::MissileStatus::Fly) {
+                    //발사 요청 실패한것
+                    m->updateStatus(Missile::MissileStatus::Wait);
+                }
+                }).detach();
+
 			return missileId;
 		}
 	}

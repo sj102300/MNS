@@ -87,19 +87,10 @@ void AircraftManager::judgeEngagable() {
 			targetAircraft->updatePosition(newAircraftWithIp.aircraftData_.location_);
 
 			if (targetAircraft->isEnemy()) {
-				/*std::cout << newAircraftWithIp.aircraftData_.aircraftId_
-					<< " is enemy aircraft. Not engageable." << std::endl;	*/
 				if (targetAircraft->hasBecomeEngageable(batteryLoc_, newAircraftWithIp.engagementStatus_)) {
-					
-					std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-					std::cout << newAircraftWithIp.aircraftData_.aircraftId_
-						<< "hasBecomeEngageable() true" << std::endl;
-					std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-
 					engagementManager_->addEngagableAircraft(newAircraftWithIp.aircraftData_.aircraftId_);
 				}
 			}
-
 			sender_->sendAircraftData(newAircraftWithIp);
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));

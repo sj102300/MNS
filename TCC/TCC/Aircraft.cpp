@@ -64,7 +64,7 @@ void Aircraft::getImpactPoint(TCC::Position &impactPoint) {
 
 bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
     double vt = 1.0; // 항공기 속도 (km/s)
-    double vm = 2.0; // 미사일 속도 (km/s)
+    double vm = 2.25; // 미사일 속도 (km/s)
 
     if (dirVec_.isZeroVector()) {
         impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
@@ -114,6 +114,7 @@ bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
 bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus) {
 
     engagementStatus = (unsigned int)status_;
+
     if (status_ == EngagementStatus::Engaging || status_ == EngagementStatus::Destroyed) {
         return false; // 이미 교전 중이거나 격추된 상태
     }

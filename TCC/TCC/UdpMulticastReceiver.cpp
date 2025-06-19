@@ -143,7 +143,7 @@ bool TCC::UdpMulticastReceiver::parseReceivedAircraftMSG(const char * buffer, Ai
 
 	AircraftMSG msg;
 	memcpy((void*)&msg, buffer, length);
-
+	 
 	//if (!TCC::isValidAircraftId(msg.aircraftId_))
 	//	return false;
 

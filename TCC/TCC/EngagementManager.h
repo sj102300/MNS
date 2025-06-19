@@ -20,6 +20,11 @@ class AircraftManager;
 
 class EngagementManager {
 public:
+	enum DestroyType {
+		SelfDestroy = 10,
+		EmergencyDestroy = 20,
+		EngagementSuccess = 30,
+	};
 	EngagementManager();
 	void start();
 	void stop();
@@ -31,7 +36,7 @@ public:
 	bool emergencyDestroy(std::string commandId, std::string missileId);
 	void addEngagableAircraft(std::string& aircraftId);
 	bool manualFire(std::string commandId, std::string targetAircraftId);
-	bool handleMissileDestroyed(std::string& missileId);
+	bool handleMissileDestroyed(std::string& missileId, unsigned int type);
 	void notifyThread();
 	~EngagementManager();
 
@@ -40,6 +45,7 @@ private:
 		Auto = 0,
 		Manual = 1,
 	};
+	
 
 	class EngagableAircraftQueue {
 	public:
