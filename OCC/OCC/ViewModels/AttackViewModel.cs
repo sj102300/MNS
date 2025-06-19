@@ -333,9 +333,6 @@ namespace OCC.ViewModels
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (status == (uint)Missile.MissileStatus.FollowUp)
-                    status = (uint)Missile.MissileStatus.HitSuccess;  // 
-
                 if (missileLookup.TryGetValue(id, out var missile))
                 {
                     missile.Latitude = lat;
