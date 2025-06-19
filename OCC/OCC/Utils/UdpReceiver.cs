@@ -23,6 +23,7 @@ namespace OCC.Utils
         public static event Action<string, double, double, double, uint, uint, double, double, double> AircraftReceived;
         public static event Action<string, string, string, double,double, double> ImpactPointReceived;
         public static event Action<string, double, double, double, uint> MissileReceived;
+        public static event Action<string, string, string, uint> MissileDestroyReceived;
 
         public static void Start(ObservableCollection<AircraftWithIp> aircraftList, Dictionary<string, AircraftWithIp> aircraftLookup,
             ObservableCollection<Missile> missileList, Dictionary<string, Missile> missileLookup,
@@ -33,9 +34,9 @@ namespace OCC.Utils
 
             Task.Run(() =>
             {
-                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.99"), 9001);        //승엽
+                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.99"), 9001);        //승엽
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
-                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
+                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
                 using var udp = new UdpClient(ep);
 
@@ -58,6 +59,10 @@ namespace OCC.Utils
                             else if(cmd == 201)
                             {
                                 ParseLaunchCommand(data.Skip(8).ToArray());
+                            }
+                            else if(cmd == 203)
+                            {
+                                ParseMissileDestroy(data.Skip(8).ToArray());
                             }
                             else if (cmd == 300)
                             {
@@ -155,6 +160,33 @@ namespace OCC.Utils
 
             MissileReceived?.Invoke(id, lat, lon, alt, status);
             //Debug.WriteLine($"[Missile] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, Status: {status}");
+        }
+
+        private static void ParseMissileDestroy(byte[] body)
+        {
+            // body: [발사명령식별자(20)][항공기식별자(8)][미사일식별자(8)][폭파종류(4)]
+            int offset = 0;
+
+            string launchCommandId = Encoding.ASCII.GetString(body, offset, 20).Trim('\0', ' ');
+            offset += 20;
+
+            string aircraftId = Encoding.ASCII.GetString(body, offset, 8).Trim('\0', ' ');
+            offset += 8;
+
+            string missileId = Encoding.ASCII.GetString(body, offset, 8).Trim('\0', ' ');
+            offset += 8;
+
+            uint destroyType = BitConverter.ToUInt32(body, offset);
+            offset += 4;
+
+            // 필요에 따라 이벤트로 전달 (destroyType 추가)
+            MissileDestroyReceived?.Invoke(launchCommandId, aircraftId, missileId, destroyType);
+
+            Debug.WriteLine($"[MissileDestroy]");
+            Debug.WriteLine($"  발사명령 식별자: {launchCommandId}");
+            Debug.WriteLine($"  항공기 식별자  : {aircraftId}");
+            Debug.WriteLine($"  미사일 식별자  : {missileId}");
+            Debug.WriteLine($"  폭파 종류      : {destroyType}");
         }
 
     }
