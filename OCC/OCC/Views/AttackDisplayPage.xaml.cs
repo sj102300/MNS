@@ -369,20 +369,30 @@ namespace OCC.Views
                 {
                     var last = routePoints.LastOrDefault();
                     var curr = new PointLatLng(missile.Latitude, missile.Longitude);
+
+                    // bearing 계산
+                    double angle = 0;
+                    if (_missilePrevPositions.TryGetValue(missile.Id, out var prev))
+                        angle = CalculateBearing(prev.Lat, prev.Lng, missile.Latitude, missile.Longitude);
+
+                    var tail = GetMissileTailPosition(missile, angle, 45); // markerSize-10
+
+                    // 중복 좌표 방지
                     if (last == null || last.Lat != curr.Lat || last.Lng != curr.Lng)
                     {
+                        // 마지막 점을 꼬리로 보정
+                        routePoints.Add(tail);
                         routePoints.Add(curr);
                         route.Points.Clear();
                         route.Points.AddRange(routePoints);
-                        // 반드시 RegenerateShape 호출
                         mapControl.RegenerateShape(route);
 
-                        // RegenerateShape 이후 스타일 재적용
+                        // 스타일 재적용
                         if (route.Shape is System.Windows.Shapes.Path path)
                         {
                             path.Stroke = Brushes.Red;
                             path.StrokeThickness = 4;
-                            //path.StrokeDashArray = new DoubleCollection { 1, 3 };
+                            path.StrokeDashArray = new DoubleCollection { 6, 4 };
                             path.Opacity = 0.8;
                         }
                     }
@@ -409,6 +419,28 @@ namespace OCC.Views
             //        marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
             //    }
             //}
+        }
+
+        // 미사일의 꼬리 위치 구하는 함수
+        private PointLatLng GetMissileTailPosition(Missile missile, double angleDegree, double markerSize)
+        {
+            // markerSize: 이미지의 실제 픽셀 크기 (지도상에서 약간의 거리로 변환)
+            // angleDegree: 미사일의 진행 방향(0=북쪽, 90=동쪽, 180=남쪽, 270=서쪽)
+            // 꼬리(뒤쪽)는 진행방향의 반대(-180도)로 markerSize/2 만큼 이동
+
+            // 위도 1도 ≈ 111,320m, 경도 1도 ≈ 111,320 * cos(위도)
+            double meters = (markerSize / 2) * 2.5; // 2.5: 픽셀→미터 보정(지도 확대/축소에 따라 조정 필요)
+            double bearing = (angleDegree + 180) % 360; // 꼬리 방향
+
+            double lat = missile.Latitude;
+            double lng = missile.Longitude;
+
+            // 위도 변화량
+            double dLat = meters * Math.Cos(bearing * Math.PI / 180.0) / 111320.0;
+            // 경도 변화량
+            double dLng = meters * Math.Sin(bearing * Math.PI / 180.0) / (111320.0 * Math.Cos(lat * Math.PI / 180.0));
+
+            return new PointLatLng(lat + dLat, lng + dLng);
         }
 
         //미사일 이미지 마커 변경 메서드
@@ -456,7 +488,7 @@ namespace OCC.Views
             var marker = new GMapMarker(new PointLatLng(missile.Latitude, missile.Longitude))
             {
                 Shape = markerGrid,
-                Offset = new Point(-markerSize / 2, -markerSize / 2)
+                Offset = new Point(-(markerSize-10) / 2, -(markerSize-10) / 2)
             };
 
             mapControl.Markers.Add(marker);
@@ -464,15 +496,19 @@ namespace OCC.Views
             _missilePrevPositions[missile.Id] = new PointLatLng(missile.Latitude, missile.Longitude);
 
             // 경로 Polyline 추가
-            var routePoints = new List<PointLatLng> { new PointLatLng(missile.Latitude, missile.Longitude) };
+            double angle = 0;
+            if (_missilePrevPositions.TryGetValue(missile.Id, out var prev))
+                angle = CalculateBearing(prev.Lat, prev.Lng, missile.Latitude, missile.Longitude);
+
+            var tail = GetMissileTailPosition(missile, angle, markerSize - 10);
+            var routePoints = new List<PointLatLng> { tail, new PointLatLng(missile.Latitude, missile.Longitude) };
             var route = new GMapRoute(routePoints);
             mapControl.Markers.Add(route);
-            // 스타일을 반드시 지정
             route.Shape = new System.Windows.Shapes.Path
             {
                 Stroke = Brushes.Red,
                 StrokeThickness = 4,
-                //StrokeDashArray = new DoubleCollection { 6, 1 },
+                StrokeDashArray = new DoubleCollection { 6, 4 },
                 Opacity = 0.8
             };
             mapControl.RegenerateShape(route);
@@ -666,7 +702,7 @@ namespace OCC.Views
                         //image.RenderTransform = new RotateTransform(angle, image.Width / 2, image.Height / 2);
                         image.RenderTransformOrigin = new Point(0.5, 0.5);
                         image.RenderTransform = new RotateTransform(angle);
-                        Debug.WriteLine($"{missile.Id} 미사일 방향각 조정 : {angle}");
+                        //Debug.WriteLine($"{missile.Id} 미사일 방향각 조정 : {angle}");
                     }
                 }
             }
