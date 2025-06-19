@@ -74,18 +74,17 @@
                         <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="13" TextAlignment="Center" Foreground="#FFDDDDDD"/>  
                                 <!--<TextBlock Text="{Binding MissileStatusText}" FontSize="8" Margin="0,0,0,0" HorizontalAlignment="Center" TextAlignment="Center"/>-->
-                                <Image Loaded="Image_Loaded"
-                                       Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
-                                       TargetUpdated="Image_TargetUpdated"
-                                       Stretch="UniformToFill"
-                                              MaxWidth="170"
-       HorizontalAlignment="Stretch"
-       VerticalAlignment="Stretch"
-                                       >
-                                    <Image.Source>
-                                        <Binding Path="VisualState"
-                                                 Converter="{StaticResource VisualStateToGifConverter}"
-                                                 UpdateSourceTrigger="PropertyChanged" />
+                            <Image Loaded="Image_Loaded"
+                                   Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
+                                   TargetUpdated="Image_TargetUpdated"
+                                   Stretch="UniformToFill"
+                                   MaxWidth="170"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch">
+                                <Image.Source>
+                                    <Binding Path="VisualState"
+                                        Converter="{StaticResource VisualStateToGifConverter}"
+                                        UpdateSourceTrigger="PropertyChanged" />
                                     </Image.Source>
                                 </Image>
                             </StackPanel>
