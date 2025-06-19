@@ -15,6 +15,10 @@ void Missile::updateStatus(MissileStatus newStatus) {
 	status_ = newStatus;
 }
 
+unsigned int Missile::getMissileStatus() {
+	return status_;
+}
+
 bool Missile::checkId(std::string id) {
 	if (id == missileId_) {
 		return true;

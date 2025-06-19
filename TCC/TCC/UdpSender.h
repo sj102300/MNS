@@ -43,8 +43,8 @@ namespace TCC{
 		bool sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint);
 		const int serializeLaunchCommandBody(char* buffer, std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint);
 
-        bool sendDestroyCommand(std::string& commandId, std::string& aircraftId, std::string& missileId);
-        const int serializeDestroyCommand(char* buffer, std::string& commandId, std::string& aircraftId, std::string missileId);
+        bool sendDestroyCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, unsigned int type);
+        const int serializeDestroyCommand(char* buffer, std::string& commandId, std::string& aircraftId, std::string missileId, unsigned int type);
 
     private:
         std::string ip_;

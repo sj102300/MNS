@@ -142,12 +142,12 @@ const int TCC::UdpSender::serializeMissileSender(char* buffer, UdpMulticastRecei
     return 36; // 총 직렬화된 body바이트 수
 }
 
-bool TCC::UdpSender::sendDestroyCommand(std::string&commandId, std::string& aircraftId, std::string& missileId) {
+bool TCC::UdpSender::sendDestroyCommand(std::string&commandId, std::string& aircraftId, std::string& missileId, unsigned int type) {
 
     char buffer[44];
     //헤더 붙이기
     int headerSize = serializeHeader(buffer, CommandCode::DestroyCommand, 36);
-    int bodySize = serializeDestroyCommand(buffer + headerSize, commandId, aircraftId, missileId);
+    int bodySize = serializeDestroyCommand(buffer + headerSize, commandId, aircraftId, missileId, type);
 
     if (sendByteData(buffer, headerSize + bodySize) < 0) {
         std::cerr << "sendByteData() failed: " << WSAGetLastError() << "\n";
@@ -160,14 +160,14 @@ bool TCC::UdpSender::sendDestroyCommand(std::string&commandId, std::string& airc
     return true;
 }
 
-
-const int TCC::UdpSender::serializeDestroyCommand(char* buffer, std::string&commandId, std::string& aircraftId, std::string missileId) {
+const int TCC::UdpSender::serializeDestroyCommand(char* buffer, std::string&commandId, std::string& aircraftId, std::string missileId, unsigned int type) {
     std::memset(buffer + 0, 0, 8);
     std::memcpy(buffer + 0, commandId.c_str(), 20);
-    std::memcpy(buffer + 8, aircraftId.c_str(), 8);
-    std::memcpy(buffer + 12, missileId.c_str(), 8);
+    std::memcpy(buffer + 20, aircraftId.c_str(), 8);
+    std::memcpy(buffer + 28, missileId.c_str(), 8);
+    std::memcpy(buffer + 36, &type, sizeof(unsigned int));
 
-    return 36; // 총 직렬화된 body바이트 수
+    return 40; // 총 직렬화된 body바이트 수
 }
 
 //const int TCC::UdpSender::serializeEmergencySender(char* buffer, std::string commandId, std::string missileId) {

@@ -43,17 +43,26 @@ namespace {
 }
 
 void Aircraft::calcDirVec(const TCC::Position& newPos) {
-    // 항공기 위치 - 새로운 위치 (방향 벡터 계산)
-    double dx = newPos.longitude_ - pos_.longitude_;
-    double dy = newPos.latitude_ - pos_.latitude_;
+    // 현재 위치(lat1, lon1)와 새로운 위치(lat2, lon2)를 라디안으로 변환
+    double lat1 = pos_.latitude_ * DEG_TO_RAD;
+    double lon1 = pos_.longitude_ * DEG_TO_RAD;
+    double lat2 = newPos.latitude_ * DEG_TO_RAD;
+    double lon2 = newPos.longitude_ * DEG_TO_RAD;
 
-    // 벡터 크기 계산 (정규화 필요)
-    double magnitude = std::sqrt(dx * dx + dy * dy);
-    if (magnitude == 0.0) return; // 방향 없음
+    // 경도 차이 계산
+    double dLon = lon2 - lon1;
 
-    // 정규화
-    dirVec_.dx_ = dx / magnitude;
-    dirVec_.dy_ = dy / magnitude;
+    // 방향 벡터의 x, y 성분 계산 (구면 삼각법 기반)
+    // x: 동쪽 방향 성분, y: 북쪽 방향 성분
+    double x = cos(lat2) * sin(dLon);
+    double y = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
+
+    // 크기 계산 후 정규화
+    double magnitude = std::sqrt(x * x + y * y);
+    if (magnitude == 0) return; // 같은 위치일 경우 방향 없음
+
+    dirVec_.dx_ = x / magnitude; // 단위 방향 벡터 (x 성분)
+    dirVec_.dy_ = y / magnitude; // 단위 방향 벡터 (y 성분)
 
     return;
 }
@@ -64,7 +73,7 @@ void Aircraft::getImpactPoint(TCC::Position &impactPoint) {
 
 bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
     double vt = 1.0; // 항공기 속도 (km/s)
-    double vm = 2.0; // 미사일 속도 (km/s)
+    double vm = 2.25; // 미사일 속도 (km/s)
 
     if (dirVec_.isZeroVector()) {
         impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
@@ -114,6 +123,7 @@ bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
 bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus) {
 
     engagementStatus = (unsigned int)status_;
+
     if (status_ == EngagementStatus::Engaging || status_ == EngagementStatus::Destroyed) {
         return false; // 이미 교전 중이거나 격추된 상태
     }

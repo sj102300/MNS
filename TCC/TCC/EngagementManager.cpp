@@ -71,7 +71,7 @@ bool EngagementManager::mappingMissileToAircraft(std::string & aircraftId, std::
 		return false;		//사용가능한 미사일이 없음. 더미 데이터
 	}
 
-	//WDL기능 할거면 이미 있는 미사일인지 검사하기
+	
 	missileToAircraft_[missileId] = aircraftId;
 	return true;
 }
@@ -122,7 +122,7 @@ bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::str
 	}
 
 	//터진 미사일의 원래 발사 명령 찾기
-	if (!handleMissileDestroyed(targetMissileId)) {
+	if (!handleMissileDestroyed(targetMissileId, DestroyType::EngagementSuccess)) {
 		std::cout << u8"===========================================================" << std::endl;
 		std::cout << u8"미사일 폭파 메시지 전송 실패! engagementSuccess()" << std::endl;
 		std::cout << u8"===========================================================" << std::endl;
@@ -133,7 +133,7 @@ bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::str
 	return true;
 }
 
-bool EngagementManager::handleMissileDestroyed(std::string& missileId) {
+bool EngagementManager::handleMissileDestroyed(std::string& missileId, unsigned int type) {
 	std::string launchCommandId = "";
 	std::string aircraftId = "";
 	for (auto& v : fireCommands_) {
@@ -150,7 +150,7 @@ bool EngagementManager::handleMissileDestroyed(std::string& missileId) {
 		return false;
 	}
 
-	sender_->sendDestroyCommand(launchCommandId, aircraftId, missileId);
+	sender_->sendDestroyCommand(launchCommandId, aircraftId, missileId, type);
 	return true;
 
 }
@@ -279,7 +279,6 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 
 	//발사명령 보내기
 	fireCommands_[commandId] = { missileId, aircraftId };
-	std::cout << "fireCommands_.size() : "<<fireCommands_.size() << std::endl;
 	multisender_->sendLaunchCommand(commandId, aircraftId, missileId, impactPoint);
 	sender_->sendLaunchCommand(commandId, aircraftId, missileId, impactPoint);
 
@@ -311,7 +310,7 @@ bool EngagementManager::emergencyDestroy(std::string commandId, std::string miss
 
 	//비상폭파했다치고..
 	//걔가 쫓던 발사명령을 찾아와야함
-	if (!handleMissileDestroyed(missileId)) {
+	if (!handleMissileDestroyed(missileId, DestroyType::EmergencyDestroy)) {
 		std::cout << u8"===========================================================" << std::endl;
 		std::cout << u8"미사일 폭파 메시지 전송 실패! emergencyDestroy()" << std::endl;
 		std::cout << u8"===========================================================" << std::endl;
