@@ -107,31 +107,31 @@ int main() {
     std::thread scenarioThread([&]() {
         scenarioRunner.run();  // blocking
         });
-    std::cout << u8"시나리오 신호 받기전..?" << "\n";
     while (true) {
         {
             std::unique_lock<std::mutex> lock(mtx);
             cv.wait(lock, [] { return isChanged.load(); });
             isChanged = false;
         }
+        
         if (running) {
-            std::cout << "[" << SUBSYSTEM_ID << "] LCH 시스템 실행...\n";
+            std::cout << u8"[" << SUBSYSTEM_ID << u8"] LCH 시스템 실행...\n";
 
             if (!launcher.init(UDP_IP, 9000,UDP_IP,9000)) {
-                std::cerr << "[" << SUBSYSTEM_ID << "] 초기화 실패! 스레드 실행 안함\n";
+                std::cerr << u8"[" << SUBSYSTEM_ID << u8"] error for initialized!!! thread can't start\n";
                 continue;
             }
             
-            if (launcherThread.joinable()) {
-                launcherThread.join(); // 이전 thread가 돌고 있었다면 반드시 정리
-            }
+            //if (launcherThread.joinable()) {
+            //    launcherThread.join(); // 이전 thread가 돌고 있었다면 반드시 정리
+            //}
 
             launcherThread = std::thread([&]() {
                 launcher.run();
                 });
         }
         else {
-            std::cout << "[" << SUBSYSTEM_ID << "] 시뮬레이션 종료 처리 중...\n";
+            std::cout << u8"[" << SUBSYSTEM_ID << u8"] 시뮬레이션 종료 처리 중...\n";
 
             launcher.stop();  // run 루프 내부 탈출 유도
 
@@ -139,13 +139,38 @@ int main() {
                 launcherThread.join();
             }
 
-            std::cout << "[" << SUBSYSTEM_ID << "] LCH 시스템 종료 완료, 대기 상태 진입\n";
+            std::cout << u8"[" << SUBSYSTEM_ID << u8"] LCH 시스템 종료 완료, 대기 상태 진입\n";
         }
     }
 
     if (scenarioThread.joinable()) scenarioThread.join();
 
-    std::cout << "[" << SUBSYSTEM_ID << "] 프로그램 종료\n";
+    std::cout << u8"[" << SUBSYSTEM_ID << u8"] 프로그램 종료\n";
     return 0;
 }
+
+
+//int main(void) {
+//
+//    std::cout << u8"[" << SUBSYSTEM_ID << u8"] LCH 시스템 실행...\n";
+//
+//    if (!launcher.init(UDP_IP, 9000,UDP_IP,9000)) {
+//        std::cerr << u8"[" << SUBSYSTEM_ID << u8"] 초기화 실패! 스레드 실행 안함\n";
+//      
+//    }
+//            
+//    if (launcherThread.joinable()) {
+//        launcherThread.join(); // 이전 thread가 돌고 있었다면 반드시 정리
+//    }
+//
+//    launcherThread = std::thread([&]() {
+//        launcher.run();
+//        });
+//
+//    while (1) {
+//
+//    }
+//
+//}
+
 #endif

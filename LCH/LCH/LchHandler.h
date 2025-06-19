@@ -2,6 +2,13 @@
 
 #include "UdpReceiver.h"
 #include "UdpMulSender.h"
+#include "Packet.h"
+#include <vector>
+
+struct MissileStatus {
+    std::string missileId;
+    unsigned int status;
+};
 
 class LCHLauncher {
 public:
@@ -20,4 +27,5 @@ private:
     std::unique_ptr<UdpReceiver> receiver_;
     std::unique_ptr<UdpMulSender> sender_;
     std::atomic<bool> running_;
+    std::vector<MissileStatus> missileStatusList_;
 };

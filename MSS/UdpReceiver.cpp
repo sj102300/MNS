@@ -2,7 +2,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "UdpReceiver.h"
 #include "Packet.h"
-
+#include "MissileController.h" // [추가]
 
 UdpReceiver::UdpReceiver()
     : sock_(INVALID_SOCKET), running_(false), port_(0) {
@@ -91,9 +91,11 @@ void UdpReceiver::run() {
                 OrderPacket orderpkg;
                 memcpy(&orderpkg, bodyPtr, sizeof(orderpkg));
                 std::string missileId(orderpkg.MissileId, strnlen(orderpkg.MissileId, 8));
+                std::string aircraftId(orderpkg.AtsId, strnlen(orderpkg.AtsId, 8));
                 Location impactPoint = orderpkg.ImpactPoint;
 
-                std::cout << u8"수신한 미사일 ID: [" << missileId << "]\n";
+                std::cout << u8"[명령 수신] 미사일: " << missileId
+                    << u8", 타겟 항공기: " << aircraftId << "\n";
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
@@ -102,6 +104,18 @@ void UdpReceiver::run() {
                     missile->setMissileId(missileId);
                     missile->setState(1);  // 예: 3 = 발사 후 비행 상태
                     missile->setTargetLocation(impactPoint);
+                
+                    // 타겟 항공기 ID 설정
+                    missile->setTargetAircraftId(aircraftId);
+
+                    // 컨트롤러에도 항공기 ID 전달
+                    auto controller = missile->getController();
+                    if (controller) {
+                        controller->setTargetAircraftId(aircraftId);
+
+                        // aircraft map도 연결
+                        controller->setAircraftMap(&Aircraft_map_);
+                    }
                 }
                 std::cout << u8"[업데이트됨] 미사일: " << missileId
                     << u8" → 목표: (" << impactPoint.altitude << ", " << impactPoint.latitude << ")\n";
@@ -152,8 +166,38 @@ void UdpReceiver::run() {
                     missile->setMissileId(missileId);
                     missile->setState(3);  // 3번은 비상폭파 상태임
                 }
-                std::cout << u8"[업데이트됨] 미사일: " << missileId << "비상폭파 상태로 변환\n";
+                std::cout << u8"[업데이트됨] 미사일: " << missileId << u8"비상폭파 상태로 변환\n";
 
+                break;
+            }
+                     // ATS를 주기적으로 받기 위함임
+            case 1001: {
+                if (bodyLength < sizeof(AirCraftPacket) - 8) {
+                    std::cerr << u8"항공기 패킷 길이 부족\n";
+                    break;
+                }
+                AirCraftPacket acPacket;
+                memcpy(&acPacket, bodyPtr, sizeof(acPacket));
+
+                std::string aircraftId(acPacket.AtsId, strnlen(acPacket.AtsId, 8));
+                Location loc = acPacket.AtsLoc;
+                //Velocity vel = acPacket.AtsVelocity;
+
+                auto it = Aircraft_map_.find(aircraftId);
+                if (it != Aircraft_map_.end()) {
+                    // 기존 객체가 있으면 업데이트
+                    auto aircraft = it->second;
+                    aircraft->update(loc);
+                }
+                else {
+                    // 없으면 새 객체 만들어 추가
+                    auto newAircraft = std::make_shared<Aircraft>(aircraftId, loc);
+                    Aircraft_map_[aircraftId] = newAircraft;
+                }
+
+                std::cout << u8"[항공기 업데이트] ID: " << aircraftId
+                    << u8" → 위치: (" << loc.latitude << ", " << loc.longitude << ", " << loc.altitude << ")\n";
+            
                 break;
             }
             default:
@@ -178,4 +222,8 @@ void UdpReceiver::close() {
 
 void UdpReceiver::setMissileMap(const std::unordered_map<std::string, std::shared_ptr<Missile>>& map) {
     missile_map_ = map;
+}
+
+const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* UdpReceiver::getAircraftMapPtr() const {
+    return &Aircraft_map_;
 }

@@ -3,6 +3,9 @@
 #include "LchHandler.h"
 #include <iostream>
 #include <cstring>  // memcpy
+#include <algorithm> // std::find_if
+#include <cstdio>    // printf
+
 
 LCHLauncher::LCHLauncher():running_(false) {}
 
@@ -26,21 +29,25 @@ void LCHLauncher::run() {
     char buffer[2048];
 
     while (running_) {
-        int bytes = receiver_->receive(buffer, sizeof(buffer));
+      
+        int bytes = receiver_->receive(buffer, sizeof(buffer)); // 여기서 일단 받는다
+       
         if (bytes < 8) continue;
 
         uint32_t eventCode;
         uint32_t bodyLength;
+        char cl[8];
         memcpy(&eventCode, buffer, 4);
         memcpy(&bodyLength, buffer + 4, 4);
+        memcpy(&cl, buffer + 44, 8);
 
         if (bytes < 8 + static_cast<int>(bodyLength)) {
-            std::cerr << "[LCH] 원하는 정보가 아님\n";
+            std::cerr << u8"[LCH] 원하는 정보가 아님\n";
             continue;
         }
 
         if (eventCode == 2001) {
-            std::cout << "[LCH] 발사명령 수신 → MSS로 전송 중...\n";
+            std::cout << u8"[LCH] 발사명령 수신 → " << cl <<u8"로 전송 중...\n";
 
             // eventCode 수정: 2001 → 2002
             uint32_t newEventCode = 2002;
@@ -48,10 +55,35 @@ void LCHLauncher::run() {
 
             int sent = sender_->send(buffer, bytes);
             if (sent < 0)
-                std::cerr << "[LCH] MSS 전송 실패\n";
+                std::cerr << u8"[LCH] MSS 전송 실패\n";
             else
-                std::cout << "[LCH] MSS 전송 완료 (" << sent << " bytes)\n";
+                std::cout << u8"[LCH] MSS 전송 완료 (" << sent << " bytes)\n";
+        }else if (eventCode == 3001) {
+            if (bodyLength < sizeof(MissilePacket) - 8) {
+                std::cerr << u8"[LCH] 미사일 패킷 크기 이상\n";
+                continue;
+            }
+
+            MissilePacket* pkt = reinterpret_cast<MissilePacket*>(buffer);
+
+            // missileId 문자열 변환 (null 종료 보장 안 될 수 있으니 strnlen 사용)
+            std::string missileId(pkt->MissileId, strnlen(pkt->MissileId, sizeof(pkt->MissileId)));
+            unsigned int status = pkt->MissileState;
+
+            // 상태 업데이트 또는 새로 추가
+            auto it = std::find_if(missileStatusList_.begin(), missileStatusList_.end(),
+                [&](const MissileStatus& m) { return m.missileId == missileId; });
+
+            if (it != missileStatusList_.end()) {
+                it->status = status;
+            }
+            else {
+                missileStatusList_.push_back({ missileId, status });
+            }
+
+           // std::cout << u8"[LCH] 미사일 상태 업데이트 - ID: " << missileId << ", 상태: " << status << "\n";
         }
+        
     }
 }
 void LCHLauncher::stop() {

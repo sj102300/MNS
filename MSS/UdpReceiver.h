@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include "IReceiver.h" // 이 부분 테스팅 위해 추가
 #include "Missile.h"
+#include "Aircraft.h"
 
 class UdpReceiver : public IReceiver {
 public:
@@ -29,6 +30,7 @@ public:
     // 미사일 설정
     void setMissileMap(const std::unordered_map<std::string, std::shared_ptr<Missile>>& map); // 6개의 미사일 객체를 관리하기 위함
 
+    const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* getAircraftMapPtr() const;
 
 private:
     SOCKET sock_;
@@ -39,4 +41,6 @@ private:
     int port_;
     std::shared_ptr<Missile> missile_;
     std::unordered_map<std::string, std::shared_ptr<Missile>> missile_map_;
+    std::shared_ptr<Aircraft> aircraft_;
+    std::unordered_map <std::string, std::shared_ptr<Aircraft>> Aircraft_map_;
 };

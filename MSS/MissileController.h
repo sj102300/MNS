@@ -1,7 +1,15 @@
 #pragma once
 
 #include "Missile.h"
+#include "Aircraft.h"  // [추가] Aircraft
 #include <chrono>
+#include <unordered_map>
+#include <string>
+#include <memory>
+#include <cmath>
+#define EARTH_RADIUS_KM 6371.0
+
+class Aircraft;  // [추가] 선언
 
 class MissileController {
 public:
@@ -9,7 +17,7 @@ public:
 
 	void setMissile(std::shared_ptr<Missile> m);
 
-	void setTarget(Location pos);
+	void setTarget(Location pos);  // 기존 임팩트 포인트용
 
 	void start(float speed);
 
@@ -19,8 +27,14 @@ public:
 
 	void updatePosition(float speed = 5.0f);
 
+	// [추가] 추적용 항공기 ID, 맵 설정
+	void setTargetAircraftId(const std::string& aircraftId);
+	void setAircraftMap(const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* aircraftMap);
+
+	double toRad(double deg);
+	double haversine(double lat1, double lon1, double lat2, double lon2);
+
 	// gtest를 위한 코드 2줄
-public:
 	bool hasTarget() const { return hasTarget_; }
 	double getEstimatedTimeToImpact() const { return estimatedTimeToImpact_; }
 
@@ -35,4 +49,9 @@ private:
 	std::chrono::steady_clock::time_point launch_time_;
 	bool launch_time_recorded_ = false;
 	double estimatedTimeToImpact_ = -1.0;
+
+	// [추가]
+	std::string targetAircraftId_;
+	const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* aircraftMap_ = nullptr;
+	bool hasEnteredTerminalGuidance_ = false;
 };

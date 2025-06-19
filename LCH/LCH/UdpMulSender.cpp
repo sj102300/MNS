@@ -62,5 +62,5 @@ void UdpMulSender::close() {
         closesocket(sock_);
         sock_ = INVALID_SOCKET;
     }
-    WSACleanup();
+    //WSACleanup();
 }

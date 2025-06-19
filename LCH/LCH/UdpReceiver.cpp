@@ -14,20 +14,20 @@ bool UdpReceiver::init(const std::string& multicast_addr, int port) {
 
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        std::cerr << "WSAStartup failed\n";
+        std::cerr << u8"WSAStartup failed\n";
         return false;
     }
 
     sock_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock_ == INVALID_SOCKET) {
-        std::cerr << "socket() failed\n";
+        std::cerr << u8"socket() failed\n";
         WSACleanup();
         return false;
     }
 
     int reuse = 1;
     if (setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse)) < 0) {
-        std::cerr << "setsockopt SO_REUSEADDR failed\n";
+        std::cerr << u8"setsockopt SO_REUSEADDR failed\n";
         closesocket(sock_);
         WSACleanup();
         return false;
@@ -39,17 +39,17 @@ bool UdpReceiver::init(const std::string& multicast_addr, int port) {
     localAddr_.sin_port = htons(port_);
 
     if (bind(sock_, (sockaddr*)&localAddr_, sizeof(localAddr_)) < 0) {
-        std::cerr << "bind() failed\n";
+        std::cerr << u8"bind() failed\n";
         closesocket(sock_);
         WSACleanup();
         return false;
     }
 
     mreq_.imr_multiaddr.s_addr = inet_addr(multicast_addr.c_str());
-    mreq_.imr_interface.s_addr = htonl(INADDR_ANY);
+    mreq_.imr_interface.s_addr = inet_addr("192.168.2.11");
 
     if (setsockopt(sock_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq_, sizeof(mreq_)) < 0) {
-        std::cerr << "setsockopt IP_ADD_MEMBERSHIP failed\n";
+        std::cerr << u8"setsockopt IP_ADD_MEMBERSHIP failed\n";
         closesocket(sock_);
         WSACleanup();
         return false;
@@ -63,7 +63,7 @@ int UdpReceiver::receive(char* buffer, int bufferSize) {
     int senderLen = sizeof(senderAddr);
     int ret = recvfrom(sock_, buffer, bufferSize, 0, (sockaddr*)&senderAddr, &senderLen);
     if (ret == SOCKET_ERROR) {
-        std::cerr << "recvfrom failed: " << WSAGetLastError() << "\n";
+        std::cerr << u8"recvfrom failed: " << WSAGetLastError() << "\n";
         return -1;
     }
     return ret;
