@@ -335,6 +335,16 @@ bool EngagementManager::EngagableAircraftQueue::pushQueue(std::string& aircraftI
 	return true;
 }
 
+bool EngagementManager::weaponDataLink(std::string commandId, std::string aircraftId, std::string missileId) {
+
+	//¹»ÇØÁà¾ßÇÏÁö?
+	TCC::Position impactPoint;
+
+	//TODO!!!!!!!!!!!!!!!!!!!!!!!!
+
+	multisender_->sendWDLCommand(commandId, aircraftId, missileId, impactPoint);
+}
+
 bool EngagementManager::EngagableAircraftQueue::popQueue(std::string& aircraftId) {
 	std::lock_guard<std::mutex>lock(mtx_);
 	if (queue.empty())

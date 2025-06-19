@@ -37,6 +37,8 @@ public:
 	void addEngagableAircraft(std::string& aircraftId);
 	bool manualFire(std::string commandId, std::string targetAircraftId);
 	bool handleMissileDestroyed(std::string& missileId, unsigned int type);
+	bool weaponDataLink(std::string commandId, std::string aircraftId, std::string missileId);
+
 	void notifyThread();
 	~EngagementManager();
 
