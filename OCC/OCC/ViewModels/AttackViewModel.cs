@@ -333,9 +333,6 @@ namespace OCC.ViewModels
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (status == (uint)Missile.MissileStatus.FollowUp)
-                    status = (uint)Missile.MissileStatus.HitSuccess;  // 
-
                 if (missileLookup.TryGetValue(id, out var missile))
                 {
                     missile.Latitude = lat;
@@ -434,7 +431,6 @@ namespace OCC.ViewModels
 
         private readonly List<(string url, string id)> subsystems = new()
         {
-            //($"http://192.168.2.64:8080", "TCC"),
             ($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
             ($"{Network.MFR}", "MFR"),

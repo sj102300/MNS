@@ -18,8 +18,12 @@ namespace OCC.Models
             HitSuccess = 2,   // 명중성공
             EmergencyDestroy = 3,  // 비상폭파
             SelfDestroy = 4, // 자폭
-            FollowUp = 5 //유도
+            FollowUp = 5, //유도
+            LaunchRequest = 6, //발사요청
         }
+
+        //1 -> 5 -> 2 
+        /// FollowUp(5)일때 HitSuccess(2) 상태로 바꾸고 -> 2번이 되면 ? Done
 
         public string Id { get; }  // 식별자는 불변
         private double latitude { get; set; }
@@ -27,6 +31,8 @@ namespace OCC.Models
         private double altitude { get; set; }
 
         private bool hasLaunched = false; // launching.gif를 1번만 보여주기 위한 플래그
+
+        private bool hasHit = false;
 
         private uint status;
         public uint Status
@@ -46,7 +52,7 @@ namespace OCC.Models
                             break;
 
                         case 1: // 비행 중
-                            if (old == 0 && !hasLaunched)
+                            if ((old == 0 || old == 6) && !hasLaunched)
                             {
                                 VisualState = MissileVisualState.Launching;
                                 hasLaunched = true;
@@ -58,12 +64,16 @@ namespace OCC.Models
                             break;
 
                         case 2: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
-                            if (old == 1)
-                                VisualState = MissileVisualState.HitSuccess;
-                            else
-                                VisualState = MissileVisualState.Done;
                             break;
-
+                        case 5: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
+                            if (old == 1 && !hasHit) 
+                            {
+                                VisualState = MissileVisualState.HitSuccess;
+                                hasHit = true;
+                            }
+                            //else
+                            //    VisualState = MissileVisualState.Done;
+                            break;
                         case 3: // 비상 폭파
                             if (old == 1)
                                 VisualState = MissileVisualState.EmergencyExplode;
@@ -126,6 +136,7 @@ namespace OCC.Models
             MissileStatus.EmergencyDestroy => "비상폭파",
             MissileStatus.SelfDestroy => "자폭",
             MissileStatus.FollowUp => "유도 중",
+            MissileStatus.LaunchRequest => "발사 요청",
             _ => "알 수 없음"
         };
 

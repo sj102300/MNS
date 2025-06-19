@@ -43,6 +43,9 @@ namespace OCC.Views
         private readonly Dictionary<string, GMapRoute> _missileRoutes = new();
         private readonly Dictionary<string, List<PointLatLng>> _missileRoutePoints = new();
 
+        // 미사일 파괴 패킷 수신 시, 미사일 id → 파괴 상태값 매핑
+        private readonly Dictionary<string, uint> _missileDestroyedStatus = new();
+
         private GMapMarker _batteryMarker;
         private string _scenarioId;
 
@@ -61,6 +64,54 @@ namespace OCC.Views
             _viewModel.AircraftList.CollectionChanged += AircraftList_CollectionChanged;
             _viewModel.MissileList.CollectionChanged += MissileList_CollectionChanged;
             _viewModel.ImpactPointList.CollectionChanged += ImpactPointList_CollectionChanged;
+
+            // 미사일 파괴 패킷 수신 시 마커 제거 이벤트 구독
+            OCC.Utils.UdpReceiver.MissileDestroyReceived += OnMissileDestroyReceived;
+        }
+
+        private void OnMissileDestroyReceived(string launchCommandId, string aircraftId, string missileId, uint destroyType)
+        {
+            // UI 스레드에서 실행
+            Dispatcher.Invoke(() =>
+            {
+                // 1. 미사일 마커 파괴 애니메이션(이미지)로 교체 (destroyType에 따라)
+                if (_viewModel.MissileList.FirstOrDefault(m => m.Id == missileId) is Missile missile)
+                {
+                    ReplaceMissileMarkerWithDestroyed(missile, destroyType);
+                }
+                else
+                {
+                    // 만약 Missile 객체가 없으면 기존 마커만 제거
+                    if (_missileMarkers.TryGetValue(missileId, out var missileMarker))
+                    {
+                        mapControl.Markers.Remove(missileMarker);
+                        _missileMarkers.Remove(missileId);
+                    }
+                }
+                if (_missileRoutes.TryGetValue(missileId, out var missileRoute))
+                {
+                    mapControl.Markers.Remove(missileRoute);
+                    _missileRoutes.Remove(missileId);
+                    _missileRoutePoints.Remove(missileId);
+                }
+
+                if(destroyType == 30)
+                {
+                    // 2. 항공기 마커 제거
+                    if (_aircraftMarkers.TryGetValue(aircraftId, out var aircraftMarker))
+                    {
+                        mapControl.Markers.Remove(aircraftMarker);
+                        _aircraftMarkers.Remove(aircraftId);
+                    }
+                }
+
+                // 3. IP(ImpactPoint) 마커 제거: launchCommandId가 ImpactPoint의 Id임
+                if (_ipMarkers.TryGetValue(launchCommandId, out var ipMarker))
+                {
+                    mapControl.Markers.Remove(ipMarker);
+                    _ipMarkers.Remove(launchCommandId);
+                }
+            });
         }
 
         private void ImpactPointList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -133,7 +184,7 @@ namespace OCC.Views
         //항공기 이미지 마커 변경 메서드
         private void AddImageAircraftMarker(AircraftWithIp aircraft)
         {
-            double markerSize = 55;  // 아이콘 크기 조정
+            double markerSize = 50;  // 아이콘 크기 조정
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
@@ -185,7 +236,7 @@ namespace OCC.Views
         //이미지 IP 마커 변경 메서드
         private void AddImageIpMarker(ImpactPoint ip)
         {
-            double markerSize = 15; // 아이콘 크기
+            double markerSize = 10; // 아이콘 크기
             string imgPath = "pack://application:,,,/images/impactPoint.png";
 
             var image = new Image
@@ -261,14 +312,14 @@ namespace OCC.Views
             double markerSize;
             string destroyImgPath;
 
-            if (missile_status == (uint)Missile.MissileStatus.HitSuccess)
+            if (missile_status == 30)
             {
-                markerSize = 130;
+                markerSize = 60;
                 destroyImgPath = "pack://application:,,,/images/destroy.png";
             }
             else
             {
-                markerSize = 100;
+                markerSize = 60;
                 destroyImgPath = "pack://application:,,,/images/emergencyDestroy.png";
             }
 
@@ -298,34 +349,35 @@ namespace OCC.Views
             mapControl.Markers.Add(newMarker);
             _missileMarkers[missile.Id] = newMarker;
 
-            if (missile_status != (uint)Missile.MissileStatus.HitSuccess)
+            // 3초 후 서서히 사라지는 애니메이션 적용
+            var timer = new System.Windows.Threading.DispatcherTimer
             {
-                // 3초 후 서서히 사라지는 애니메이션 적용
-                var timer = new System.Windows.Threading.DispatcherTimer
-                {
-                    Interval = TimeSpan.FromSeconds(3)
-                };
-                timer.Tick += (s, e) =>
-                {
-                    timer.Stop();
+                Interval = TimeSpan.FromSeconds(3)
+            };
+            timer.Tick += (s, e) =>
+            {
+                timer.Stop();
 
-                    // Fade-out 애니메이션 (1초)
-                    var fade = new System.Windows.Media.Animation.DoubleAnimation
-                    {
-                        From = 1.0,
-                        To = 0.0,
-                        Duration = new System.Windows.Duration(TimeSpan.FromSeconds(1)),
-                        FillBehavior = System.Windows.Media.Animation.FillBehavior.Stop
-                    };
-                    fade.Completed += (s2, e2) =>
-                    {
-                        mapControl.Markers.Remove(newMarker);
-                        _missileMarkers.Remove(missile.Id);
-                    };
-                    markerGrid.BeginAnimation(UIElement.OpacityProperty, fade);
+                // Fade-out 애니메이션 (1초)
+                var fade = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    From = 1.0,
+                    To = 0.0,
+                    Duration = new System.Windows.Duration(TimeSpan.FromSeconds(1)),
+                    FillBehavior = System.Windows.Media.Animation.FillBehavior.Stop
                 };
-                timer.Start();
-            }
+                fade.Completed += (s2, e2) =>
+                {
+                    mapControl.Markers.Remove(newMarker);
+                    _missileMarkers.Remove(missile.Id);
+                };
+                markerGrid.BeginAnimation(UIElement.OpacityProperty, fade);
+            };
+            timer.Start();
+            //if (missile_status != (uint)Missile.MissileStatus.HitSuccess)
+            //{
+                // 사라지는 애니메이션 조건이 있다면 여기에 추가
+            //}
         }
 
         private void MissileList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -404,12 +456,12 @@ namespace OCC.Views
                 //UpdateMissileMarkerVisibility(missile);
 
                 // 상태가 격추완료(HitSuccess)면 마커를 destroy.png로 교체
-                if (missile.Status == (uint)Missile.MissileStatus.HitSuccess ||
-                    missile.Status == (uint)Missile.MissileStatus.SelfDestroy ||
-                    missile.Status == (uint)Missile.MissileStatus.EmergencyDestroy)
-                {
-                    ReplaceMissileMarkerWithDestroyed(missile, missile.Status);
-                }
+                //if (missile.Status == (uint)Missile.MissileStatus.HitSuccess ||
+                //    missile.Status == (uint)Missile.MissileStatus.SelfDestroy ||
+                //    missile.Status == (uint)Missile.MissileStatus.EmergencyDestroy)
+                //{
+                //    ReplaceMissileMarkerWithDestroyed(missile, missile.Status);
+                //}
             }
 
             //if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
@@ -447,7 +499,7 @@ namespace OCC.Views
         private void AddImageMissileMarker(Missile missile)
         {
 
-            double markerSize = 55;  // 마커 이미지 크기 조정
+            double markerSize = 50;  // 마커 이미지 크기 조정
             string imgPath = "pack://application:,,,/images/missile.png"; // 리소스 경로
 
             // Grid로 이미지와 텍스트를 겹치게 배치
