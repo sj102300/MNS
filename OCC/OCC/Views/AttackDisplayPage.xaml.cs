@@ -39,6 +39,10 @@ namespace OCC.Views
         private readonly Dictionary<string, GMapMarker> _missileMarkers = new();
         private readonly Dictionary<string, PointLatLng> _aircraftPrevPositions = new();
         private readonly Dictionary<string, PointLatLng> _missilePrevPositions = new();
+        // 미사일 경로 표시용
+        private readonly Dictionary<string, GMapRoute> _missileRoutes = new();
+        private readonly Dictionary<string, List<PointLatLng>> _missileRoutePoints = new();
+
         private GMapMarker _batteryMarker;
         private string _scenarioId;
 
@@ -129,20 +133,20 @@ namespace OCC.Views
         //항공기 이미지 마커 변경 메서드
         private void AddImageAircraftMarker(AircraftWithIp aircraft)
         {
-            double markerSize = 40;  // 아이콘 크기 조정
+            double markerSize = 55;  // 아이콘 크기 조정
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
             {
-                Width = markerSize + 25,
-                Height = markerSize + 5 // 텍스트 공간 확보
+                Width = markerSize,
+                Height = markerSize// 텍스트 공간 확보
             };
 
             // 항공기 이미지
             var image = new Image
             {
-                Width = markerSize,
-                Height = markerSize,
+                Width = markerSize - 15,
+                Height = markerSize - 15,
                 Source = new BitmapImage(new Uri(
                     "pack://application:,,,/images/Aircraft.png",
                     UriKind.Absolute)),
@@ -358,6 +362,31 @@ namespace OCC.Views
                 {
                     marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
                 }
+
+                // 경로 점 추가 및 갱신
+                if (_missileRoutePoints.TryGetValue(missile.Id, out var routePoints) &&
+    _missileRoutes.TryGetValue(missile.Id, out var route))
+                {
+                    var last = routePoints.LastOrDefault();
+                    var curr = new PointLatLng(missile.Latitude, missile.Longitude);
+                    if (last == null || last.Lat != curr.Lat || last.Lng != curr.Lng)
+                    {
+                        routePoints.Add(curr);
+                        route.Points.Clear();
+                        route.Points.AddRange(routePoints);
+                        // 반드시 RegenerateShape 호출
+                        mapControl.RegenerateShape(route);
+
+                        // RegenerateShape 이후 스타일 재적용
+                        if (route.Shape is System.Windows.Shapes.Path path)
+                        {
+                            path.Stroke = Brushes.Red;
+                            path.StrokeThickness = 4;
+                            //path.StrokeDashArray = new DoubleCollection { 1, 3 };
+                            path.Opacity = 0.8;
+                        }
+                    }
+                }
             }
 
             if (e.PropertyName == nameof(Missile.Status))
@@ -386,21 +415,21 @@ namespace OCC.Views
         private void AddImageMissileMarker(Missile missile)
         {
 
-            double markerSize = 35;  // 마커 이미지 크기 조정
+            double markerSize = 55;  // 마커 이미지 크기 조정
             string imgPath = "pack://application:,,,/images/missile.png"; // 리소스 경로
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
             {
-                Width = markerSize + 25,
-                Height = markerSize + 5 // 텍스트 공간 확보
+                Width = markerSize,
+                Height = markerSize // 텍스트 공간 확보
             };
 
             // 미사일 이미지
             var image = new Image
             {
-                Width = markerSize,
-                Height = markerSize,
+                Width = markerSize - 10,
+                Height = markerSize - 10,
                 Source = new BitmapImage(new Uri(imgPath, UriKind.Absolute)),
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 VerticalAlignment = VerticalAlignment.Top,
@@ -433,6 +462,23 @@ namespace OCC.Views
             mapControl.Markers.Add(marker);
             _missileMarkers[missile.Id] = marker;
             _missilePrevPositions[missile.Id] = new PointLatLng(missile.Latitude, missile.Longitude);
+
+            // 경로 Polyline 추가
+            var routePoints = new List<PointLatLng> { new PointLatLng(missile.Latitude, missile.Longitude) };
+            var route = new GMapRoute(routePoints);
+            mapControl.Markers.Add(route);
+            // 스타일을 반드시 지정
+            route.Shape = new System.Windows.Shapes.Path
+            {
+                Stroke = Brushes.Red,
+                StrokeThickness = 4,
+                //StrokeDashArray = new DoubleCollection { 6, 1 },
+                Opacity = 0.8
+            };
+            mapControl.RegenerateShape(route);
+
+            _missileRoutes[missile.Id] = route;
+            _missileRoutePoints[missile.Id] = routePoints;
         }
 
 
@@ -442,6 +488,13 @@ namespace OCC.Views
             {
                 mapControl.Markers.Remove(marker);
                 _missileMarkers.Remove(missile.Id);
+            }
+
+            if (_missileRoutes.TryGetValue(missile.Id, out var route))
+            {
+                mapControl.Markers.Remove(route);
+                _missileRoutes.Remove(missile.Id);
+                _missileRoutePoints.Remove(missile.Id);
             }
         }
 
