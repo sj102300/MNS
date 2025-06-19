@@ -16,6 +16,14 @@
 namespace TCC{
     class UdpSender{
     public:
+
+        enum CommandCode : int {
+            AircraftData = 100,
+            MissileData = 300,
+            LaunchCommand = 201,
+            DestroyCommand = 203
+        };
+
         UdpSender(const std::string& ip, int port);
         ~UdpSender();
 
@@ -34,6 +42,9 @@ namespace TCC{
 
 		bool sendLaunchCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint);
 		const int serializeLaunchCommandBody(char* buffer, std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint);
+
+        bool sendDestroyCommand(std::string& commandId, std::string& aircraftId, std::string& missileId);
+        const int serializeDestroyCommand(char* buffer, std::string& commandId, std::string& aircraftId, std::string missileId);
 
     private:
         std::string ip_;

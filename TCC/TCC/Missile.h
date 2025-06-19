@@ -11,7 +11,8 @@ public:
 		Fly = 1,      // 비행(표적을 향해 비행 중)
 		Splashed = 2,        // 격추(미사일이 표적 격추)
 		EmergencyDestroyed = 3,        // 비상폭파(사용자가 비상폭파 명령 내림)
-		SelfDestroyed = 4        // 자폭 (IP지났을 때 자동 폭파)
+		SelfDestroyed = 4,        // 자폭 (IP지났을 때 자동 폭파)
+		FollowUp = 5,				//유도 중
 	};
 
 	bool checkId(std::string id);

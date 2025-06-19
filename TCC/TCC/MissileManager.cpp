@@ -82,6 +82,13 @@ void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg)
             std::cout << u8"미사일 데이터 전송 실패\n";
         }
     }
+
+    //자폭한 경우
+    if (msg.status_ == Missile::MissileStatus::SelfDestroyed) {
+        std::string missileId(msg.missileId, 8);
+        engagementManager_->handleMissileDestroyed(missileId);
+    }
+
   //  if (msg.status_ == 2) { // 2: 격추 성공
 		//std::string missileId(msg.missileId, 8);
   //      if (engagementManager_) {

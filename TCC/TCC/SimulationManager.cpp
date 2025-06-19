@@ -3,15 +3,15 @@
 
 SimulationManager::SimulationManager():isRunning_(false), isChanged_(false) {
 	scenarioManager_ = new sm::ScenarioManager(
-		"http://192.168.2.66:8080",     // TCC Http ì„œë²„ ì£¼ì†Œ
+		"http://192.168.2.64:8080",     // TCC Http ì„œë²„ ì£¼ì†Œ
 		"http://192.168.2.30:8080",    // SCN Http ì„œë²„ ì£¼ì†Œ
-		"TCC"         // í´ë¼ì´ì–¸íŠ¸ ID
+		"TCC"  
 	);
 
 	scenarioManager_->setOnReadyCallback([this]() {
 		std::lock_guard<std::mutex> lock(mtx_);
 
-		if (isRunning_) {       //?´ë? ?œë‚˜ë¦¬ì˜¤ê°€ ?¤í–‰ ì¤?
+		if (isRunning_) {  
 			return;
 		}
 

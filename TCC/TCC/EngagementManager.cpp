@@ -85,8 +85,21 @@ bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::str
 	std::cout << "Target Missile ID: " << targetMissileId << std::endl;
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
+
+	std::cout << u8"찾는 missileId: [" << targetMissileId << "]" << std::endl;
+
+	for (auto& v : missileToAircraft_) {
+		std::cout << u8"찾는 missileId: [" << targetMissileId << "]" << std::endl;
+		std::cout << u8"저장된 missileId: [" << v.first << "]" << std::endl;
+
+	}
+
 	auto it = missileToAircraft_.find(targetMissileId);
 	if (it == missileToAircraft_.end()) {		//사용한 미사일이 아님
+		std::cout << u8"===========================================================" << std::endl;
+		std::cout << u8"사용한 미사일이 아닙니다. engagementSuccess()" << std::endl;
+		std::cout << u8"===========================================================" << std::endl;
+
 		return false;
 	}
 
@@ -96,7 +109,8 @@ bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::str
 	//격추된 항공기 상태 변화
 	Aircraft* targetAircraft = aircraftManager_->getAircraft(targetAircraftId);
 	if (targetAircraft == nullptr) {
-		std::cout << "탐지된 항공기가 아닙니다!" << std::endl;
+
+		std::cout << u8"탐지된 항공기가 아닙니다!" << std::endl;
 		return false;
 	}
 	targetAircraft->updateStatus(Aircraft::EngagementStatus::Destroyed);
@@ -104,18 +118,54 @@ bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::str
 	//원래 쫓던 항공기 상태 변화
 	std::string& originalTargetAircraftId = it->second;
 	if (originalTargetAircraftId != targetAircraftId) {		//원하던 항공기를 격추한게 아님.
+
+		std::cout << u8"===========================================================" << std::endl;
+		std::cout << u8"원하던 항공기를 격추하지 못했습니다. engagementSuccess()" << std::endl;
+		std::cout << u8"===========================================================" << std::endl;
+
 		Aircraft* originalTargetAircraft = aircraftManager_->getAircraft(originalTargetAircraftId);
 		if (originalTargetAircraft == nullptr) {
-			std::cout << "교전 중인 항공기가 아닙니다!" << std::endl;
+			std::cout << u8"교전 중인 항공기가 아닙니다!" << std::endl;
 			return false;
 		}
 		originalTargetAircraft->updateStatus(Aircraft::EngagementStatus::NotEngageable);
 		// TODO: WDL기능 추가 가능
 	}
 
+	//터진 미사일의 원래 발사 명령 찾기
+	if (!handleMissileDestroyed(targetMissileId)) {
+		std::cout << u8"===========================================================" << std::endl;
+		std::cout << u8"미사일 폭파 메시지 전송 실패! engagementSuccess()" << std::endl;
+		std::cout << u8"===========================================================" << std::endl;
+	}
+
 	missileToAircraft_.erase(it);
 
 	return true;
+}
+
+bool EngagementManager::handleMissileDestroyed(std::string& missileId) {
+	std::string launchCommandId = "";
+	std::string aircraftId = "";
+	for (auto& v : fireCommands_) {
+		if (v.second.first == missileId) {
+			launchCommandId = v.first;
+			aircraftId = v.second.second;
+			break;
+		}
+		std::cout << u8"찾는 missileId: [" << missileId << "]" << std::endl;
+		std::cout << u8"저장된 missileId: [" << v.second.first << "]" << std::endl;
+	}
+	if (launchCommandId.empty()) {
+		std::cout << u8"===========================================================" << std::endl;
+		std::cout << u8"발사 명령 식별자를 찾을 수 없습니다! handleMissileDestroyed()" << std::endl;
+		std::cout << u8"===========================================================" << std::endl;
+		return false;
+	}
+
+	sender_->sendDestroyCommand(launchCommandId, aircraftId, missileId);
+	return true;
+
 }
 
 //MissileManager에서 이거 호출할까?
@@ -240,6 +290,9 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 
 	unsigned int engagementStatus = aircraft->updateStatus(Aircraft::EngagementStatus::Engaging);
 
+	//발사명령 보내기
+	fireCommands_[commandId] = { missileId, aircraftId };
+	std::cout << "fireCommands_.size() : "<<fireCommands_.size() << std::endl;
 	multisender_->sendLaunchCommand(commandId, aircraftId, missileId, impactPoint);
 	sender_->sendLaunchCommand(commandId, aircraftId, missileId, impactPoint);
 
@@ -258,7 +311,7 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 bool EngagementManager::emergencyDestroy(std::string commandId, std::string missileId) {
 	
 	multisender_->sendEmergencyDestroyCommand(commandId, missileId);
-
+	
 	bool result = multisender_->waitForAckResult(missileId, 3000); // 3초 대기
 	if (result) {
 		// Ack 수신 성공 처리
@@ -268,11 +321,14 @@ bool EngagementManager::emergencyDestroy(std::string commandId, std::string miss
 	else {
 		// Ack 수신 실패 처리
 	}
-	
-	// TCC receiver 미사일의 데이터를 계속 수신 -> status == 비상폭파
-	// 이 비상폭파가 어느 미사일의 비상폭파인지 확인 -> Ack
-	//sender에서 미사일 상태를 가져와서 status 비상폭파 -> true -> 동기 처럼 cv
-	//return false/true
+
+	//비상폭파했다치고..
+	//걔가 쫓던 발사명령을 찾아와야함
+	if (!handleMissileDestroyed(missileId)) {
+		std::cout << u8"===========================================================" << std::endl;
+		std::cout << u8"미사일 폭파 메시지 전송 실패! emergencyDestroy()" << std::endl;
+		std::cout << u8"===========================================================" << std::endl;
+	}
 
 	return true;
 }
