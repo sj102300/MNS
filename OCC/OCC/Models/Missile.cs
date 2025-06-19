@@ -17,7 +17,8 @@ namespace OCC.Models
             InFlight = 1, // 비행중
             HitSuccess = 2,   // 명중성공
             EmergencyDestroy = 3,  // 비상폭파
-            SelfDestroy = 4 // 자폭
+            SelfDestroy = 4, // 자폭
+            FollowUp = 5 //유도
         }
 
         public string Id { get; }  // 식별자는 불변
@@ -83,7 +84,6 @@ namespace OCC.Models
                             break;
                     }
                 }
-
                 status = newVal;
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(MissileStatusText));
@@ -126,6 +126,7 @@ namespace OCC.Models
             MissileStatus.HitSuccess => "명중성공",
             MissileStatus.EmergencyDestroy => "비상폭파",
             MissileStatus.SelfDestroy => "자폭",
+            MissileStatus.FollowUp => "유도 중",
             _ => "알 수 없음"
         };
 
