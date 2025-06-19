@@ -85,7 +85,7 @@ void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg)
 
     //ÀÚÆøÇÑ °æ¿ì
     if (msg.status_ == Missile::MissileStatus::SelfDestroyed) {
-        std::string missileId(msg.missileId, 8);
+        std::string missileId(msg.missileId, 7);
         engagementManager_->handleMissileDestroyed(missileId);
     }
 
