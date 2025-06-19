@@ -357,10 +357,7 @@ bool EngagementManager::EngagableAircraftQueue::pushQueue(std::string& aircraftI
 }
 
 bool EngagementManager::weaponDataLink(std::string commandId, std::string aircraftId, std::string missileId) {
-
-	//뭘해줘야하지?
-	TCC::Position impactPoint;
-
+	
 	Aircraft* targetAircraft = aircraftManager_->getAircraft(aircraftId);
 	if (targetAircraft == nullptr) {
 		std::cout << "--------------------------------" << std::endl;
@@ -413,6 +410,18 @@ bool EngagementManager::weaponDataLink(std::string commandId, std::string aircra
 	handleMissileDestroyed(missileId, DestroyType::WDL);		//원래있던 발사명령의 impact point 지우기 위함
 	sender_->sendLaunchCommand(wdlCommandId, aircraftId, missileId, impactPoint);
 	multisender_->sendWDLCommand(wdlCommandId, aircraftId, missileId, impactPoint);
+
+	std::cout << u8"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+	std::cout << u8"[WDL 명령 전송]" << std::endl;
+	std::cout << u8" - 명령 식별자: " << wdlCommandId << std::endl;
+	std::cout << u8" - 항공기 식별자: " << aircraftId << std::endl;
+	std::cout << u8" - 미사일 식별자: " << missileId << std::endl;
+	std::cout << u8" - 요격 예상 좌표: 위도 = " << impactPoint.latitude_
+		<< u8", 경도 = " << impactPoint.longitude_
+		<< u8", 고도 = " << impactPoint.altitude_ << std::endl;
+	std::cout << u8"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
+	return true;
 }
 
 bool EngagementManager::EngagableAircraftQueue::popQueue(std::string& aircraftId) {

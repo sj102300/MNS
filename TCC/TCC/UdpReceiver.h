@@ -70,6 +70,7 @@ namespace TCC {
 		void responseChangeModeAck(unsigned int changedMode);
 		void responseManualFireAck(ManualFireMSG& body);
 		void responseEmergencyDestroyAck(EmergencyDestroyMSG& body);
+		void responseWdlAck(WDLMSG& msg);
 
 		std::string ip_;
 		int port_;

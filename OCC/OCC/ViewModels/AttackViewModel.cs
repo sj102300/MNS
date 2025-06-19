@@ -34,6 +34,7 @@ using System.Windows.Shapes;
 using System.ComponentModel.Design;
 using System.Windows.Media.Imaging;
 using WpfAnimatedGif;
+using System.IO;
 
 
 namespace OCC.ViewModels
@@ -79,6 +80,7 @@ namespace OCC.ViewModels
         public ICommand ChangeModeCommand { get; }
         public ICommand ManualFireCommand { get; }
         public ICommand EmergencyDestroyCommand { get; }
+        public ICommand WdlCommand { get; }
         //public ICommand SelectAircraftCommand { get; }
 
         public AttackViewModel(NavigationService navigationService)
@@ -106,6 +108,12 @@ namespace OCC.ViewModels
                 execute: _ => SendEmergencyDestroyPacketAsync(SelectedMissile),
                 canExecute: _ => true
             );
+
+            WdlCommand = new RelayCommand<object>(
+                execute: _ => SendWDLPacketAsync(SelectedAircraft, SelectedMissile),
+                canExecute: _ => true
+
+                );
 
             StartReceiving();
         }
@@ -556,6 +564,100 @@ namespace OCC.ViewModels
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private void SendWDLPacketAsync(AircraftWithIp aircraft, Missile missile)
+        {
+            if (aircraft == null || missile == null)
+            {
+                MessageBox.Show("항공기와 미사일을 선택하세요!");
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                const uint CommandCode = 301;
+                const uint BodyLength = 36;
+                const int RetryCount = 3;
+                const int RetryIntervalMs = 100;
+
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(Network.TCCHost), Network.TCCHostPort);
+                IPEndPoint localEP = new IPEndPoint(IPAddress.Any, 0);
+
+                using var udpClient = new UdpClient();
+                udpClient.Client.ReceiveTimeout = RetryIntervalMs;
+
+                byte[] buffer = CreateWdlPacket(CommandCode, BodyLength, aircraft.Id, missile.Id);
+
+                bool ackReceived = false;
+
+                for (int i = 0; i < RetryCount; i++)
+                {
+                    try
+                    {
+                        udpClient.Send(buffer, buffer.Length, remoteEP);
+                        Debug.WriteLine($"[{i + 1}] WDL 패킷 전송 완료 ({aircraft.Id}, {missile.Id})");
+
+                        var response = udpClient.Receive(ref localEP);
+                        if (response != null && response.Length > 0)
+                        {
+                            ackReceived = true;
+                            Debug.WriteLine("ACK 수신 완료!");
+                            break;
+                        }
+                    }
+                    catch (SocketException ex)
+                    {
+                        Debug.WriteLine($"[{i + 1}] ACK 수신 실패: {ex.Message}");
+                        Debug.WriteLine("ackReceived 구현 안함");
+                    }
+
+                    await Task.Delay(RetryIntervalMs);
+                }
+
+                if (ackReceived)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Debug.WriteLine("WDL 명령 성공");
+                        // 필요시 후속 로직 삽입
+                    });
+                }
+                else
+                {
+                    MessageBox.Show($"ACK 미수신 → 비상 폭파 명령 송신 실패: {missile.Id}");
+                }
+            });
+        }
+
+        private byte[] CreateWdlPacket(uint commandCode, uint bodyLength, string aircraftId, string missileId)
+        {
+            using var ms = new MemoryStream(44); // 전체 크기 44바이트
+            using var bw = new BinaryWriter(ms);
+
+            // 1. 명령 코드 (4바이트)
+            bw.Write(commandCode);
+
+            // 2. body 길이 (4바이트) - 항상 36
+            bw.Write(bodyLength);
+
+            // 3. 발사 명령 식별자 (20바이트) - WF-YYYYMMDDHHMMSSmmm
+            string fireId = $"WF-{DateTime.UtcNow:yyyyMMddHHmmssfff}";
+            WriteFixedString(bw, fireId, 20);
+
+            // 4. 항공기 식별자 (8바이트)
+            WriteFixedString(bw, aircraftId, 8);
+
+            // 5. 미사일 식별자 (8바이트)
+            WriteFixedString(bw, missileId, 8);
+
+            return ms.ToArray(); // 44바이트짜리 패킷 반환
+        }
+        private void WriteFixedString(BinaryWriter bw, string value, int length)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(value ?? "");
+            Array.Resize(ref bytes, length); // 길이 조정 (0-padding or truncate)
+            bw.Write(bytes);
         }
 
         private void SendEmergencyDestroyPacketAsync(Missile missile)

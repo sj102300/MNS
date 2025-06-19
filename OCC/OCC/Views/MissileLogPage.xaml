@@ -99,18 +99,27 @@
         </Grid>
         <!-- 오른쪽 1/4 영역: 필요시 컨텐츠 추가 -->
         <StackPanel Grid.Row="2" Margin="12"
-        HorizontalAlignment="Right"
-        VerticalAlignment="Bottom"
-        >
-            <Button Content="비상폭파"
-        Command="{Binding EmergencyDestroyCommand}"
-        Width="120"
-        Height="40"
-        Background="#B71C1C"
-        Foreground="White"
-        FontWeight="Bold"
-        FontSize="15"
-        Margin="0,0,0,8"/>
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="WDL"
+                Command="{Binding WdlCommand}"
+                    Width="120"
+                Height="40"
+                Background="#37474F"
+                Foreground="White"
+                FontWeight="Bold"
+                FontSize="15"
+                Margin="0,0,8,0"/>
+                    <Button Content="비상폭파"
+                Command="{Binding EmergencyDestroyCommand}"
+                Width="120"
+                Height="40"
+                Background="#B71C1C"
+                Foreground="White"
+                FontWeight="Bold"
+                FontSize="15"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Page>

@@ -109,7 +109,7 @@ void TCC::UdpReceiver::receive() {
 			std::cout << "WDLRequest" << std::endl;
 			if (!parseWdlMSG(buffer + 8, wdlMsg))
 				break;
-			//responseWdlAck(wdlMsg);
+			responseWdlAck(wdlMsg);
 			engagementManager_->weaponDataLink(std::string(wdlMsg.commandId_, 20), std::string(wdlMsg.aircraftId_, 8), std::string(wdlMsg.missileId_, 7));
 			break;
 		default:
@@ -138,7 +138,27 @@ void TCC::UdpReceiver::responseManualFireAck(ManualFireMSG& body) {
 		std::cout << "[UdpReceiver] Sent ManualFireAck to client\n";
 	}
 }
+void TCC::UdpReceiver::responseWdlAck(WDLMSG& msg) {
+	AckHeader header;
+	header.commandCode_ = CommandCode::WDLRequest;  // WDL 요청에 대한 ACK 식별 코드
+	header.bodyLength_ = sizeof(WDLMSG);
 
+	char buffer[sizeof(AckHeader) + sizeof(WDLMSG)];  // 정확한 크기만큼 버퍼 생성
+
+	memcpy(buffer, &header, sizeof(AckHeader));
+	memcpy(buffer + sizeof(AckHeader), &msg, sizeof(WDLMSG));
+
+	int sent = sendto(serverSocket_, buffer, sizeof(buffer), 0,
+		reinterpret_cast<const sockaddr*>(&senderAddr_),
+		sizeof(senderAddr_));
+
+	if (sent == SOCKET_ERROR) {
+		std::cerr << "[UdpReceiver] WDL Ack sendto failed: " << WSAGetLastError() << "\n";
+	}
+	else {
+		std::cout << "[UdpReceiver] Sent WDL Ack to client\n";
+	}
+}
 void TCC::UdpReceiver::responseChangeModeAck(unsigned int changedMode) {  
    AckHeader header;  
    header.commandCode_ = CommandCode::ModeChangeRequest;  
