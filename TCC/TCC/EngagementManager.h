@@ -24,6 +24,7 @@ public:
 		SelfDestroy = 10,
 		EmergencyDestroy = 20,
 		EngagementSuccess = 30,
+		WDL = 40,
 	};
 	EngagementManager();
 	void start();
@@ -85,6 +86,8 @@ private:
 	void work();
 	bool mappingMissileToAircraft(std::string& aircraftId, std::string& missileId);
 	void makeAutoFireCommandId(std::string& commandId);
+	void makeWDLCommandId(std::string& commandId);
+
 };
 
 //
