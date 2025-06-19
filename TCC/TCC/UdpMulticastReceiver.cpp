@@ -110,7 +110,7 @@ void TCC::UdpMulticastReceiver::receive() {
 			if (!parseReceivedEngagementSuccessMSG(buffer + 8, engagementSuccessMsg, header.bodyLength_))
 				break;
 			responseEngagementSuccessAck(engagementSuccessMsg);
-			engagementManager_->engagementSuccess(std::string(engagementSuccessMsg.targetAircraftId_, 8), std::string(engagementSuccessMsg.targetMissileId_, 8));
+			engagementManager_->engagementSuccess(std::string(engagementSuccessMsg.targetAircraftId_, 8), std::string(engagementSuccessMsg.targetMissileId_, 7));
 			break;
 
 		case EventCode::MissileStatus:

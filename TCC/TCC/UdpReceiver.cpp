@@ -31,7 +31,8 @@ bool TCC::UdpReceiver::init(EngagementManager * engagementManager) {
 
 	recvAddr_.sin_family = AF_INET;
 	recvAddr_.sin_port = htons(9999);
-	recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.189");
+	//recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.189");
+	recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.180");			//╫баж
 
 	if (bind(serverSocket_, (sockaddr*)&recvAddr_, sizeof(recvAddr_)) == SOCKET_ERROR) {
 		std::cout << "Bind failed: " << WSAGetLastError() << "\n";
@@ -99,7 +100,7 @@ void TCC::UdpReceiver::receive() {
 			if (!parseEmergencyDestroyMSG(buffer + 8, emergencyDestroyMsg))
 				break;
 			responseEmergencyDestroyAck(emergencyDestroyMsg);
-			engagementManager_->emergencyDestroy(std::string(emergencyDestroyMsg.commandId_, 20), std::string(emergencyDestroyMsg.targetMissileId_, 8));
+			engagementManager_->emergencyDestroy(std::string(emergencyDestroyMsg.commandId_, 20), std::string(emergencyDestroyMsg.targetMissileId_, 7));
 			break;
 
 		default:

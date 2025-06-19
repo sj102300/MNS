@@ -31,6 +31,7 @@ public:
 	bool emergencyDestroy(std::string commandId, std::string missileId);
 	void addEngagableAircraft(std::string& aircraftId);
 	bool manualFire(std::string commandId, std::string targetAircraftId);
+	bool handleMissileDestroyed(std::string& missileId);
 	void notifyThread();
 	~EngagementManager();
 
@@ -61,7 +62,8 @@ private:
 	TCC::UdpMulticastSender * multisender_;
 	MissileManager* missileManager_;
 	AircraftManager* aircraftManager_;
-	std::unordered_map<std::string, std::string> missileToAircraft_; // 미사일 : 키 , 항공기 : value
+	std::unordered_map<std::string, std::string> missileToAircraft_; // 미사일Id : 항공기 Id
+	std::unordered_map<std::string, std::pair<std::string, std::string>> fireCommands_;		// 발사명령 식별자 : {미사일Id, 항공기Id}
 	std::thread workThread_;
 	TCC::Position batteryLoc_;
 
