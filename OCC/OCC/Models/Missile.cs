@@ -57,8 +57,7 @@ namespace OCC.Models
                             }
                             break;
 
-                        //case 2:  // 2: 명중 성공  
-                        case 5: // 시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5로 수정
+                        case 2: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
                             if (old == 1)
                                 VisualState = MissileVisualState.HitSuccess;
                             else
@@ -80,7 +79,7 @@ namespace OCC.Models
                             break;
 
                         default:
-                            //VisualState = MissileVisualState.Done;  // X
+                            VisualState = MissileVisualState.Done;  // X
                             break;
                     }
                 }
