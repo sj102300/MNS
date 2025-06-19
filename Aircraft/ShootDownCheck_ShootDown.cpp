@@ -1,17 +1,13 @@
-#include "ShootDownCheck.h"
-#include <cmath>
+#include "ShootDown.h"
 #define x first
 #define y second
-#define EarthR 6356.784
-#define pi 3.14159265358979
 
-
-double ShootDownCheck::toRadians(double degree) {
+double toRadians(double degree) {
     return degree * (pi / 180);
 }
 
 // 두 위도/경도 좌표 간의 거리를 계산하는 함수
-double ShootDownCheck::haversineDistance(double lat1, double lon1, double lat2, double lon2) {
+double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
     double phi1 = toRadians(lat1);
     double phi2 = toRadians(lat2);
     double deltaPhi = toRadians(lat2 - lat1);
@@ -28,8 +24,8 @@ double ShootDownCheck::haversineDistance(double lat1, double lon1, double lat2, 
 }
 
 //오차범위 30m
-bool ShootDownCheck::ShootDown(std::pair<double,double> currentPoint, std::pair<double,double> missilePoint) {
+bool ShootDowns(std::pair<double,double> currentPoint, std::pair<double,double> missilePoint) {
     double Adistance = haversineDistance(currentPoint.x, currentPoint.y, missilePoint.x, missilePoint.y);
-    if (Adistance <= 0.03) return true;
+    if (Adistance <= 0.15) return true; //1km 반경 격추 성공 판단
 	return false;
 }

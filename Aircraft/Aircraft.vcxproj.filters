@@ -18,14 +18,8 @@
     <ClCompile Include="AircraftCoordinate_makePoint.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="AircraftCoordinate_Reciever.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="AircraftCoordinate_Sender.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ShootDownCheck.h">
-      <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="ShootDownCheck_Reciever.cpp">
       <Filter>소스 파일</Filter>
@@ -44,10 +38,19 @@
     <ClInclude Include="CoordinateGeneration.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ShootDownChecker.h">
+    <ClInclude Include="AircraftCoordinate.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AircraftCoordinate.h">
+    <ClInclude Include="Missile.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpMulticastReceiver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ShootDown.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="sender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

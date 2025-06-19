@@ -17,6 +17,7 @@ public:
 	vector<double> makeStartOpt(std::pair<double, double> startPoint, std::pair<double, double> finishPoint) override;
 	pair<double, double> makePoint(double dx, double dy, pair<double, double> currentPoint) override;
 	void sendAircraftInfo(pair<double, double> currentPoint, string id, char IFF) override;
-	vector<vector<string>> scenarioReciever() override;
+	//vector<vector<string>> scenarioReciever() override;
+	bool SurviveStatus(pair<double, double> currentPoint, pair<double, double> endPoint) override;
 	void initializeMultiSocket();
 };

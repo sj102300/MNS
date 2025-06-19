@@ -136,10 +136,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AircraftCoordinate_makePoint.cpp" />
-    <ClCompile Include="AircraftCoordinate_Reciever.cpp" />
     <ClCompile Include="AircraftCoordinate_Sender.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ShootDownCheck.h" />
     <ClCompile Include="ShootDownCheck_Reciever.cpp" />
     <ClCompile Include="ShootDownCheck_Sender.cpp" />
     <ClCompile Include="ShootDownCheck_ShootDown.cpp" />
@@ -147,7 +145,10 @@
   <ItemGroup>
     <ClInclude Include="AircraftCoordinate.h" />
     <ClInclude Include="CoordinateGeneration.h" />
-    <ClInclude Include="ShootDownChecker.h" />
+    <ClInclude Include="Missile.h" />
+    <ClInclude Include="sender.h" />
+    <ClInclude Include="ShootDown.h" />
+    <ClInclude Include="UdpMulticastReceiver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
