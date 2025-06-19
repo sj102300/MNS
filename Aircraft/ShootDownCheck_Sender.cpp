@@ -45,9 +45,9 @@ void sendSuccessInfo(std::string aircraftId, std::string missileId) {
 
     std::string eventStr = "SUCCESS";
     strncpy(packet.EventId, eventStr.c_str(), sizeof(packet.EventId));
-    strncpy(packet.MissileId, missileId.c_str(), sizeof(packet.MissileId));
     strncpy(packet.AirCraftId, aircraftId.c_str(), sizeof(packet.AirCraftId));
-
+    strncpy(packet.MissileId, missileId.c_str(), sizeof(packet.MissileId));
+ 
     int sendSize = sendto(
         udpSocket2,
         reinterpret_cast<const char*>(&packet),

@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
                 if (ShootDowns(aircraft.currentPoint, MissilePoints)) {
                     initializeMultiSenderSocket();
                     sendSuccessInfo(aircraft.id, missile.missileId);
+                    std::cout << "격추완료\n";
                     std::exit(0);
 
                     /*while (true) {
