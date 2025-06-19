@@ -19,6 +19,7 @@
     <None Remove="images\destroy.png" />
     <None Remove="images\emergencyDestroy.png" />
     <None Remove="images\emergency_explode.gif" />
+    <None Remove="images\empty.png" />
     <None Remove="images\hit_success.gif" />
     <None Remove="images\impactPoint.png" />
     <None Remove="images\in_flight.gif" />
@@ -28,6 +29,7 @@
     <None Remove="images\self_explode.gif" />
     <None Remove="images\unknown.gif" />
     <None Remove="images\waiting.gif" />
+    <None Remove="images\waiting.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +38,7 @@
     <Resource Include="images\battery.png" />
     <Resource Include="images\destroy.png" />
     <Resource Include="images\emergencyDestroy.png" />
+    <Resource Include="images\empty.png" />
     <Resource Include="images\impactPoint.png" />
     <Resource Include="images\missile.png" />
     <Resource Include="images\self_explode.gif">
@@ -74,6 +77,7 @@
     <Resource Include="images\waiting.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="images\waiting.png" />
   </ItemGroup>
 
 </Project>

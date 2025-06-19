@@ -431,8 +431,8 @@ namespace OCC.ViewModels
 
         private readonly List<(string url, string id)> subsystems = new()
         {
-            ($"http://192.168.2.64:8080", "TCC"),
-            //($"{Network.TCC}", "TCC"),
+            //($"http://192.168.2.64:8080", "TCC"),
+            ($"{Network.TCC}", "TCC"),
             ($"{Network.ATS}", "ATS"),
             ($"{Network.MFR}", "MFR"),
             ($"{Network.MSS}", "MSS"),
