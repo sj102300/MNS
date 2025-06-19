@@ -12,8 +12,8 @@ namespace OCC.Models
         Launching = 10,
         InFlight = 1,
         HitSuccess = 2,
-        PressingButton = 11,
         EmergencyExplode = 3,
-        SelfExplode = 4
+        SelfExplode = 4,
+        Done = 100 // empty.png
     }
 }

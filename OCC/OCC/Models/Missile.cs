@@ -25,6 +25,8 @@ namespace OCC.Models
         private double longitude { get; set; }
         private double altitude { get; set; }
 
+        private bool hasLaunched = false; // launching.gif를 1번만 보여주기 위한 플래그
+
         private uint status;
         public uint Status
         {
@@ -34,17 +36,51 @@ namespace OCC.Models
                 var old = status; 
                 var newVal = value;
 
-                if(old != newVal)
+                if (old != newVal)
                 {
-                    if (old == 0 && newVal == 1)
-                        VisualState = MissileVisualState.Launching;
-                    else if (old == 1 && newVal == 3)
-                        VisualState = MissileVisualState.PressingButton;
-                    else
-                        VisualState = (MissileVisualState)newVal;
+                    switch (newVal)
+                    {
+                        case 0: // 대기 상태
+                            VisualState = MissileVisualState.Waiting;
+                            break;
 
-                    //OnPropertyChanged(nameof(VisualState));
-                    //Debug.Write("VisualState Changed");
+                        case 1: // 비행 중
+                            if (old == 0 && !hasLaunched)
+                            {
+                                VisualState = MissileVisualState.Launching;
+                                hasLaunched = true;
+                            }
+                            else
+                            {
+                                VisualState = MissileVisualState.InFlight;
+                            }
+                            break;
+
+                        case 2: // 명중 성공
+                            if (old == 1)
+                                VisualState = MissileVisualState.HitSuccess;
+                            else
+                                VisualState = MissileVisualState.Done;
+                            break;
+
+                        case 3: // 비상 폭파
+                            if (old == 1)
+                                VisualState = MissileVisualState.EmergencyExplode;
+                            else
+                                VisualState = MissileVisualState.Done;
+                            break;
+
+                        case 4: // 자폭
+                            if (old == 1)
+                                VisualState = MissileVisualState.SelfExplode;
+                            else
+                                VisualState = MissileVisualState.Done;
+                            break;
+
+                        default:
+                            //VisualState = MissileVisualState.Done;  // X
+                            break;
+                    }
                 }
 
                 status = newVal;
@@ -58,8 +94,11 @@ namespace OCC.Models
             get => visualState;
             set
             {
-                visualState = value;
-                OnPropertyChanged(nameof(VisualState));
+                if (visualState != value)
+                {
+                    visualState = value;
+                    OnPropertyChanged(nameof(VisualState));  // ← 이거 중요!
+                }
             }
         }
 

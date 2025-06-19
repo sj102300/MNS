@@ -19,16 +19,21 @@ namespace OCC.Converters
             var state = (OCC.Models.MissileVisualState)value;
             return state switch
             {
-                MissileVisualState.Waiting => "images/waiting.gif",
+                MissileVisualState.Waiting => "images/waiting.png",
                 MissileVisualState.Launching => "images/launching.gif",
                 MissileVisualState.InFlight => "images/in_flight.gif",
                 MissileVisualState.HitSuccess => "images/hit_success.gif",
-                MissileVisualState.PressingButton => "images/press_button.gif",
                 MissileVisualState.EmergencyExplode => "images/emergency_explode.gif",
                 MissileVisualState.SelfExplode => "images/self_explode.gif",
+                MissileVisualState.Done => "images/empty.png",
                 _ => "images/unknown.gif"
             };
         }
+
+        //1.로딩 렉
+        //    2. 상태전이 안됨
+        //    0 -> 1 발사
+        //    1 유지가 비행
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();

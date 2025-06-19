@@ -19,8 +19,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3.5*" />
-            <RowDefinition Height="5*" />
-            <RowDefinition Height="1.5*"/>
+            <RowDefinition Height="5.5*" />
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <!-- 상단(60%) 영역: Grid.Row="0" -->
         <!--상단 항공기 정보 출력 (식별자, 위도 경도 고도, 상태, impactpoint의 위도 경도 고도)-->
@@ -51,25 +51,46 @@
                       ItemsSource="{Binding MissileList}"
                       SelectedItem="{Binding SelectedMissile, Mode=TwoWay}"
                       Margin="12" 
+                       Background="#1A1D23"
                       BorderThickness="0">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="3" Rows="2"/>
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                        <!--<Setter Property="Margin" Value="2"/>-->
+                    </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="Gray" BorderThickness="1" Margin="6" Padding="5" Width="140" Height="120">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="13" TextAlignment="Center" />
-                                <TextBlock Text="{Binding MissileStatusText}" FontSize="12" Margin="0,2,0,2" TextAlignment="Center"/>
-                                <Image Width="60" Height="60"
-                                       Loaded="Image_Loaded"
-                                       Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
-                                       TargetUpdated="Image_TargetUpdated"
-                                       Stretch="UniformToFill"/>
+                        
+                        <!--<Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">-->
+                        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="13" TextAlignment="Center" Foreground="#FFDDDDDD"/>  
+                                <!--<TextBlock Text="{Binding MissileStatusText}" FontSize="8" Margin="0,0,0,0" HorizontalAlignment="Center" TextAlignment="Center"/>-->
+                            <Image Loaded="Image_Loaded"
+                                   Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
+                                   TargetUpdated="Image_TargetUpdated"
+                                   Stretch="UniformToFill"
+                                   MaxWidth="170"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch">
+                                <Image.Source>
+                                    <Binding Path="VisualState"
+                                        Converter="{StaticResource VisualStateToGifConverter}"
+                                        UpdateSourceTrigger="PropertyChanged" />
+                                    </Image.Source>
+                                </Image>
                             </StackPanel>
-                        </Border>
+                            
+                        <!--</Border>-->
+                        
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
