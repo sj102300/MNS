@@ -110,7 +110,8 @@ void TCC::UdpReceiver::receive() {
 			if (!parseWdlMSG(buffer + 8, wdlMsg))
 				break;
 			//responseWdlAck(wdlMsg);
-			engagementManager_->weaponDataLink(std::string());
+			engagementManager_->weaponDataLink(std::string(wdlMsg.commandId_, 20), std::string(wdlMsg.aircraftId_, 8), std::string(wdlMsg.missileId_, 7));
+			break;
 		default:
 			break;
 		}
