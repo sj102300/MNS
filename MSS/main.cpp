@@ -142,7 +142,7 @@ int main() {
             // 포대 위치 획득
             Coordinate battery = scenarioRunner.getBatteryLocation();
             Location loca = { battery.latitude,battery.longitude,battery.altitude };
-            std::cout << "u8[" << SUBSYSTEM_ID << "] 포대 위치: "
+            std::cout << u8"[" << SUBSYSTEM_ID << u8"] 포대 위치: "
                 << battery.latitude << ", " << battery.longitude << ", " << battery.altitude << "\n";
 
             // 기존 미사일 정리
@@ -174,6 +174,11 @@ int main() {
             receiver->setMissileMap(missileMap);
             receiver->start();
 
+            // MissileController에도 Aircraft_map 포인터 설정
+            for (auto& [id, missile] : missileMap) {
+                auto controller = missile->getController();  // get 함수 필요
+                controller->setAircraftMap(receiver->getAircraftMapPtr());  // get 함수 필요
+            }
         }
         else {
             std::cout << u8"[" << SUBSYSTEM_ID << u8"] 시뮬레이션 종료 처리 중...\n";
@@ -190,7 +195,7 @@ int main() {
 
     if (scenarioThread.joinable()) scenarioThread.join();
 
-    std::cout << u8"[" << SUBSYSTEM_ID << "] 프로그램 종료\n";
+    std::cout << u8"[" << SUBSYSTEM_ID << u8"] 프로그램 종료\n";
     return 0;
 }
 #endif

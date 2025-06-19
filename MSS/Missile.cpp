@@ -14,6 +14,11 @@ void Missile::init(std::shared_ptr<UdpMulticast> s, std::shared_ptr<MissileContr
     controller = std::move(c);
     controller->setMissile(shared_from_this());
     controller->setTarget({0,0,0});
+
+    // [추가] 타겟 항공기 ID가 지정되어 있다면 전달
+    if (!TargetAircraftId.empty()) {
+        controller->setTargetAircraftId(TargetAircraftId);
+    }
 }
 void Missile::setLoc(Location& loc) {
     MissileLoc.altitude = loc.altitude;
@@ -41,4 +46,17 @@ void Missile::start(float speed) {
 void Missile::stop() {
     if (sender) sender->close();
     if (controller) controller->stop();
+}
+
+// [추가] 타겟 항공기 ID 설정 함수 정의
+void Missile::setTargetAircraftId(const std::string& aircraftId) {
+    TargetAircraftId = aircraftId;
+}
+
+const std::string& Missile::getTargetAircraftId() const {
+    return TargetAircraftId;
+}
+
+std::shared_ptr<MissileController> Missile::getController() {
+    return controller;
 }

@@ -30,6 +30,7 @@ public:
     // 미사일 설정
     void setMissileMap(const std::unordered_map<std::string, std::shared_ptr<Missile>>& map); // 6개의 미사일 객체를 관리하기 위함
 
+    const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* getAircraftMapPtr() const;
 
 private:
     SOCKET sock_;

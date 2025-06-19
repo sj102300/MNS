@@ -2,7 +2,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "UdpReceiver.h"
 #include "Packet.h"
-
+#include "MissileController.h" // [추가]
 
 UdpReceiver::UdpReceiver()
     : sock_(INVALID_SOCKET), running_(false), port_(0) {
@@ -91,9 +91,11 @@ void UdpReceiver::run() {
                 OrderPacket orderpkg;
                 memcpy(&orderpkg, bodyPtr, sizeof(orderpkg));
                 std::string missileId(orderpkg.MissileId, strnlen(orderpkg.MissileId, 8));
+                std::string aircraftId(orderpkg.AtsId, strnlen(orderpkg.AtsId, 8));
                 Location impactPoint = orderpkg.ImpactPoint;
 
-                std::cout << u8"수신한 미사일 ID: [" << missileId << "]\n";
+                std::cout << u8"[명령 수신] 미사일: " << missileId
+                    << u8", 타겟 항공기: " << aircraftId << "\n";
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
@@ -102,6 +104,18 @@ void UdpReceiver::run() {
                     missile->setMissileId(missileId);
                     missile->setState(1);  // 예: 3 = 발사 후 비행 상태
                     missile->setTargetLocation(impactPoint);
+                
+                    // 타겟 항공기 ID 설정
+                    missile->setTargetAircraftId(aircraftId);
+
+                    // 컨트롤러에도 항공기 ID 전달
+                    auto controller = missile->getController();
+                    if (controller) {
+                        controller->setTargetAircraftId(aircraftId);
+
+                        // aircraft map도 연결
+                        controller->setAircraftMap(&Aircraft_map_);
+                    }
                 }
                 std::cout << u8"[업데이트됨] 미사일: " << missileId
                     << u8" → 목표: (" << impactPoint.altitude << ", " << impactPoint.latitude << ")\n";
@@ -152,7 +166,7 @@ void UdpReceiver::run() {
                     missile->setMissileId(missileId);
                     missile->setState(3);  // 3번은 비상폭파 상태임
                 }
-                std::cout << u8"[업데이트됨] 미사일: " << missileId << "비상폭파 상태로 변환\n";
+                std::cout << u8"[업데이트됨] 미사일: " << missileId << u8"비상폭파 상태로 변환\n";
 
                 break;
             }
@@ -206,6 +220,10 @@ void UdpReceiver::close() {
     WSACleanup();
 }
 
-void UdpReceiver::(const std::unordered_map<std::string, std::shared_ptr<Missile>>& map) {
+void UdpReceiver::setMissileMap(const std::unordered_map<std::string, std::shared_ptr<Missile>>& map) {
     missile_map_ = map;
+}
+
+const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* UdpReceiver::getAircraftMapPtr() const {
+    return &Aircraft_map_;
 }

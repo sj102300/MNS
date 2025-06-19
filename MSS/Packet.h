@@ -67,7 +67,7 @@ struct AirCraftPacket {
     unsigned int BodyLength;
     char AtsId[8];
     Location AtsLoc;
-    unsigned int AtsIdentify;
+    char AtsIdentify;
 };
 #pragma pack(pop)
 

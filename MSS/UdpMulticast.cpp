@@ -24,14 +24,14 @@ bool UdpMulticast::init(const std::string& multicast_address, int port) {
 
         WSADATA wsaData;
         if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-            std::cerr << "WSAStartup failed\n";
+            std::cerr << u8"WSAStartup failed\n";
             return false;
         }
 
         // 家南 积己 (UDP)
         sock_ = socket(AF_INET, SOCK_DGRAM, 0);
         if (sock_ == INVALID_SOCKET) {
-            std::cerr << "Failed to create socket\n";
+            std::cerr << u8"Failed to create socket\n";
             return false;
         }
 

@@ -10,6 +10,8 @@ public:
     std::string MissileId;
     unsigned int MissileState;
     Location MissileLoc;
+    std::string TargetAircraftId;  // [추가] 타겟 항공기 ID
+    std::shared_ptr<MissileController> getController();  // ← 이 줄 추가
 
     // 미사일 생성하자마자 -> 바로 쓰레드 돌리기 시작한다!!
     Missile();
@@ -24,6 +26,10 @@ public:
 
     // 초기화하는 모듈
     void init(std::shared_ptr<UdpMulticast> s, std::shared_ptr<MissileController> c);
+
+    // [추가] 타겟 항공기 ID 설정
+    void setTargetAircraftId(const std::string& aircraftId);
+    const std::string& getTargetAircraftId() const;
 
     // 시작하는 모듈
     void start(float speed);
