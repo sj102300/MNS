@@ -51,7 +51,7 @@ namespace OCC.Views
                     // 기본 설정: 반복 재생
                     ImageBehavior.SetRepeatBehavior(image, RepeatBehavior.Forever);
 
-                    if (gifPath.Contains("launching") || gifPath.Contains("self_explode") || gifPath.Contains("hit_success") || gifPath.Contains("emergency_explode"))
+                    if (gifPath.Contains("launching") || gifPath.Contains("explode") || gifPath.Contains("hit_success"))
                     {
                         // Launching일 경우 한 번만 재생
                         ImageBehavior.SetRepeatBehavior(image, new RepeatBehavior(1));

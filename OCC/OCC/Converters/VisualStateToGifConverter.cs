@@ -23,17 +23,12 @@ namespace OCC.Converters
                 MissileVisualState.Launching => "images/launching.gif",
                 MissileVisualState.InFlight => "images/in_flight.gif",
                 MissileVisualState.HitSuccess => "images/hit_success.gif",
-                MissileVisualState.EmergencyExplode => "images/emergency_explode.gif",
-                MissileVisualState.SelfExplode => "images/self_explode.gif",
+                MissileVisualState.EmergencyExplode => "images/explode.gif",  // 비폭과
+                MissileVisualState.SelfExplode => "images/explode.gif",       // 자폭을 동일한 영상으로 처리
                 MissileVisualState.Done => "images/empty.png",
                 _ => "images/unknown.gif"
             };
         }
-
-        //1.로딩 렉
-        //    2. 상태전이 안됨
-        //    0 -> 1 발사
-        //    1 유지가 비행
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();

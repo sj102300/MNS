@@ -18,17 +18,14 @@
     <None Remove="images\battery.png" />
     <None Remove="images\destroy.png" />
     <None Remove="images\emergencyDestroy.png" />
-    <None Remove="images\emergency_explode.gif" />
     <None Remove="images\empty.png" />
+    <None Remove="images\explode.gif" />
     <None Remove="images\hit_success.gif" />
     <None Remove="images\impactPoint.png" />
     <None Remove="images\in_flight.gif" />
     <None Remove="images\launching.gif" />
     <None Remove="images\missile.png" />
-    <None Remove="images\sample.gif" />
-    <None Remove="images\self_explode.gif" />
     <None Remove="images\unknown.gif" />
-    <None Remove="images\waiting.gif" />
     <None Remove="images\waiting.png" />
   </ItemGroup>
 
@@ -39,11 +36,9 @@
     <Resource Include="images\destroy.png" />
     <Resource Include="images\emergencyDestroy.png" />
     <Resource Include="images\empty.png" />
+    <Resource Include="images\explode.gif" />
     <Resource Include="images\impactPoint.png" />
     <Resource Include="images\missile.png" />
-    <Resource Include="images\self_explode.gif">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -56,9 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="images\emergency_explode.gif">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="images\hit_success.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -68,13 +60,7 @@
     <Resource Include="images\launching.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="images\sample.gif">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="images\unknown.gif">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="images\waiting.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="images\waiting.png" />
