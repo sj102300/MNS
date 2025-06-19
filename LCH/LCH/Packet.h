@@ -18,3 +18,13 @@ struct OrderPacket {
     Location ImpactPoint;
 };
 #pragma pack(pop)
+
+#pragma pack(push,1)
+struct MissilePacket {
+    unsigned int EventCode;
+    unsigned int BodyLength;
+    char MissileId[8];
+    unsigned int MissileState;
+    Location MissileLoc;
+};
+#pragma pack(pop)
