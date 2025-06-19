@@ -48,21 +48,28 @@ namespace OCC.Views
                 {
                     var uri = new Uri($"pack://application:,,,/{gifPath}");
                     var imageSource = new BitmapImage(uri);
-                    // 기본 설정: 반복 재생
-                    ImageBehavior.SetRepeatBehavior(image, RepeatBehavior.Forever);
 
+                    // 반드시 SetAnimatedSource 전에 RepeatBehavior 설정
                     if (gifPath.Contains("launching") || gifPath.Contains("explode") || gifPath.Contains("hit_success"))
                     {
-                        // Launching일 경우 한 번만 재생
-                        ImageBehavior.SetRepeatBehavior(image, new RepeatBehavior(1));
+                        ImageBehavior.SetRepeatBehavior(image, new RepeatBehavior(1)); // 1회 재생
+                    }
+                    else
+                    {
+                        ImageBehavior.SetRepeatBehavior(image, RepeatBehavior.Forever); // 무한 반복
                     }
 
+                    // 애니메이션 소스 설정
+                    ImageBehavior.SetAnimatedSource(image, null); // 초기화
                     ImageBehavior.SetAnimatedSource(image, imageSource);
 
                     ImageBehavior.AddAnimationCompletedHandler(image, (s, args) =>
                     {
                         if (image.DataContext is Missile missile)
                         {
+                            if (missile.VisualState == MissileVisualState.Done)
+                                return;
+
                             switch (missile.VisualState)
                             {
                                 case MissileVisualState.Launching:
