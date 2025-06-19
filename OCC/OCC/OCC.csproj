@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\AircraftInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="images\Aircraft.png" />
+    <None Remove="images\background-img.png" />
+    <None Remove="images\battery.png" />
+    <None Remove="images\destroy.png" />
+    <None Remove="images\emergencyDestroy.png" />
+    <None Remove="images\empty.png" />
+    <None Remove="images\explode.gif" />
+    <None Remove="images\hit_success.gif" />
+    <None Remove="images\impactPoint.png" />
+    <None Remove="images\in_flight.gif" />
+    <None Remove="images\launching.gif" />
+    <None Remove="images\missile.png" />
+    <None Remove="images\unknown.gif" />
+    <None Remove="images\waiting.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\Aircraft.png" />
+    <Resource Include="images\background-img.png" />
+    <Resource Include="images\battery.png" />
+    <Resource Include="images\destroy.png" />
+    <Resource Include="images\emergencyDestroy.png" />
+    <Resource Include="images\empty.png" />
+    <Resource Include="images\explode.gif" />
+    <Resource Include="images\impactPoint.png" />
+    <Resource Include="images\missile.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GMap.NET.Core" Version="2.1.7" />
+    <PackageReference Include="GMap.NET.WinPresentation" Version="2.1.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="WPF-UI" Version="4.0.2" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\hit_success.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\in_flight.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\launching.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\unknown.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\waiting.png" />
+  </ItemGroup>
+
+</Project>

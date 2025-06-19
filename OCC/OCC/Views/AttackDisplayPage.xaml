@@ -1,0 +1,80 @@
+﻿<Page x:Class="OCC.Views.AttackDisplayPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:OCC.Views"
+      xmlns:ui="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
+      xmlns:gmap="clr-namespace:GMap.NET.WindowsPresentation;assembly=GMap.NET.WindowsPresentation"
+      mc:Ignorable="d" 
+      d:DesignHeight="768" d:DesignWidth="1024"
+      Background="#1A1D23"
+      Title="AttackDisplayPage">
+
+    <Grid>
+        <!--<Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>-->
+
+        <!-- 좌측: 메인 정보/화면 영역 (추후 확장 가능) -->
+        <ui:Card Grid.Row="0" Grid.Column="0"
+                 Background="#23262E"
+                 Margin="0,0,16,0"
+                 Padding="18"
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch">
+            <DockPanel LastChildFill="True">
+                <!-- 상단: 뒤로가기 버튼 -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="12,12,12,12">
+                    <ui:Button Command="{Binding QuitCommand}"
+                               Width="110"
+                               Height="36"
+                               Appearance="Secondary"
+                               Background="#B71C1C"
+                               Foreground="#FFFFFF"
+                               FontWeight="SemiBold"
+                               FontSize="14"
+                               CornerRadius="16"
+                               Padding="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Margin="0,0,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="시나리오 종료"
+                                       VerticalAlignment="Center"
+                                       FontWeight="SemiBold"
+                                       FontSize="14"
+                                       />
+                        </StackPanel>
+                    </ui:Button>
+                </StackPanel>
+                <!-- 지도 -->
+                <GroupBox Name="mapgroup"
+                      Background="#23262E"
+                      BorderBrush="#37474F"
+                      Foreground="#B0BEC5"
+                      FontWeight="SemiBold"
+                      FontSize="14"
+                      VerticalContentAlignment="Stretch"
+                      HorizontalContentAlignment="Stretch"
+                      Margin="12,0,12,12"
+                      MinHeight="340"
+                      MinWidth="480">
+                    <gmap:GMapControl 
+                        x:Name="mapControl" 
+                        Zoom="13" 
+                        MaxZoom="24" 
+                        MinZoom="1"
+                        Background="Transparent"
+                        MinHeight="340"
+                        MinWidth="480"/>    
+                </GroupBox>
+            </DockPanel>
+        </ui:Card>
+
+    </Grid>
+</Page>
