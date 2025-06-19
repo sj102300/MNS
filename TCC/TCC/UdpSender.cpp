@@ -77,8 +77,16 @@ const int TCC::UdpSender::serializeAircraftSender(char* buffer, AircraftManager:
     std::memcpy(buffer + 0, data.aircraftData_.aircraftId_.c_str(), 8);
 
     std::memcpy(buffer + 8, &data.aircraftData_.location_, sizeof(double) * 3);
+
     std::memcpy(buffer + 32, &data.aircraftData_.isEnemy_, sizeof(unsigned int));
-    std::memcpy(buffer + 36, &data.engagementStatus_, sizeof(unsigned int));
+
+    if (data.aircraftData_.isEnemy_) {
+        std::memcpy(buffer + 36, &data.engagementStatus_, sizeof(unsigned int));
+    }
+    else {
+        unsigned int engagementStatus = 0;
+        std::memcpy(buffer + 36, &engagementStatus, sizeof(unsigned int));
+    }
 
     std::memcpy(buffer + 40, &data.impactPoint_, sizeof(double)*3);
 
