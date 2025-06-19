@@ -17,6 +17,7 @@ public:
 	Aircraft(std::string id, TCC::Position pos_, bool isEnemy_);
 	const bool isEnemy() const;
 	bool calcImpactPoint(TCC::Position &batteryLoc);
+	bool calcWDLImpactPoint(TCC::Position& curMissileLoc);
 	bool hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus);
 	void updatePosition(TCC::Position& newLocation);
 	bool isEngagable();

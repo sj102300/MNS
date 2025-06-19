@@ -67,6 +67,8 @@ void TCC::UdpReceiver::receive() {
 	ModeChangeMSG modechangemsg;
 	ManualFireMSG manualFireMsg;
 	EmergencyDestroyMSG emergencyDestroyMsg;
+	WDLMSG wdlMsg;
+
 	int addrLen = sizeof(senderAddr_);
 
 	while (isRunning_) {
@@ -103,7 +105,13 @@ void TCC::UdpReceiver::receive() {
 			responseEmergencyDestroyAck(emergencyDestroyMsg);
 			engagementManager_->emergencyDestroy(std::string(emergencyDestroyMsg.commandId_, 20), std::string(emergencyDestroyMsg.targetMissileId_, 7));
 			break;
-
+		case CommandCode::WDLRequest:
+			std::cout << "WDLRequest" << std::endl;
+			if (!parseWdlMSG(buffer + 8, wdlMsg))
+				break;
+			responseWdlAck(wdlMsg);
+			engagementManager_->weaponDataLink(std::string(wdlMsg.commandId_, 20), std::string(wdlMsg.aircraftId_, 8), std::string(wdlMsg.missileId_, 7));
+			break;
 		default:
 			break;
 		}
@@ -130,7 +138,27 @@ void TCC::UdpReceiver::responseManualFireAck(ManualFireMSG& body) {
 		std::cout << "[UdpReceiver] Sent ManualFireAck to client\n";
 	}
 }
+void TCC::UdpReceiver::responseWdlAck(WDLMSG& msg) {
+	AckHeader header;
+	header.commandCode_ = CommandCode::WDLRequest;  // WDL 요청에 대한 ACK 식별 코드
+	header.bodyLength_ = sizeof(WDLMSG);
 
+	char buffer[sizeof(AckHeader) + sizeof(WDLMSG)];  // 정확한 크기만큼 버퍼 생성
+
+	memcpy(buffer, &header, sizeof(AckHeader));
+	memcpy(buffer + sizeof(AckHeader), &msg, sizeof(WDLMSG));
+
+	int sent = sendto(serverSocket_, buffer, sizeof(buffer), 0,
+		reinterpret_cast<const sockaddr*>(&senderAddr_),
+		sizeof(senderAddr_));
+
+	if (sent == SOCKET_ERROR) {
+		std::cerr << "[UdpReceiver] WDL Ack sendto failed: " << WSAGetLastError() << "\n";
+	}
+	else {
+		std::cout << "[UdpReceiver] Sent WDL Ack to client\n";
+	}
+}
 void TCC::UdpReceiver::responseChangeModeAck(unsigned int changedMode) {  
    AckHeader header;  
    header.commandCode_ = CommandCode::ModeChangeRequest;  
@@ -176,6 +204,28 @@ void TCC::UdpReceiver::responseEmergencyDestroyAck(EmergencyDestroyMSG& body) {
 	}
 }
 
+//void TCC::UdpReceiver::responseWdlAck(WDLMSG& body) {
+//	AckHeader header;
+//	header.commandCode_ = CommandCode::EmergencyDestroyRequest;
+//	header.bodyLength_ = sizeof(EmergencyDestroyMSG);
+//	char buffer[50];
+//
+//	memcpy(buffer, &header, sizeof(AckHeader));
+//	memcpy(buffer + sizeof(AckHeader), &body, sizeof(EmergencyDestroyMSG));
+//
+//	int sent = sendto(serverSocket_, buffer, sizeof(buffer), 0,
+//		reinterpret_cast<const sockaddr*>(&senderAddr_),
+//		sizeof(senderAddr_));
+//
+//	if (sent == SOCKET_ERROR) {
+//		std::cerr << "[UdpReceiver] Ack sendto failed: " << WSAGetLastError() << "\n";
+//	}
+//	else {
+//		std::cout << "[UdpReceiver] Sent EmergencyDestroyAck to client\n";
+//	}
+//}
+
+
 bool TCC::UdpReceiver::parseModeChangeMSG(const char* buffer, ModeChangeMSG& msg) {
 	memcpy(&msg.mode_, buffer, sizeof(unsigned int));
 	if (msg.mode_ != 0 && msg.mode_ != 1)
@@ -202,6 +252,11 @@ bool TCC::UdpReceiver::parseEmergencyDestroyMSG(const char* buffer, EmergencyDes
 	//if (!TCC::isValidMissileId(msg.targetMissileId_))
 	//	return false;
 
+	return true;
+}
+
+bool TCC::UdpReceiver::parseWdlMSG(const char* buffer, WDLMSG& msg) {
+	memcpy(&msg, buffer, sizeof(WDLMSG));
 	return true;
 }
 

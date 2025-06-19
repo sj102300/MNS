@@ -90,6 +90,21 @@ void TCC::UdpMulticastSender::sendLaunchCommand(std::string& commandId, std::str
     return;
 }
 
+void TCC::UdpMulticastSender::sendWDLCommand(std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
+
+    char* buffer = new char[100];
+
+    int headerSize = serializeHeader(buffer, EventCode::WDLCommand, sizeof(WDLBody));
+    int bodySize = serializeWDLCommandBody(buffer + headerSize, commandId, aircraftId, missileId, impactPoint);
+    int totalSize = headerSize + bodySize;
+
+    std::thread([this, buffer, totalSize]() {
+        sendUntilReceiveAck(buffer, totalSize);
+        delete[] buffer;
+        }).detach();
+    return;
+}
+
 void TCC::UdpMulticastSender::setAckResult(const std::string& missileId, bool result) {
     {
         std::lock_guard<std::mutex> lock(ackMtx_);
@@ -175,6 +190,14 @@ const int TCC::UdpMulticastSender::serializeEmergencyDestroyCommandBody(char* bu
     memcpy(buffer + 20, missileId.c_str(), 8);
     return 28;
 } 
+
+const int TCC::UdpMulticastSender::serializeWDLCommandBody(char* buffer, std::string& commandId, std::string& aircraftId, std::string& missileId, TCC::Position& impactPoint) {
+    memcpy(buffer, commandId.c_str(), 20);
+    memcpy(buffer + 20, aircraftId.c_str(), 8);
+    memcpy(buffer + 28, missileId.c_str(), 8);
+    memcpy(buffer + 36, &impactPoint, 24);
+    return 60;
+}
 
 const int TCC::UdpMulticastSender::sendByteData(const char* data, int length) {
     if (sock_ == INVALID_SOCKET) {

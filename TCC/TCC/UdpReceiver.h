@@ -16,6 +16,7 @@ namespace TCC {
 			ModeChangeRequest = 200,
 			ManualFireRequest = 201,
 			EmergencyDestroyRequest = 202,
+			WDLRequest = 301,
 		};
 
 		typedef struct _header {
@@ -46,6 +47,12 @@ namespace TCC {
 			char targetMissileId_[8];
 		} EmergencyDestroyMSG;
 
+		typedef struct _wdl_message {
+			char commandId_[20];
+			char aircraftId_[8];
+			char missileId_[8];
+		} WDLMSG;
+
 		UdpReceiver(std::string ip, int port);
 		bool init(EngagementManager * engagementManager);
 		void start();
@@ -58,9 +65,12 @@ namespace TCC {
 		bool parseModeChangeMSG(const char* buffer, ModeChangeMSG& msg);
 		bool parseManualFireMSG(const char* buffer, ManualFireMSG& msg);
 		bool parseEmergencyDestroyMSG(const char* buffer, EmergencyDestroyMSG& msg);
+		bool parseWdlMSG(const char* buffer, WDLMSG& msg);
+
 		void responseChangeModeAck(unsigned int changedMode);
 		void responseManualFireAck(ManualFireMSG& body);
 		void responseEmergencyDestroyAck(EmergencyDestroyMSG& body);
+		void responseWdlAck(WDLMSG& msg);
 
 		std::string ip_;
 		int port_;

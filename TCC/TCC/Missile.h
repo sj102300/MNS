@@ -22,6 +22,7 @@ public:
 	bool isAvailable(unsigned int status, std::string& missileId);
 	void updateStatus(MissileStatus);
 	unsigned int getMissileStatus();
+	bool getCurLocation(TCC::Position& loc);
 	~Missile();
 
 private:

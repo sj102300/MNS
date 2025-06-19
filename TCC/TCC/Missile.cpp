@@ -19,6 +19,11 @@ unsigned int Missile::getMissileStatus() {
 	return status_;
 }
 
+bool Missile::getCurLocation(TCC::Position& loc) {
+	loc = position_;
+	return true;
+}
+
 bool Missile::checkId(std::string id) {
 	if (id == missileId_) {
 		return true;

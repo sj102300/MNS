@@ -63,6 +63,27 @@ void EngagementManager::makeAutoFireCommandId(std::string& commandId) {
 	commandId = oss.str();
 }
 
+void EngagementManager::makeWDLCommandId(std::string& commandId) {
+	using namespace std::chrono;
+
+	// 현재 시간
+	auto now = system_clock::now();
+	auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+
+	// time_t → tm 변환
+	std::time_t now_time_t = system_clock::to_time_t(now);
+	std::tm now_tm;
+	localtime_s(&now_tm, &now_time_t);  // Windows 안전 버전
+
+	// 문자열 생성
+	std::ostringstream oss;
+	oss << "WF-"  // 접두사
+		<< std::put_time(&now_tm, "%Y%m%d%H%M%S")
+		<< std::setw(3) << std::setfill('0') << ms.count();  // 밀리초
+
+	commandId = oss.str();
+}
+
 bool EngagementManager::mappingMissileToAircraft(std::string & aircraftId, std::string& missileId) {
 
 	missileId = missileManager_->findAvailableMissile();
@@ -332,6 +353,74 @@ bool EngagementManager::EngagableAircraftQueue::pushQueue(std::string& aircraftI
 	set.insert(aircraftId);
 	queue.push(aircraftId);
 	std::cout << "EngagableAircraftQueue pushQueue() : " << aircraftId << std::endl;
+	return true;
+}
+
+bool EngagementManager::weaponDataLink(std::string commandId, std::string aircraftId, std::string missileId) {
+	
+	Aircraft* targetAircraft = aircraftManager_->getAircraft(aircraftId);
+	if (targetAircraft == nullptr) {
+		std::cout << "--------------------------------" << std::endl;
+		std::cout << "No targetAircraft!" << std::endl;
+		std::cout << "--------------------------------" << std::endl;
+		return false;
+	}
+
+	if (!targetAircraft->isEnemy()) {
+		std::cout << "--------------------------------" << std::endl;
+		std::cout << u8"아군 항공기입니다 격추할 수 없습니다!" << std::endl;
+		std::cout << "--------------------------------" << std::endl;
+		return false;
+	}
+
+	if (!targetAircraft->isEngagable()) {
+		std::cout << "--------------------------------" << std::endl;
+		std::cout << "targetAircraft is notEngageable" << std::endl;
+		std::cout << "--------------------------------" << std::endl;
+		return false;		//교전 불가능 한 항공기임.
+	}
+
+	Missile* targetMissile = missileManager_->selectMissile(missileId);
+	TCC::Position curMissileLoc;
+	targetMissile->getCurLocation(curMissileLoc);
+
+	if (!targetAircraft->calcImpactPoint(curMissileLoc)) {
+		std::cout << "--------------------------------" << std::endl;
+		std::cout << "Failed to calculate impact point." << std::endl;
+		std::cout << "--------------------------------" << std::endl;
+		targetAircraft->updateStatus(Aircraft::EngagementStatus::NotEngageable);
+		return false;
+	};
+
+	TCC::Position impactPoint;
+	targetAircraft->getImpactPoint(impactPoint);
+	std::cout << "lati: " << impactPoint.latitude_
+		<< "longi: " << impactPoint.longitude_
+		<< "alti: " << impactPoint.altitude_
+		<< std::endl;
+
+	//미사일 맵핑 수정
+	missileToAircraft_[missileId] = aircraftId;
+
+	std::string wdlCommandId;
+	makeWDLCommandId(wdlCommandId);
+	fireCommands_[wdlCommandId] = { missileId, aircraftId };
+	//unordered_map 두개 부분 수정하기
+
+	handleMissileDestroyed(missileId, DestroyType::WDL);		//원래있던 발사명령의 impact point 지우기 위함
+	sender_->sendLaunchCommand(wdlCommandId, aircraftId, missileId, impactPoint);
+	multisender_->sendWDLCommand(wdlCommandId, aircraftId, missileId, impactPoint);
+
+	std::cout << u8"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+	std::cout << u8"[WDL 명령 전송]" << std::endl;
+	std::cout << u8" - 명령 식별자: " << wdlCommandId << std::endl;
+	std::cout << u8" - 항공기 식별자: " << aircraftId << std::endl;
+	std::cout << u8" - 미사일 식별자: " << missileId << std::endl;
+	std::cout << u8" - 요격 예상 좌표: 위도 = " << impactPoint.latitude_
+		<< u8", 경도 = " << impactPoint.longitude_
+		<< u8", 고도 = " << impactPoint.altitude_ << std::endl;
+	std::cout << u8"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
 	return true;
 }
 
