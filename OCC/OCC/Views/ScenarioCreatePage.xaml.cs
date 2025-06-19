@@ -93,6 +93,32 @@ namespace OCC.Views
             };
         }
 
+        private GMapPolygon CreateCircle(PointLatLng center, double radiusKm, int segments, Brush stroke, Brush fill = null)
+        {
+            var points = new List<PointLatLng>();
+            double seg = 360.0 / segments;
+            for (int i = 0; i < segments; i++)
+            {
+                double theta = Math.PI * i * seg / 180.0;
+                // 위도 1도 ≈ 111.32km, 경도 1도 ≈ 111.32km * cos(위도)
+                double dLat = (radiusKm / 111.32) * Math.Sin(theta);
+                double dLng = (radiusKm / (111.32 * Math.Cos(center.Lat * Math.PI / 180))) * Math.Cos(theta);
+                points.Add(new PointLatLng(center.Lat + dLat, center.Lng + dLng));
+            }
+            var polygon = new GMapPolygon(points);
+
+            // WPF Path 스타일 적용
+            polygon.Shape = new System.Windows.Shapes.Path
+            {
+                Stroke = stroke,
+                StrokeThickness = 3,
+                Fill = fill ?? Brushes.Transparent,
+                Opacity = 0.4
+            };
+
+            return polygon;
+        }
+
         private void mapControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _mouseDownPoint = e.GetPosition(mapControl);
@@ -153,6 +179,17 @@ namespace OCC.Views
                         Offset = new Point(-markerSize / 2, -markerSize / 2)
                     };
                     mapControl.Markers.Add(marker);
+
+                    if(_viewModel.SelectedItem == "포대")
+                    {
+                        // 300km, 130km 원 추가
+                        var circle300 = CreateCircle(position, 300, 120, Brushes.Red, null);
+                        var circle130 = CreateCircle(position, 130, 120, Brushes.ForestGreen, null);
+                        mapControl.RegenerateShape(circle300);
+                        mapControl.RegenerateShape(circle130);
+                        mapControl.Markers.Add(circle300);
+                        mapControl.Markers.Add(circle130);
+                    }
 
                     // 시작과 끝점 연결
                     if (_viewModel.StartPoint != null && _viewModel.EndPoint != null)
