@@ -66,7 +66,6 @@ void EngagementManager::makeAutoFireCommandId(std::string& commandId) {
 bool EngagementManager::mappingMissileToAircraft(std::string & aircraftId, std::string& missileId) {
 
 	missileId = missileManager_->findAvailableMissile();
-	
 	if (missileId.empty()) {
 		std::cout << "No Available Missile!" << std::endl;
 		return false;		//사용가능한 미사일이 없음. 더미 데이터
@@ -85,21 +84,11 @@ bool EngagementManager::engagementSuccess(std::string targetAircraftId, std::str
 	std::cout << "Target Missile ID: " << targetMissileId << std::endl;
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
-
-	std::cout << u8"찾는 missileId: [" << targetMissileId << "]" << std::endl;
-
-	for (auto& v : missileToAircraft_) {
-		std::cout << u8"찾는 missileId: [" << targetMissileId << "]" << std::endl;
-		std::cout << u8"저장된 missileId: [" << v.first << "]" << std::endl;
-
-	}
-
 	auto it = missileToAircraft_.find(targetMissileId);
 	if (it == missileToAircraft_.end()) {		//사용한 미사일이 아님
 		std::cout << u8"===========================================================" << std::endl;
 		std::cout << u8"사용한 미사일이 아닙니다. engagementSuccess()" << std::endl;
 		std::cout << u8"===========================================================" << std::endl;
-
 		return false;
 	}
 
@@ -153,8 +142,6 @@ bool EngagementManager::handleMissileDestroyed(std::string& missileId) {
 			aircraftId = v.second.second;
 			break;
 		}
-		std::cout << u8"찾는 missileId: [" << missileId << "]" << std::endl;
-		std::cout << u8"저장된 missileId: [" << v.second.first << "]" << std::endl;
 	}
 	if (launchCommandId.empty()) {
 		std::cout << u8"===========================================================" << std::endl;
