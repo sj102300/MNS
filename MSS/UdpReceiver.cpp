@@ -170,7 +170,7 @@ void UdpReceiver::run() {
 
                 break;
             }
-                     // ATS를 주기적으로 받기 위함임
+            // ATS를 주기적으로 받기 위함임
             case 1001: {
                 if (bodyLength < sizeof(AirCraftPacket) - 8) {
                     std::cerr << u8"항공기 패킷 길이 부족\n";
@@ -195,9 +195,49 @@ void UdpReceiver::run() {
                     Aircraft_map_[aircraftId] = newAircraft;
                 }
 
-                std::cout << u8"[항공기 업데이트] ID: " << aircraftId
-                    << u8" → 위치: (" << loc.latitude << ", " << loc.longitude << ", " << loc.altitude << ")\n";
+               // std::cout << u8"[항공기 업데이트] ID: " << aircraftId
+               //     << u8" → 위치: (" << loc.latitude << ", " << loc.longitude << ", " << loc.altitude << ")\n";
             
+                break;
+            }
+            case 301: { // IMPACT_POINT 재설정
+                if (bodyLength < sizeof(WDLPacket) - 8) {
+                    std::cerr << u8"WDL 패킷 길이 부족\n";
+                    std::cout << u8"packet size : " << sizeof(WDLPacket) << "\n";
+                    break;
+                }
+
+                WDLPacket wdlPacket;
+                memcpy(&wdlPacket, bodyPtr, sizeof(wdlPacket));
+
+                std::string missileId(wdlPacket.MissileId, strnlen(wdlPacket.MissileId, 8));
+                Location newImpactPoint = wdlPacket.ImpactPoint;
+                std::string aircraftId(wdlPacket.AtsId, strnlen(wdlPacket.AtsId, 8));
+                auto it = missile_map_.find(missileId);
+                if (it != missile_map_.end()) {
+                    std::cout << u8"미사일 [" << missileId << u8"]의 목표 위치를 갱신합니다.\n";
+                    auto missile = it->second;
+                    missile->setState(7);  // 3번은 비상폭파 상태임
+                    missile->setTargetLocation(newImpactPoint);
+                   
+                    missile->setTargetAircraftId(aircraftId);
+                    /*방금 추가한 컨트롤러 코드*/
+                    auto controller = missile->getController();
+                    if (controller) {
+                        controller->setTargetAircraftId(aircraftId);
+
+                        // aircraft map도 연결
+                        controller->setAircraftMap(&Aircraft_map_);
+                    }
+                    std::cout << u8"[업데이트됨] 미사일: " << missileId
+                        << u8" → 새로운 목표: (" << newImpactPoint.latitude << ", "
+                        << newImpactPoint.longitude << ", "
+                        << newImpactPoint.altitude << ")\n";
+                }
+                else {
+                    std::cerr << u8"해당 미사일 ID를 찾을 수 없습니다: " << missileId << "\n";
+                }
+
                 break;
             }
             default:

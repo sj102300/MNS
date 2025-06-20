@@ -54,4 +54,8 @@ private:
 	std::string targetAircraftId_;
 	const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* aircraftMap_ = nullptr;
 	bool hasEnteredTerminalGuidance_ = false;
+
+	// wdl Ãß°¡
+	//double totalDistanceTraveled_ = 0.01;
+	//float speed_kmps_init_ = 2.0f;
 };

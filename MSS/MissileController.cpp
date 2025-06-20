@@ -5,10 +5,143 @@
 #include <memory>
 #include <thread>
 #include <iostream>
+#include <utility>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
+
+// 선회율 계산
+double Cal_RateOfTurn(double w, double t) {
+	double v = 2000.0; // 속도(m/s)
+	double aoa = 0.05236; // 받음각(rad), 약 3도
+	double L = 0.4135 * v * v * aoa / 2; // 양력
+	double l = (4.61 * 0.5) / (4.61 * 0.25); // 모멘트암 비율
+	double T = L * l; // 토크
+	double I = 400 * (3 * 0.275 * 0.275 + 4.61 * 4.61) / 12; // 관성모멘트
+	double a = T / I; // 각가속도
+
+	w += a * t;
+
+	return w;
+}
+
+// 좌표 업데이트
+std::pair<double, double> update_latlon(double heading, double w, double dt, double x, double y) {
+	double v = 2000.0;
+	double R = 6371000.0;
+	double pi = 3.14159265358979;
+
+	double lat = x * pi / 180.0;
+	double lon = y * pi / 180.0;
+
+	double new_heading = heading + w * dt;
+
+	double dNorth = v * std::cos(new_heading) * dt;
+	double dEast = v * std::sin(new_heading) * dt;
+
+	double dLat = dNorth / R;
+	double dLon = dEast / (R * std::cos(lat));
+
+	double new_lat = lat + dLat;
+	double new_lon = lon + dLon;
+
+	return {
+		new_lat * 180.0 / pi,
+		new_lon * 180.0 / pi
+	};
+}
+
+// 베르누이 압력장 계산
+double Bernoulli(double MissileVelocity, double AirVelocity) {
+	double density = 0.413;
+	return (density * (pow(AirVelocity, 2) - pow(MissileVelocity, 2))) / 2;
+}
+
+// 항력 계산
+double Drag_cal(double deltaP, double MissileRadius) {
+	double pi = 3.14159265358979;
+	double Area = pow(MissileRadius, 2) * pi;
+	return deltaP * Area;
+}
+
+// 랭킨 오발 속도장 계산
+double RankineOval(double Missilelength, double MissileRadius, double AirVelocity, double x, double r) {
+	double pi = 3.14159265358979;
+	double Q = pi * pow(MissileRadius, 2) * AirVelocity;
+
+	double denom1 = pow((x + Missilelength / 2), 2) + pow(r, 2);
+	double denom2 = pow((x - Missilelength / 2), 2) + pow(r, 2);
+
+	// 분모가 너무 작으면 기본 유속 반환
+	if (denom1 < 1e-6 || denom2 < 1e-6) {
+		return AirVelocity;
+	}
+
+	double Vx = AirVelocity
+		+ Q / (4 * pi) * (2 * (x + Missilelength / 2)) / denom1
+		- Q / (4 * pi) * (2 * (x - Missilelength / 2)) / denom2;
+
+	double Vr = Q / (4 * pi) * (2 * r) / denom1
+		- Q / (4 * pi) * (2 * r) / denom2;
+
+	double V = std::sqrt(Vx * Vx + Vr * Vr);
+
+	if (std::isnan(V) || std::isinf(V)) {
+		std::cerr << "[RankineOval] Invalid velocity V detected.\n";
+		return AirVelocity;
+	}
+
+	return V;
+}
+
+// 자폭 여부 판단
+float decision_suicide(double range) {
+	if (range >= 130) {
+		double AirVelocity = 2000.0;
+		double Missilelength = 4.61;
+		double MissileRadius = 0.275;
+		double missile_mass = 400.0;
+		double dt = 0.1;
+		double velocity_now = AirVelocity;
+
+		for (int i = 0; i < 1000; ++i) {
+			double velocity = 0.0;
+			double dx = Missilelength / 100;
+			double current_dx = dx;
+
+			for (int j = 0; j < 100; j++) {
+				double local_v = RankineOval(Missilelength, MissileRadius, velocity_now, current_dx, MissileRadius);
+				if (std::isnan(local_v) || std::isinf(local_v)) {
+					std::cerr << "[decision_suicide] Invalid local velocity at x = " << current_dx << "\n";
+					return 0.0f;
+				}
+				velocity += local_v;
+				current_dx += dx;
+			}
+			velocity /= 100;
+
+			double delta_pressure = Bernoulli(velocity_now, velocity);
+			double Drag = Drag_cal(delta_pressure, MissileRadius);
+			double acceleration = -Drag / missile_mass;
+
+			velocity_now += acceleration * dt;
+
+			if (std::isnan(velocity_now) || std::isinf(velocity_now)) {
+				std::cerr << "[decision_suicide] Invalid velocity_now at iteration " << i << "\n";
+				return 0.0f;
+			}
+
+			if (velocity_now <= 10.0) {
+				std::cout << "[decision_suicide] Velocity too low, self-destruct triggered.\n";
+				return 0.0f;
+			}
+		}
+		return static_cast<float>(velocity_now);
+	}
+	return 2000.0f;
+}
 
 MissileController::MissileController()
 	:impact_point({0, 0, 10}),hasTarget_(false){}
@@ -44,6 +177,7 @@ void MissileController::setTarget(Location pos) {
 
 
 void MissileController::start(float speed) {
+	//speed_kmps_init_ = speed;
 	running_ = true;
 	updateThread_ = std::thread(&MissileController::updateLoop, this, speed);
 }
@@ -62,13 +196,16 @@ void MissileController::stop() {
 }
 
 void MissileController::updatePosition(float speed_kmps) {  // Proportional Navigation
-	if (!missile_ || !hasTarget_ || missile_->MissileState != 1) return;
+	if (!missile_ || !hasTarget_) return;
+	if (!(missile_->MissileState == 1 || missile_->MissileState == 5|| missile_->MissileState == 7)) return;
 	if (!launch_time_recorded_ || estimatedTimeToImpact_ < 0.0) return;
 	if (missile_->MissileState == 2 || missile_->MissileState == 3 || missile_->MissileState == 4) {
 		running_ = false;
 		return;
 	}
-
+	if (missile_->MissileState == 7) {
+		missile_->MissileState = 1;
+	}
 	constexpr double PN_GAIN = 3.0;
 	constexpr double TIME_STEP = 0.1;
 
@@ -77,6 +214,7 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 	bool isTerminalGuidance = false;
 
 	if (!targetAircraftId_.empty() && aircraftMap_ != nullptr) {
+		
 		auto it = aircraftMap_->find(targetAircraftId_);
 		if (it != aircraftMap_->end() && it->second) {
 			const Location& acLoc = it->second->getLocation();
@@ -134,6 +272,8 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 						<< u8" → 항공기: " << targetAircraftId_
 						<< u8", 거리: " << distance_km << u8" km\n";
 					hasEnteredTerminalGuidance_ = true;
+
+					missile_->MissileState = 5; // 5번이 종말 유도 상태라고 가정
 				}	
 			}	
 		}
@@ -143,6 +283,7 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 	}
 	// 종말 유도 끝
 
+	
 	// 위치 업데이트 (반지름 기반 → 위도/경도 단위로 변환)
 	double move_km = speed_kmps * 0.1; // 0.1초당 이동 거리
 	double delta_lat = (dir_lat_ * move_km) / EARTH_RADIUS_KM * 180.0 / M_PI;
