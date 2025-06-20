@@ -87,10 +87,19 @@ void MissileManager::echoMissileData(TCC::UdpMulticastReceiver::MissileMSG& msg)
             std::cout << u8"미사일 데이터 전송 실패\n";
         }
     }
+    
+    std::string missileId(msg.missileId, 7);
+    for (auto* m : missiles_) {
+        if (m->checkId(missileId)) {
+            m->updatePosition(msg.location_);
+            break;
+        }
+        //std::cout << "Missile ID: " << m->getId()/*
+        //    << ", Status: " << m->getStatus() << "\n";*/
+    }
 
     //자폭한 경우
     if (msg.status_ == Missile::MissileStatus::SelfDestroyed) {
-        std::string missileId(msg.missileId, 7);
         engagementManager_->handleMissileDestroyed(missileId, EngagementManager::DestroyType::SelfDestroy);
     }
 

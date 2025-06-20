@@ -171,6 +171,7 @@ bool EngagementManager::handleMissileDestroyed(std::string& missileId, unsigned 
 		return false;
 	}
 
+	fireCommands_.erase(launchCommandId);
 	sender_->sendDestroyCommand(launchCommandId, aircraftId, missileId, type);
 	return true;
 
@@ -273,7 +274,7 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 		return false;		//교전 불가능 한 항공기임.
 	}
 
-	if (!aircraft->calcImpactPoint(batteryLoc_)) {
+	if (!aircraft->calcImpactPoint(batteryLoc_, 2.25)) {
 		std::cout << "--------------------------------" << std::endl;
 		std::cout << "Failed to calculate impact point." << std::endl;
 		std::cout << "--------------------------------" << std::endl;
@@ -384,7 +385,7 @@ bool EngagementManager::weaponDataLink(std::string commandId, std::string aircra
 	TCC::Position curMissileLoc;
 	targetMissile->getCurLocation(curMissileLoc);
 
-	if (!targetAircraft->calcImpactPoint(curMissileLoc)) {
+	if (!targetAircraft->calcImpactPoint(curMissileLoc, 2.0)) {
 		std::cout << "--------------------------------" << std::endl;
 		std::cout << "Failed to calculate impact point." << std::endl;
 		std::cout << "--------------------------------" << std::endl;
@@ -398,9 +399,11 @@ bool EngagementManager::weaponDataLink(std::string commandId, std::string aircra
 		<< "longi: " << impactPoint.longitude_
 		<< "alti: " << impactPoint.altitude_
 		<< std::endl;
+	targetAircraft->updateStatus(Aircraft::EngagementStatus::Engaging);
 
 	//미사일 맵핑 수정
 	missileToAircraft_[missileId] = aircraftId;
+	
 
 	std::string wdlCommandId;
 	makeWDLCommandId(wdlCommandId);

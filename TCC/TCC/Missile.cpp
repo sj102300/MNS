@@ -11,6 +11,10 @@ namespace {
 	
 }
 
+void Missile::updatePosition(TCC::Position& newloc) {
+	position_ = newloc;
+}
+
 void Missile::updateStatus(MissileStatus newStatus) {
 	status_ = newStatus;
 }

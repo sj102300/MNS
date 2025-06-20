@@ -16,6 +16,7 @@ public:
 		SelfDestroyed = 4,        // 자폭 (IP지났을 때 자동 폭파)
 		FollowUp = 5,				//유도 중
 		LaunchRequest = 6,			//발사 요청 중
+		Turning = 7, //선회중, WDL
 	};
 
 	bool checkId(std::string id);
@@ -23,6 +24,7 @@ public:
 	void updateStatus(MissileStatus);
 	unsigned int getMissileStatus();
 	bool getCurLocation(TCC::Position& loc);
+	void updatePosition(TCC::Position& newloc);
 	~Missile();
 
 private:
