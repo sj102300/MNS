@@ -32,8 +32,8 @@ bool TCC::UdpReceiver::init(EngagementManager * engagementManager) {
 	recvAddr_.sin_family = AF_INET;
 	recvAddr_.sin_port = htons(9999);
 	//recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.189");			//½Â¿±
-	//recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.188");			//¸íÁØ
-	recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.180");			//½ÂÁÖ
+	recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.188");			//¸íÁØ
+	//recvAddr_.sin_addr.s_addr = inet_addr("192.168.2.180");			//½ÂÁÖ
 
 	if (bind(serverSocket_, (sockaddr*)&recvAddr_, sizeof(recvAddr_)) == SOCKET_ERROR) {
 		std::cout << "Bind failed: " << WSAGetLastError() << "\n";

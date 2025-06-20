@@ -71,9 +71,8 @@ void Aircraft::getImpactPoint(TCC::Position &impactPoint) {
     impactPoint = impactPoint_;
 }
 
-bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc) {
+bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc, double vm) {
     double vt = 1.0; // 항공기 속도 (km/s)
-    double vm = 2.25; // 미사일 속도 (km/s)
 
     if (dirVec_.isZeroVector()) {
         impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값

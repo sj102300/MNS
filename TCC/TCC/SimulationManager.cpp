@@ -3,8 +3,8 @@
 
 SimulationManager::SimulationManager():isRunning_(false), isChanged_(false) {
 	scenarioManager_ = new sm::ScenarioManager(
-		"http://192.168.2.64:8080",     // TCC 승주
-		//"http://192.168.2.65:8080",     // TCC 명준
+		//"http://192.168.2.64:8080",     // TCC 승주
+		"http://192.168.2.65:8080",     // TCC 명준
 		//"http://192.168.2.66:8080",     // TCC 승엽
 		"http://192.168.2.30:8080",    // SCN Http ì„œë²„ ì£¼ì†Œ
 		"TCC"  
