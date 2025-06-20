@@ -77,7 +77,10 @@ namespace OCC.Views
                 // 1. 미사일 마커 파괴 애니메이션(이미지)로 교체 (destroyType에 따라)
                 if (_viewModel.MissileList.FirstOrDefault(m => m.Id == missileId) is Missile missile)
                 {
-                    ReplaceMissileMarkerWithDestroyed(missile, destroyType);
+                    if(destroyType != 40)
+                    {
+                        ReplaceMissileMarkerWithDestroyed(missile, destroyType);
+                    } 
                 }
                 else
                 {
@@ -88,12 +91,12 @@ namespace OCC.Views
                         _missileMarkers.Remove(missileId);
                     }
                 }
-                if (_missileRoutes.TryGetValue(missileId, out var missileRoute))
-                {
-                    mapControl.Markers.Remove(missileRoute);
-                    _missileRoutes.Remove(missileId);
-                    _missileRoutePoints.Remove(missileId);
-                }
+                //if (_missileRoutes.TryGetValue(missileId, out var missileRoute))
+                //{
+                //    mapControl.Markers.Remove(missileRoute);
+                //    _missileRoutes.Remove(missileId);
+                //    _missileRoutePoints.Remove(missileId);
+                //}
 
                 if(destroyType == 30)
                 {
@@ -184,7 +187,7 @@ namespace OCC.Views
         //항공기 이미지 마커 변경 메서드
         private void AddImageAircraftMarker(AircraftWithIp aircraft)
         {
-            double markerSize = 50;  // 아이콘 크기 조정
+            double markerSize = 55;  // 아이콘 크기 조정
 
             // Grid로 이미지와 텍스트를 겹치게 배치
             var markerGrid = new Grid
@@ -578,12 +581,12 @@ namespace OCC.Views
                 _missileMarkers.Remove(missile.Id);
             }
 
-            if (_missileRoutes.TryGetValue(missile.Id, out var route))
-            {
-                mapControl.Markers.Remove(route);
-                _missileRoutes.Remove(missile.Id);
-                _missileRoutePoints.Remove(missile.Id);
-            }
+            //if (_missileRoutes.TryGetValue(missile.Id, out var route))
+            //{
+            //    mapControl.Markers.Remove(route);
+            //    _missileRoutes.Remove(missile.Id);
+            //    _missileRoutePoints.Remove(missile.Id);
+            //}
         }
 
         private void AttackDisplayPage_Loaded(object sender, RoutedEventArgs e)

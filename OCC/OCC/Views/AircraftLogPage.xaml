@@ -29,7 +29,7 @@
           CanUserResizeColumns="False">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" Width="*" />
+                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" IsReadOnly="True" Width="*" />
                 <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
                 <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
                 <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />
@@ -51,9 +51,9 @@
           CanUserAddRows="False"
           CanUserResizeColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" Width="*" />
-                <DataGridTextColumn Header="항공기 식별자" Binding="{Binding AircraftId}" Width="*" />
-                <DataGridTextColumn Header="미사일 식별자" Binding="{Binding MissileId}" Width="*" />
+                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="항공기 식별자" Binding="{Binding AircraftId}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="미사일 식별자" Binding="{Binding MissileId}" IsReadOnly="True" Width="*" />
                 <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
                 <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
                 <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />

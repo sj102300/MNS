@@ -71,7 +71,7 @@ namespace OCC.ViewModels
 
         public bool IsAutoFireMode => FireMode == Models.FireMode.FireModeType.Auto;
         public bool IsManualFireMode => FireMode == Models.FireMode.FireModeType.Manual;
-        public string ChangeModeText => FireMode == FireModeType.Auto ? "자동 발사 모드 OFF" : "자동 발사 모드 ON";
+        public string ChangeModeText => FireMode == FireModeType.Auto ? "자동 발사 모드 ON" : "자동 발사 모드 OFF";
         public Brush ChangeModeButtonBackground => FireMode == FireModeType.Auto ? Brushes.Green : Brushes.LightGray;
 
         //private static string commandId = "MF-2024052812304500"; // 예시 발사 명령 식별자
@@ -179,7 +179,7 @@ namespace OCC.ViewModels
                             : Models.FireMode.FireModeType.Auto;
 #if true
                         Debug.WriteLine(FireMode);
-                        MessageBox.Show($"ACK 수신 → 모드 전환 완료: {FireMode}");
+                        //MessageBox.Show($"ACK 수신 → 모드 전환 완료: {FireMode}");
 #endif 
                     });
                 }
