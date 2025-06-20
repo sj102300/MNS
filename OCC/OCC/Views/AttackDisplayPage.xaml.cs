@@ -43,11 +43,14 @@ namespace OCC.Views
         private readonly Dictionary<string, GMapRoute> _missileRoutes = new();
         private readonly Dictionary<string, List<PointLatLng>> _missileRoutePoints = new();
 
+
         // 미사일 파괴 패킷 수신 시, 미사일 id → 파괴 상태값 매핑
         private readonly Dictionary<string, uint> _missileDestroyedStatus = new();
 
         private GMapMarker _batteryMarker;
         private string _scenarioId;
+
+        private PointLatLng _curMissile;
 
         // 임계값: 위경도 변화가 이 값 이상일 때만 bearing 계산 (약 5~6m)
         private const double PositionThreshold = 0.00005;
@@ -113,6 +116,13 @@ namespace OCC.Views
                 {
                     mapControl.Markers.Remove(ipMarker);
                     _ipMarkers.Remove(launchCommandId);
+                }
+
+                if(destroyType == 40)
+                {
+                    if(_missileMarkers.TryGetValue(missileId, out var gMapMarker)) {
+                        _missilePrevPositions[missileId] = new PointLatLng(gMapMarker.Position.Lat, gMapMarker.Position.Lng);
+                    } 
                 }
             });
         }
@@ -239,7 +249,7 @@ namespace OCC.Views
         //이미지 IP 마커 변경 메서드
         private void AddImageIpMarker(ImpactPoint ip)
         {
-            double markerSize = 10; // 아이콘 크기
+            double markerSize = 15; // 아이콘 크기
             string imgPath = "pack://application:,,,/images/impactPoint.png";
 
             var image = new Image
@@ -297,7 +307,6 @@ namespace OCC.Views
                 else
                 {
                     marker.Shape.Visibility = Visibility.Visible;
-                    UpdateMissileMarkerDirection(missile);
                 }
                     
             }
@@ -317,12 +326,12 @@ namespace OCC.Views
 
             if (missile_status == 30)
             {
-                markerSize = 60;
+                markerSize = 120;
                 destroyImgPath = "pack://application:,,,/images/destroy.png";
             }
             else
             {
-                markerSize = 60;
+                markerSize = 120;
                 destroyImgPath = "pack://application:,,,/images/emergencyDestroy.png";
             }
 
@@ -412,10 +421,18 @@ namespace OCC.Views
 
             if (e.PropertyName == nameof(Missile.Latitude) || e.PropertyName == nameof(Missile.Longitude))
             {
+                // bearing 계산
+                double angle = 0;
+                if (_missilePrevPositions.TryGetValue(missile.Id, out var prev))
+                    angle = CalculateBearing(prev.Lat, prev.Lng, missile.Latitude, missile.Longitude);
+
                 UpdateMissileMarkerVisibility(missile);
+                UpdateMissileMarkerDirection(missile);
+                //_missilePrevPositions[missile.Id] = new PointLatLng(missile.Latitude, missile.Longitude);
                 if (_missileMarkers.TryGetValue(missile.Id, out var marker))
                 {
                     marker.Position = new PointLatLng(missile.Latitude, missile.Longitude);
+                    _curMissile = new PointLatLng(missile.Latitude, missile.Longitude);
                 }
 
                 // 경로 점 추가 및 갱신
@@ -424,11 +441,6 @@ namespace OCC.Views
                 {
                     var last = routePoints.LastOrDefault();
                     var curr = new PointLatLng(missile.Latitude, missile.Longitude);
-
-                    // bearing 계산
-                    double angle = 0;
-                    if (_missilePrevPositions.TryGetValue(missile.Id, out var prev))
-                        angle = CalculateBearing(prev.Lat, prev.Lng, missile.Latitude, missile.Longitude);
 
                     var tail = GetMissileTailPosition(missile, angle, 45); // markerSize-10
 
@@ -757,6 +769,7 @@ namespace OCC.Views
                         //image.RenderTransform = new RotateTransform(angle, image.Width / 2, image.Height / 2);
                         image.RenderTransformOrigin = new Point(0.5, 0.5);
                         image.RenderTransform = new RotateTransform(angle);
+                        //_missilePrevPositions[missile.Id] = new PointLatLng(missile.Latitude, missile.Longitude);
                         //Debug.WriteLine($"{missile.Id} 미사일 방향각 조정 : {angle}");
                     }
                 }
