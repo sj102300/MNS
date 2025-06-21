@@ -186,14 +186,18 @@
                                HorizontalAlignment="Center"
                                Margin="0,4,0,4"/>
 
-                            <Image Grid.Row="1"
-                           Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}}"
-                           Loaded="Image_Loaded"
-                           TargetUpdated="Image_TargetUpdated"
-                           Stretch="Uniform"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Stretch"
-                           Margin="3"/>
+                            <Image Loaded="Image_Loaded"
+                                   Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
+                                   TargetUpdated="Image_TargetUpdated"
+                                    Stretch="Uniform"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch">
+                                <Image.Source>
+                                    <Binding Path="VisualState"
+                                        Converter="{StaticResource VisualStateToGifConverter}"
+                                        UpdateSourceTrigger="PropertyChanged" />
+                                </Image.Source>
+                            </Image>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
