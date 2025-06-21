@@ -22,41 +22,167 @@
           ItemsSource="{Binding AircraftList}"
           SelectedItem="{Binding SelectedAircraft, Mode=TwoWay}"
           AutoGenerateColumns="False"
-          ColumnWidth="*"  
-            HeadersVisibility="Column"
           CanUserAddRows="False"
-                  Margin="12"
-          CanUserResizeColumns="False">
+          CanUserDeleteRows="False"
+          IsReadOnly="True"
+          Margin="12"
+          HeadersVisibility="Column"
+          RowHeaderWidth="0"
+          Background="#1E2A38"
+          HorizontalScrollBarVisibility="Disabled"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          Foreground="#CCCCCC"
+          GridLinesVisibility="Horizontal"
+          BorderThickness="1"
+          BorderBrush="#212e52"
+          FontSize="16"
+          FontWeight="SemiBold">
+
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#212e52"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Background" Value="#1E2A38"/>
+                    <Setter Property="Foreground" Value="#CCCCCC"/>
+                    <Setter Property="BorderBrush" Value="#212e52"/>
+                    <Setter Property="FontSize" Value="18"/>
+                    <Setter Property="BorderThickness" Value="0.5"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Setter Property="Foreground" Value="#CCCCCC"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                    <Setter Property="TextBlock.HorizontalAlignment" Value="Center"/>
+                    <Style.Triggers>
+
+                        <!-- 교전 중 -->
+                        <DataTrigger Binding="{Binding AircraftStatusText}" Value="교전 중">
+                            <Setter Property="Foreground" Value="#2da839"/>
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                        </DataTrigger>
+
+                        <!-- 교전 성공 -->
+                        <DataTrigger Binding="{Binding AircraftStatusText}" Value="교전 성공">
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="#EF5350"/>
+                        </DataTrigger>
+
+                        <!-- 교전 가능-->
+                        <DataTrigger Binding="{Binding AircraftStatusText}" Value="교전 가능">
+                            <Setter Property="Foreground" Value="#ffdb69"/>
+                        </DataTrigger>
+
+                        <!-- 교전 불가능 -->
+                        <DataTrigger Binding="{Binding AircraftStatusText}" Value="교전 불가능">
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="#e0e0e0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="#1E2A38"/>
+                    <Setter Property="Foreground" Value="#CCCCCC"/>
+                    <Setter Property="FontWeight" Value="Normal"/>
+                    <Setter Property="BorderBrush" Value="#2C3E50"/>
+                    <Setter Property="BorderThickness" Value="0.5"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
-                <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
-                <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />
+                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" Width="*" />
+                <DataGridTextColumn Header="위도(°)" Binding="{Binding Latitude, StringFormat=0.0000000}" Width="*"/>
+                <DataGridTextColumn Header="경도(°)" Binding="{Binding Longitude, StringFormat=0.0000000}" Width="*"/>
+                <DataGridTextColumn Header="고도(Km)" Binding="{Binding Altitude, StringFormat=0.0000000}" Width="*"/>
                 <DataGridTextColumn Header="상태" Binding="{Binding AircraftStatusText}" Width="*" />
-                <!-- 
-        <DataGridTextColumn Header="IP 위도" Binding="{Binding IpLatitude}" Width="*" />
-        <DataGridTextColumn Header="IP 경도" Binding="{Binding IpLongitude}" Width="*" />
-        <DataGridTextColumn Header="IP 고도" Binding="{Binding IpAltitude}" Width="*" />
-        -->
             </DataGrid.Columns>
         </DataGrid>
+
         <DataGrid Grid.Row="1"
           ItemsSource="{Binding ImpactPointList}"
           AutoGenerateColumns="False"
-          ColumnWidth="*"
-          HeadersVisibility="Column"
-                  Margin="12"
-                  
           CanUserAddRows="False"
-          CanUserResizeColumns="False">
+          CanUserDeleteRows="False"
+          IsReadOnly="True"
+          Margin="12"
+          HeadersVisibility="Column"
+          RowHeaderWidth="0"
+          Background="#1E2A38"
+          HorizontalScrollBarVisibility="Disabled"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          Foreground="#CCCCCC"
+          GridLinesVisibility="Horizontal"
+          BorderThickness="1"
+          BorderBrush="#212e52"
+          FontSize="16"
+          FontWeight="SemiBold">
+
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#212e52"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Background" Value="#1E2A38"/>
+                    <Setter Property="Foreground" Value="#CCCCCC"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="BorderBrush" Value="#212e52"/>
+                    <Setter Property="BorderThickness" Value="0.5"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                    <Setter Property="TextBlock.HorizontalAlignment" Value="Center"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="#1E2A38"/>
+                    <Setter Property="Foreground" Value="#CCCCCC"/>
+                    <Setter Property="FontWeight" Value="Normal"/>
+                    <Setter Property="BorderBrush" Value="#2C3E50"/>
+                    <Setter Property="BorderThickness" Value="0.5"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="항공기 식별자" Binding="{Binding AircraftId}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="미사일 식별자" Binding="{Binding MissileId}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
-                <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
-                <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />
+                <DataGridTextColumn Header="식별자" Binding="{Binding Id}" Width="2*" />
+                <DataGridTextColumn Header="항공기" Binding="{Binding AircraftId}" Width="*" />
+                <DataGridTextColumn Header="미사일" Binding="{Binding MissileId}" Width="*" />
+                <DataGridTextColumn Header="위도(°)" Binding="{Binding Latitude, StringFormat=0.000000}" Width="*"/>
+                <DataGridTextColumn Header="경도(°)" Binding="{Binding Longitude, StringFormat=0.000000}" Width="*"/>
+                <!--<DataGridTextColumn Header="고도(Km)" Binding="{Binding Altitude, StringFormat=0.000000}" Width="*"/>-->
             </DataGrid.Columns>
         </DataGrid>
 
@@ -68,10 +194,11 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <ui:Button Grid.Column="0" Content="발사"
+            <ui:Button Grid.Column="0" 
+                       Content="발사"
                          Command="{Binding ManualFireCommand}"
                          Width="150"
-                         Height="40"
+                         Height="45"
                          FontSize="15"
                           Margin="12"
                           HorizontalAlignment="Left"
@@ -84,7 +211,7 @@
                        Content="{Binding ChangeModeText}"
                            Command="{Binding ChangeModeCommand}"
                            Width="150"
-                           Height="40"
+                           Height="45"
                            FontSize="15"
                             Margin="12"
                             HorizontalAlignment="Right"
