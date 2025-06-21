@@ -26,7 +26,7 @@ namespace OCC.Converters
                 MissileVisualState.EmergencyExplode => "images/explode.gif",  // 비폭과
                 MissileVisualState.SelfExplode => "images/explode.gif",       // 자폭을 동일한 영상으로 처리
                 MissileVisualState.Done => "images/empty.png",
-                MissileVisualState.WeaponDataLink => "images/in_flight.gif",  // "images/weapon_datalink.gif", // 추가
+                MissileVisualState.WeaponDataLink => "images/weapon_datalink.gif",  // 추가
                 _ => "images/unknown.gif"
             };
         }

@@ -150,7 +150,7 @@ namespace OCC.Models
             MissileStatus.SelfDestroy => "자폭",
             MissileStatus.FollowUp => "유도 중",
             MissileStatus.LaunchRequest => "발사 요청",
-            MissileStatus.WDL => "WDL 타겟 변경",
+            MissileStatus.WeaponDataLink => "WDL 타겟 변경",
             _ => "알 수 없음"
         };
 
