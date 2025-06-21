@@ -171,7 +171,7 @@
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="4">
+                        <Grid Margin="4" ClipToBounds="False">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
@@ -184,18 +184,21 @@
                                Foreground="#FFDDDDDD"
                                TextAlignment="Center"
                                HorizontalAlignment="Center"
-                               Margin="0,4,0,4"/>
+                               Margin="0"/>
 
-                            <Image Loaded="Image_Loaded"
-                                   Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
-                                   TargetUpdated="Image_TargetUpdated"
-                                    Stretch="Uniform"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch">
+                            <Image Grid.Row="1"
+                                Loaded="Image_Loaded"
+                                Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
+                                TargetUpdated="Image_TargetUpdated"
+                                Stretch="Uniform"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MaxWidth="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                MaxHeight="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
                                 <Image.Source>
                                     <Binding Path="VisualState"
-                                        Converter="{StaticResource VisualStateToGifConverter}"
-                                        UpdateSourceTrigger="PropertyChanged" />
+                                         Converter="{StaticResource VisualStateToGifConverter}"
+                                         UpdateSourceTrigger="PropertyChanged" />
                                 </Image.Source>
                             </Image>
                         </Grid>
