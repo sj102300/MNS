@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:OCC"
         Title="지대공 유도무기 시뮬레이터"
-        Height="1080"
+        Height="720"
         Width="1080">
     <Grid>
         <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" />
