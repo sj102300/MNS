@@ -18,13 +18,14 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="3.5*" />
-            <RowDefinition Height="5.5*" />
+            <RowDefinition Height="2.8*" />
+            <RowDefinition Height="6.2*" />
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <!-- 상단(60%) 영역: Grid.Row="0" -->
-        <!--상단 항공기 정보 출력 (식별자, 위도 경도 고도, 상태, impactpoint의 위도 경도 고도)-->
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
         <DataGrid Grid.Row="0"
           ItemsSource="{Binding MissileList}"
           SelectedItem="{Binding SelectedMissile, Mode=TwoWay}"
@@ -34,25 +35,126 @@
           IsReadOnly="True"
           Margin="12"
           HeadersVisibility="Column"
-          RowHeaderWidth="0">
+          RowHeaderWidth="0"
+          Background="#1E2A38"
+          HorizontalScrollBarVisibility="Disabled"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          Foreground="#CCCCCC"
+          GridLinesVisibility="Horizontal"
+          BorderThickness="1"
+          BorderBrush="#212e52"
+          FontSize="14"
+          FontWeight="SemiBold">
+            
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#212e52"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Background" Value="#1E2A38"/>
+                    <Setter Property="Foreground" Value="#CCCCCC"/>
+                    <Setter Property="BorderBrush" Value="#212e52"/>
+                    <Setter Property="FontSize" Value="18"/>
+                    <Setter Property="BorderThickness" Value="0.5"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                        <Setter Property="Foreground" Value="#CCCCCC"/>
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                        <Setter Property="TextBlock.HorizontalAlignment" Value="Center"/>
+                        <Style.Triggers>
+
+                            <!-- 비행중 -->
+                            <DataTrigger Binding="{Binding MissileStatusText}" Value="비행중">
+                            <Setter Property="Foreground" Value="#2da839"/>
+                                <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            </DataTrigger>
+
+
+                            <!-- 명중성공 / 자폭 / 비상폭파 -->
+                            <DataTrigger Binding="{Binding MissileStatusText}" Value="명중성공">
+                                <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                <Setter Property="Foreground" Value="#EF5350"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding MissileStatusText}" Value="자폭">
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="#EF5350"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding MissileStatusText}" Value="비상폭파">
+                                <Setter Property="Foreground" Value="#EF5350"/>
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                        </DataTrigger>
+
+                            <!-- 발사 요청 / 타겟 변경  / 유도 중-->
+                            <DataTrigger Binding="{Binding MissileStatusText}" Value="발사 요청">
+                            <Setter Property="Foreground" Value="#ffdb69"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding MissileStatusText}" Value="타겟 변경">
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="#ffdb69"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MissileStatusText}" Value="유도 중">
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="#ffdb69"/>
+                        </DataTrigger>
+
+                        <!-- 발사전 -->
+                            <DataTrigger Binding="{Binding MissileStatusText}" Value="발사전">
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="#e0e0e0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+            </DataGrid.CellStyle>
+            
+            <DataGrid.Resources>
+                <!-- 선택된 행의 스타일 -->
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="#1E2A38"/>
+                    <Setter Property="Foreground" Value="#CCCCCC"/>
+                    <Setter Property="FontWeight" Value="Normal"/>
+                    <Setter Property="BorderBrush" Value="#2C3E50"/>
+                    <Setter Property="BorderThickness" Value="0.5"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+            
             <DataGrid.Columns>
                 <DataGridTextColumn Header="식별자" Binding="{Binding Id}" Width="*" />
-                <DataGridTextColumn Header="위도" Binding="{Binding Latitude}" Width="*" />
-                <DataGridTextColumn Header="경도" Binding="{Binding Longitude}" Width="*" />
-                <DataGridTextColumn Header="고도" Binding="{Binding Altitude}" Width="*" />
+                <DataGridTextColumn Header="위도(°)" Binding="{Binding Latitude, StringFormat=0.0000000}"  Width="*"/>
+                <DataGridTextColumn Header="경도(°)" Binding="{Binding Longitude, StringFormat=0.0000000}"  Width="*"/>
+                <DataGridTextColumn Header="고도(Km)" Binding="{Binding Altitude, StringFormat=0.0000000}"  Width="*"/>
                 <DataGridTextColumn Header="상태" Binding="{Binding MissileStatusText}" Width="*" />
             </DataGrid.Columns>
-        </DataGrid>
+        </DataGrid> 
 
         <!-- 하단(40%) 영역: Grid.Row="1" -->
         <Grid Grid.Row="1">
-            <!-- 왼쪽 3/4 영역: 3x2 표 -->
             <ListView Grid.Column="0"
-                      ItemsSource="{Binding MissileList}"
-                      SelectedItem="{Binding SelectedMissile, Mode=TwoWay}"
-                      Margin="12" 
-                       Background="#1A1D23"
-                      BorderThickness="0">
+              ItemsSource="{Binding MissileList}"
+              SelectedItem="{Binding SelectedMissile, Mode=TwoWay}"
+              Margin="4"
+              Background="#1A1D23"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              BorderThickness="0"
+              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+              ScrollViewer.VerticalScrollBarVisibility="Disabled"
+              Height="Auto">
+                <!-- 높이를 Stretch로 제한 -->
+
+                <!-- 2행 3열로 고정 -->
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="3" Rows="2"/>
@@ -63,39 +165,39 @@
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-                        <!--<Setter Property="Margin" Value="2"/>-->
+                        <Setter Property="Height" Value="Auto"/>
                     </Style>
                 </ListView.ItemContainerStyle>
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        
-                        <!--<Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">-->
-                        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="13" TextAlignment="Center" Foreground="#FFDDDDDD"/>  
-                                <!--<TextBlock Text="{Binding MissileStatusText}" FontSize="8" Margin="0,0,0,0" HorizontalAlignment="Center" TextAlignment="Center"/>-->
-                            <Image Loaded="Image_Loaded"
-                                   Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}, NotifyOnTargetUpdated=True}"
-                                   TargetUpdated="Image_TargetUpdated"
-                                   Stretch="UniformToFill"
-                                   MaxWidth="170"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch">
-                                <Image.Source>
-                                    <Binding Path="VisualState"
-                                        Converter="{StaticResource VisualStateToGifConverter}"
-                                        UpdateSourceTrigger="PropertyChanged" />
-                                    </Image.Source>
-                                </Image>
-                            </StackPanel>
-                            
-                        <!--</Border>-->
-                        
+                        <Grid Margin="4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                               Text="{Binding Id}"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Foreground="#FFDDDDDD"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,4"/>
+
+                            <Image Grid.Row="1"
+                           Tag="{Binding VisualState, Converter={StaticResource VisualStateToGifConverter}}"
+                           Loaded="Image_Loaded"
+                           TargetUpdated="Image_TargetUpdated"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Margin="3"/>
+                        </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
-            
         </Grid>
         <!-- 오른쪽 1/4 영역: 필요시 컨텐츠 추가 -->
         <StackPanel Grid.Row="2" Margin="12"

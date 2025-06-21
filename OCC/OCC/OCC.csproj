@@ -60,6 +60,9 @@
     <Resource Include="images\launching.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="images\weapon_datalink.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="images\unknown.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

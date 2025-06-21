@@ -14,6 +14,7 @@ namespace OCC.Models
         HitSuccess = 2,
         EmergencyExplode = 3,
         SelfExplode = 4,
+        WeaponDataLink = 7,
         Done = 100 // empty.png
     }
 }
