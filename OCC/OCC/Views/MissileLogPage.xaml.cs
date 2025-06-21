@@ -50,7 +50,7 @@ namespace OCC.Views
                     var imageSource = new BitmapImage(uri);
 
                     // 반드시 SetAnimatedSource 전에 RepeatBehavior 설정
-                    if (gifPath.Contains("launching") || gifPath.Contains("explode") || gifPath.Contains("hit_success"))
+                    if (gifPath.Contains("launching") || gifPath.Contains("explode") || gifPath.Contains("hit_success") || gifPath.Contains("weapon_datalink"))
                     {
                         ImageBehavior.SetRepeatBehavior(image, new RepeatBehavior(1)); // 1회 재생
                     }
@@ -73,6 +73,7 @@ namespace OCC.Views
                             switch (missile.VisualState)
                             {
                                 case MissileVisualState.Launching:
+                                case MissileVisualState.WeaponDataLink:
                                     missile.VisualState = MissileVisualState.InFlight;
                                     break;
                                 case MissileVisualState.HitSuccess:

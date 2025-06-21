@@ -20,6 +20,7 @@ namespace OCC.Models
             SelfDestroy = 4, // 자폭
             FollowUp = 5, //유도
             LaunchRequest = 6, //발사요청
+            WeaponDataLink = 7,
         }
 
         //1 -> 5 -> 2 
@@ -74,6 +75,18 @@ namespace OCC.Models
                             //else
                             //    VisualState = MissileVisualState.Done;
                             break;
+
+                        case 7: // WDL
+                            if (old == 1)
+                            {
+                                VisualState = MissileVisualState.WeaponDataLink;
+                            }
+                            else
+                            {
+                                VisualState = MissileVisualState.InFlight;
+                            }
+                                break;
+
                         case 3: // 비상 폭파
                             if (old == 1)
                                 VisualState = MissileVisualState.EmergencyExplode;
@@ -137,6 +150,7 @@ namespace OCC.Models
             MissileStatus.SelfDestroy => "자폭",
             MissileStatus.FollowUp => "유도 중",
             MissileStatus.LaunchRequest => "발사 요청",
+            MissileStatus.WeaponDataLink => "WDL 타겟 변경",
             _ => "알 수 없음"
         };
 
