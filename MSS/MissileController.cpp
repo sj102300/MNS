@@ -143,8 +143,10 @@ float decision_suicide(double range) {
 	return 2000.0f;
 }
 
-MissileController::MissileController()
-	:impact_point({0, 0, 10}),hasTarget_(false){}
+MissileController::MissileController(DestroyedAircraftsTracker* tracker)
+	:impact_point({ 0, 0, 10 }), hasTarget_(false) {
+	tracker_ = tracker;
+}
 
 void MissileController::setMissile(std::shared_ptr<Missile> m) {
 	missile_ = m;
@@ -197,15 +199,22 @@ void MissileController::stop() {
 
 void MissileController::updatePosition(float speed_kmps) {  // Proportional Navigation
 	if (!missile_ || !hasTarget_) return;
-	if (!(missile_->MissileState == 1 || missile_->MissileState == 5|| missile_->MissileState == 7)) return;
+	if (!(missile_->MissileState == 1 || missile_->MissileState == 5 || missile_->MissileState == 7)) return;
 	if (!launch_time_recorded_ || estimatedTimeToImpact_ < 0.0) return;
 	if (missile_->MissileState == 2 || missile_->MissileState == 3 || missile_->MissileState == 4) {
 		running_ = false;
 		return;
 	}
-	if (missile_->MissileState == 7) {
-		missile_->MissileState = 1;
-	}
+	//if (missile_->MissileState == 7) {
+	//	state7Count_++;
+	//	if (state7Count_ >= 3) {
+	//		missile_->MissileState = 1;
+	//		state7Count_ = 0;  // 초기화
+	//	}
+	//	else {
+	//		return;  // 3회 호출 전까진 나머지 로직 실행 안 함
+	//	}
+	//}
 	constexpr double PN_GAIN = 3.0;
 	constexpr double TIME_STEP = 0.1;
 
@@ -214,7 +223,7 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 	bool isTerminalGuidance = false;
 
 	if (!targetAircraftId_.empty() && aircraftMap_ != nullptr) {
-		
+
 		auto it = aircraftMap_->find(targetAircraftId_);
 		if (it != aircraftMap_->end() && it->second) {
 			const Location& acLoc = it->second->getLocation();
@@ -222,60 +231,65 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 			// 거리 계산 (haversine)
 			double distance_km = haversine(msLoc.latitude, msLoc.longitude, acLoc.latitude, acLoc.longitude);
 
-			if (distance_km <= 5.0) {  // 종말 모드 시작 범위
-				// 위경도 차이 → 거리(km) 방향 벡터
-				double dLatRad = toRad(acLoc.latitude - msLoc.latitude);
-				double dLonRad = toRad(acLoc.longitude - msLoc.longitude);
+			if (tracker_ != nullptr && !tracker_->isDestroyedAircraft(targetAircraftId_)) {
 
-				double dx = EARTH_RADIUS_KM * dLatRad;
-				double dy = EARTH_RADIUS_KM * cos(toRad(msLoc.latitude)) * dLonRad;
 
-				double range = sqrt(dx * dx + dy * dy);
-				if (range < 1e-6 || std::isnan(range)) {
-					std::cerr << u8"[ERROR] 종말 유도 생략: range == 0 또는 NaN → 미사일 ID: "
-							  << missile_->MissileId << "\n";
+				if (distance_km <= 5.0) {  // 종말 모드 시작 범위
+					// 위경도 차이 → 거리(km) 방향  벡터
+
+					double dLatRad = toRad(acLoc.latitude - msLoc.latitude);
+					double dLonRad = toRad(acLoc.longitude - msLoc.longitude);
+
+					double dx = EARTH_RADIUS_KM * dLatRad;
+					double dy = EARTH_RADIUS_KM * cos(toRad(msLoc.latitude)) * dLonRad;
+
+					double range = sqrt(dx * dx + dy * dy);
+					if (range < 1e-6 || std::isnan(range)) {
+						std::cerr << u8"[ERROR] 종말 유도 생략: range == 0 또는 NaN → 미사일 ID: "
+							<< missile_->MissileId << "\n";
+					}
+					else {
+						// 단위 LOS 벡터
+						double los_x = dx / range;
+						double los_y = dy / range;
+
+						// 상대 속도 (V_m - V_t), 같은 방향이므로 단순 계산
+						double Vm = speed_kmps;
+						double Vt = speed_kmps / 2;
+						double Vrel_x = Vm * dir_lat_ - Vt * los_x;
+						double Vrel_y = Vm * dir_long_ - Vt * los_y;
+
+						// LOS 각속도 λ_dot = (R × V_rel) / |R|^2
+						double los_rate = (dx * Vrel_y - dy * Vrel_x) / (range * range);  // rad/s
+
+						// 폐쇄 속도 Vc = -Vrel · LOS
+						double Vc = -(Vrel_x * los_x + Vrel_y * los_y);  // > 0
+
+						// 조향 각도 변화량 θ_dot = N * λ_dot
+						double heading_change = PN_GAIN * los_rate;  // rad/s
+
+						// dir 벡터 회전
+						double angle = -heading_change * TIME_STEP;
+						double cosA = cos(angle);
+						double sinA = sin(angle);
+
+						double new_dir_lat = dir_lat_ * cosA - dir_long_ * sinA;
+						double new_dir_long = dir_lat_ * sinA + dir_long_ * cosA;
+
+						dir_lat_ = new_dir_lat;
+						dir_long_ = new_dir_long;
+					}
+
+					if (!hasEnteredTerminalGuidance_) {
+						std::cout << u8"[종말 유도 진입] 미사일: " << missile_->MissileId
+							<< u8" → 항공기: " << targetAircraftId_
+							<< u8", 거리: " << distance_km << u8" km\n";
+						hasEnteredTerminalGuidance_ = true;
+
+						missile_->MissileState = 5; // 5번이 종말 유도 상태라고 가정
+					}
 				}
-				else {
-					// 단위 LOS 벡터
-					double los_x = dx / range;
-					double los_y = dy / range;
-
-					// 상대 속도 (V_m - V_t), 같은 방향이므로 단순 계산
-					double Vm = speed_kmps;
-					double Vt = speed_kmps / 2;
-					double Vrel_x = Vm * dir_lat_ - Vt * los_x;
-					double Vrel_y = Vm * dir_long_ - Vt * los_y;
-
-					// LOS 각속도 λ_dot = (R × V_rel) / |R|^2
-					double los_rate = (dx * Vrel_y - dy * Vrel_x) / (range * range);  // rad/s
-
-					// 폐쇄 속도 Vc = -Vrel · LOS
-					double Vc = -(Vrel_x * los_x + Vrel_y * los_y);  // > 0
-
-					// 조향 각도 변화량 θ_dot = N * λ_dot
-					double heading_change = PN_GAIN * los_rate;  // rad/s
-
-					// dir 벡터 회전
-					double angle = -heading_change * TIME_STEP;
-					double cosA = cos(angle);
-					double sinA = sin(angle);
-
-					double new_dir_lat = dir_lat_ * cosA - dir_long_ * sinA;
-					double new_dir_long = dir_lat_ * sinA + dir_long_ * cosA;
-
-					dir_lat_ = new_dir_lat;
-					dir_long_ = new_dir_long;
-				}
-
-				if (!hasEnteredTerminalGuidance_) {
-					std::cout << u8"[종말 유도 진입] 미사일: " << missile_->MissileId
-						<< u8" → 항공기: " << targetAircraftId_
-						<< u8", 거리: " << distance_km << u8" km\n";
-					hasEnteredTerminalGuidance_ = true;
-
-					missile_->MissileState = 5; // 5번이 종말 유도 상태라고 가정
-				}	
-			}	
+			}
 		}
 		else {
 			std::cout << u8"[경고] 유효한 항공기 정보를 찾을 수 없음: " << targetAircraftId_ << "\n";
@@ -283,7 +297,7 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 	}
 	// 종말 유도 끝
 
-	
+
 	// 위치 업데이트 (반지름 기반 → 위도/경도 단위로 변환)
 	double move_km = speed_kmps * 0.1; // 0.1초당 이동 거리
 	double delta_lat = (dir_lat_ * move_km) / EARTH_RADIUS_KM * 180.0 / M_PI;

@@ -62,6 +62,7 @@ int main() {
 #include <thread>
 #pragma comment(lib, "ScenarioManager.lib")
 
+
 using namespace sm;
 
 // === 설정 값 ===
@@ -115,6 +116,7 @@ void handleQuit() {         //MFR->SM으로
     std::cout << u8"[" << SUBSYSTEM_ID << u8"] 탐지 종료 완료, 다음 시작 신호 대기 중...\n";
 }
 
+#include "DestroyedAircrafts.h"
 // === main 함수 정의 ===
 int main() {
     ScenarioManager scenarioRunner(
@@ -125,6 +127,7 @@ int main() {
 
     scenarioRunner.setOnReadyCallback(handleStart);
     scenarioRunner.setOnQuitCallback(handleQuit);
+    DestroyedAircraftsTracker* destroyedAircraftTracker = new DestroyedAircraftsTracker();
 
     std::thread scenarioThread([&]() {
         scenarioRunner.run();  // blocking
@@ -150,7 +153,7 @@ int main() {
             missileMap.clear();
 
             // 미사일 생성
-            for (int i = 0; i < 6; ++i) {
+            for (int i = 0; i < 50; ++i) {
                 auto missile = std::make_shared<Missile>();
 
                 std::string id = "MSS-" + std::to_string(100 + i);
@@ -160,7 +163,7 @@ int main() {
                 auto sender = std::make_shared<UdpMulticast>();
                 sender->init(UDP_IP, UDP_PORT);
 
-                auto controller = std::make_shared<MissileController>();
+                auto controller = std::make_shared<MissileController>(destroyedAircraftTracker);
                 missile->init(sender, controller);
                 missile->start(2.0); // 초속 2km
 
@@ -169,7 +172,7 @@ int main() {
             }
 
             // 수신기 시작
-            receiver = std::make_shared<UdpReceiver>();
+            receiver = std::make_shared<UdpReceiver>(destroyedAircraftTracker);
             receiver->init(UDP_IP, UDP_PORT);
             receiver->setMissileMap(missileMap);
             receiver->start();
@@ -190,6 +193,8 @@ int main() {
             for (auto& m : missiles) {
                 m->stop();
             }
+
+			destroyedAircraftTracker->clearDestroyedAircrafts();  // 격추된 항공기 목록 초기화
         }
     }
 

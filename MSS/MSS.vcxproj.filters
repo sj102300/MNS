@@ -36,6 +36,9 @@
     <ClCompile Include="Aircraft.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="DestroyedAircrafts.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="example.json">
@@ -62,6 +65,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Aircraft.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DestroyedAircrafts.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

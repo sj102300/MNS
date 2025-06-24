@@ -6,14 +6,17 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include <mutex>
 #include <cmath>
+#include <unordered_set>
+#include "DestroyedAircrafts.h"
 #define EARTH_RADIUS_KM 6371.0
 
 class Aircraft;  // [추가] 선언
 
 class MissileController {
 public:
-	MissileController();
+	MissileController(DestroyedAircraftsTracker * tracker);
 
 	void setMissile(std::shared_ptr<Missile> m);
 
@@ -39,6 +42,7 @@ public:
 	double getEstimatedTimeToImpact() const { return estimatedTimeToImpact_; }
 
 private:
+	int state7Count_ = 0;
 	Location impact_point;
 	bool hasTarget_;
 	std::shared_ptr<Missile> missile_;
@@ -55,7 +59,10 @@ private:
 	const std::unordered_map<std::string, std::shared_ptr<Aircraft>>* aircraftMap_ = nullptr;
 	bool hasEnteredTerminalGuidance_ = false;
 
-	// wdl 추가
-	//double totalDistanceTraveled_ = 0.01;
-	//float speed_kmps_init_ = 2.0f;
+	DestroyedAircraftsTracker* tracker_;
+
+	// WDL 곡선경로 추가
+	//bool isTurningToNewTarget_ = false;
+	//double target_heading_rad_ = 0.0;
+
 };
