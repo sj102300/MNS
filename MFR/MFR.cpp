@@ -155,14 +155,14 @@ namespace mfr {
                 double dist = computeDistanceKm(batteryLat, batteryLon, batteryAlt,
                     packet.latitude, packet.longitude, packet.altitude);
 
-                std::cout << u8"[MFR] 수신 패킷 ← "
-                    << u8"ID: " << id
-                    << u8", 위도: " << packet.latitude
-                    << u8", 경도: " << packet.longitude
-                    << u8", 고도: " << packet.altitude
-                    << u8", 이벤트: " << packet.eventCode
-                    << u8", 거리: " << dist << u8"km\n";
-                std::cout << u8"\n========================================================================================================\n";
+                //std::cout << u8"[MFR] 수신 패킷 ← "
+                //    << u8"ID: " << id
+                //    << u8", 위도: " << packet.latitude
+                //    << u8", 경도: " << packet.longitude
+                //    << u8", 고도: " << packet.altitude
+                //    << u8", 이벤트: " << packet.eventCode
+                //    << u8", 거리: " << dist << u8"km\n";
+                //std::cout << u8"\n========================================================================================================\n";
             }
 
             auto now = std::chrono::steady_clock::now();
@@ -177,7 +177,7 @@ namespace mfr {
                     if (dist <= 150.0 && pkt.eventCode == 1001) {
                         AircraftPacket p = pkt;
                         p.eventCode = 1002;
-                        std::cout << u8"[MFR] 추적 탐지 전송 → ID: " << id << u8", 거리: " << dist << "km\n";
+                        //std::cout << u8"[MFR] 추적 탐지 전송 → ID: " << id << u8", 거리: " << dist << "km\n";
                         sendto(sock_, reinterpret_cast<char*>(&p), sizeof(p), 0,
                             (sockaddr*)&sendAddr_, sizeof(sendAddr_));
                     }
@@ -195,7 +195,7 @@ namespace mfr {
                     if (dist > 150.0 && dist <= 300.0 && pkt.eventCode == 1001) {
                         AircraftPacket p = pkt;
                         p.eventCode = 1002;
-                        std::cout << u8"[MFR] 광역 탐지 전송 → ID: " << id << u8", 거리: " << dist << "km\n";
+                        //std::cout << u8"[MFR] 광역 탐지 전송 → ID: " << id << u8", 거리: " << dist << "km\n";
                         sendto(sock_, reinterpret_cast<char*>(&p), sizeof(p), 0,
                             (sockaddr*)&sendAddr_, sizeof(sendAddr_));
                     }
