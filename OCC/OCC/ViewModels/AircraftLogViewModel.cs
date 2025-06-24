@@ -146,7 +146,7 @@ namespace OCC.ViewModels
                 // 4. ACK 수신 시 모드 전환
                 if (ackReceived)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    await Application.Current.Dispatcher.BeginInvoke(() =>
                     {
                         FireMode = (FireMode == Models.FireMode.FireModeType.Auto)
                             ? Models.FireMode.FireModeType.Manual

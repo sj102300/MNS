@@ -192,9 +192,9 @@
                                 TargetUpdated="Image_TargetUpdated"
                                 Stretch="Uniform"
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                MaxWidth="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                MaxHeight="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
+                                VerticalAlignment="Center">
+                                <!--MaxWidth="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" -->
+                                <!--MaxHeight="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"> -->
                                 <Image.Source>
                                     <Binding Path="VisualState"
                                          Converter="{StaticResource VisualStateToGifConverter}"
@@ -211,7 +211,7 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="WDL"
+                <Button Content="타겟 재설정"
                 Command="{Binding WdlCommand}"
                     Width="120"
                 Height="40"

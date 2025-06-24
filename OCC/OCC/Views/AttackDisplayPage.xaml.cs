@@ -75,7 +75,7 @@ namespace OCC.Views
         private void OnMissileDestroyReceived(string launchCommandId, string aircraftId, string missileId, uint destroyType)
         {
             // UI 스레드에서 실행
-            Dispatcher.Invoke(() =>
+            Dispatcher.BeginInvoke(() =>
             {
                 // 1. 미사일 마커 파괴 애니메이션(이미지)로 교체 (destroyType에 따라)
                 if (_viewModel.MissileList.FirstOrDefault(m => m.Id == missileId) is Missile missile)

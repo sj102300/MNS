@@ -82,7 +82,7 @@ namespace OCC.ViewModels
             string serverUrl = $"{Network.SCN}/scenario/list"; // 시나리오 서버 주소로 교체
             Debug.WriteLine("불러오기 요청");
             // UI 쓰레드에서 ObservableCollection 업데이트
-            Application.Current.Dispatcher.Invoke(() =>
+            await Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 ScenarioCollection.Clear();
             });
@@ -107,7 +107,7 @@ namespace OCC.ViewModels
                 });
 
                 // UI 쓰레드에서 ObservableCollection 업데이트
-                Application.Current.Dispatcher.Invoke(() =>
+                await Application.Current.Dispatcher.BeginInvoke(() =>
                 {
                     ScenarioCollection.Clear();
                     foreach (var scenario in scenarios)
@@ -124,7 +124,7 @@ namespace OCC.ViewModels
 
         private void NavigateToAttackDisplayPage()
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 // AttackViewModel 하나 생성
                 if (NavigationService == null)
@@ -166,7 +166,7 @@ namespace OCC.ViewModels
                     Content = missileLogPage
                 };
                 missileLogWindow.Show();
-           });
+            });
             
         }
 
