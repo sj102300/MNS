@@ -172,7 +172,7 @@ namespace OCC.ViewModels
                 // 4. ACK 수신 시 모드 전환
                 if (ackReceived)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    await Application.Current.Dispatcher.BeginInvoke(() =>
                     {
                         FireMode = (FireMode == Models.FireMode.FireModeType.Auto)
                             ? Models.FireMode.FireModeType.Manual
@@ -339,7 +339,7 @@ namespace OCC.ViewModels
 
         private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 if (missileLookup.TryGetValue(id, out var missile))
                 {
@@ -371,7 +371,7 @@ namespace OCC.ViewModels
         }
         private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 if (impactPointLookup.TryGetValue(commandId, out var ip))
                 {
@@ -398,7 +398,7 @@ namespace OCC.ViewModels
 
         private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 if (aircraftLookup.TryGetValue(id, out var ac))
                 {
@@ -617,7 +617,7 @@ namespace OCC.ViewModels
 
                 if (ackReceived)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    await Application.Current.Dispatcher.BeginInvoke(() =>
                     {
                         Debug.WriteLine("WDL 명령 성공");
                         // 필요시 후속 로직 삽입
@@ -713,7 +713,7 @@ namespace OCC.ViewModels
                 // 4. ACK 수신 시 모드 전환
                 if (ackReceived)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    await Application.Current.Dispatcher.BeginInvoke(() =>
                     {
                         //할거없나?
                         Debug.WriteLine(FireMode);

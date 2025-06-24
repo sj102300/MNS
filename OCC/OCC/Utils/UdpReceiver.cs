@@ -35,8 +35,8 @@ namespace OCC.Utils
             Task.Run(() =>
             {
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.99"), 9001);        //승엽
-                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
-                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
+                //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.194"), 9001);       //승주
+                IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.195"), 9001);       //명준
                 //IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.200"), 9999);
                 using var udp = new UdpClient(ep);
 
@@ -110,6 +110,11 @@ namespace OCC.Utils
             double ipLon = BitConverter.ToDouble(body, 48);
             double ipAlt = BitConverter.ToDouble(body, 56);
 
+            if(id == "ATS-0001")
+            {
+                Debug.WriteLine($"항공기 {id}번 현재 위도 : {lat}, 현재 경도 : {lon}");
+            }
+            
             AircraftReceived?.Invoke(id, lat, lon, alt, status, foe, ipLat, ipLon, ipAlt);
             //Debug.WriteLine($"[Aircraft] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, IP Lat: {ipLat:F6}, IP Lon: {ipLon:F6}, IP Alt: {ipAlt:F2}, Enemy: {foe == 1}, Status: {status}");
         }
@@ -159,6 +164,11 @@ namespace OCC.Utils
             double alt = BitConverter.ToDouble(body, 28);
 
             MissileReceived?.Invoke(id, lat, lon, alt, status);
+
+            if (id == "MSS-100")
+            {
+                Debug.WriteLine($"미사일 {id}번 현재 위도 : {lat}, 현재 경도 : {lon}");
+            }
             //Debug.WriteLine($"[Missile] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, Status: {status}");
         }
 
