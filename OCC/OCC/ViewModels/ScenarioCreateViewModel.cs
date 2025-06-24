@@ -18,7 +18,7 @@ namespace OCC.ViewModels
 {
     public class ScenarioCreateViewModel : BaseViewModel
     {
-        private const int MaxAircraftCount = 100; // 아군/적군 최대 사이클 수
+        private const int MaxAircraftCount = 50; // 아군/적군 최대 사이클 수
         private const int MaxBatteryCount = 1; // 포대 최대 개수
         private string? _selectedItem; // 선택된 아이템
         private Coordinate? _startPoint; // 시작점
