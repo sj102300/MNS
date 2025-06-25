@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +12,7 @@ namespace OCC.Models
 {
     public class Missile : INotifyPropertyChanged
     {
-        public enum MissileStatus
+        public enum MissileStatus  // 미사일 상태 
         {
             BeforeLaunch = 0,  // 발사전
             InFlight = 1, // 비행중
@@ -36,7 +37,7 @@ namespace OCC.Models
         private bool hasHit = false;
 
         private uint status;
-        public uint Status
+        public uint Status  // 미사일 상태 전이
         {
             get => status;
             set
@@ -44,19 +45,21 @@ namespace OCC.Models
                 var old = status; 
                 var newVal = value;
 
+                // 발사 후 비행 중인 애 눌러도 in_flight 가 아님 발사이미지 나옴
                 if (old != newVal)
                 {
+                    Debug.WriteLine($"[전이 전 : Status] VisualState={VisualState}");
                     switch (newVal)
                     {
                         case 0: // 대기 상태
                             VisualState = MissileVisualState.Waiting;
                             break;
 
-                        case 1: // 비행 중
-                            if ((old == 0 || old == 6) && !hasLaunched)
+                        case 1: // 비행 중 = 여기서는 in_flight.gif
+                            if (old == 0)  // ((old == 0) && !hasLaunched)
                             {
                                 VisualState = MissileVisualState.Launching;
-                                hasLaunched = true;
+                                // hasLaunched = true;
                             }
                             else
                             {
@@ -64,16 +67,22 @@ namespace OCC.Models
                             }
                             break;
 
-                        case 2: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
+                        case 2: // 명중 성공 = 여기서는 empty.png
+                            //VisualState = MissileVisualState.Done;  // X
                             break;
-                        case 5: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
+
+                        case 5: // 유도 모드 = 여기서 hit_success.gif  1회 완전 실행
                             if (old == 1 && !hasHit) 
                             {
                                 VisualState = MissileVisualState.HitSuccess;
                                 hasHit = true;
                             }
-                            //else
-                            //    VisualState = MissileVisualState.Done;
+                            else
+                                VisualState = MissileVisualState.Done;
+                            break;
+
+                        case 6: // 발사 요청 = 이거 못받는 경우가 있네 100프로 안받아지는지는 모름
+                            VisualState = MissileVisualState.Launching;
                             break;
 
                         case 7: // WDL
@@ -105,12 +114,14 @@ namespace OCC.Models
                             VisualState = MissileVisualState.Done;  // X
                             break;
                     }
+                    Debug.WriteLine($"[전이 후 : Status] VisualState={VisualState}");
                 }
                 status = newVal;
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(MissileStatusText));
             }
         }
+
         private MissileVisualState visualState;
         public MissileVisualState VisualState
         {

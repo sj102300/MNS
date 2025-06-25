@@ -366,6 +366,15 @@ namespace OCC.ViewModels
                     MissileList.Clear();
                     foreach (var m in sorted)
                         MissileList.Add(m);
+
+                    // MSS-100 우선 선택. 없으면 첫번째
+                    if (SelectedMissile == null)
+                    {
+                        var mss100 = MissileList.FirstOrDefault(m => m.Id == "MSS-100");
+                        SelectedMissile = mss100 ?? MissileList.FirstOrDefault();
+                    }
+
+
                 }
             });
         }
