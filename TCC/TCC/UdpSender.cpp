@@ -59,10 +59,15 @@ bool TCC::UdpSender::sendAircraftData(AircraftManager::NewAircraftWithIP& data){
     int headerSize = serializeHeader(buffer, CommandCode::AircraftData, 64);
     int bodySize = serializeAircraftSender(buffer+headerSize, data);
 
+    //if (data.aircraftData_.aircraftId_ == "ATS-0001") {
+    //    auto now = std::chrono::system_clock::now();
+    //    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    //    std::cout << "sendAircraftData() [ATS-0001] timestamp(ms since epoch): " << ms << std::endl;
+    //}
+
     if (sendByteData(buffer, headerSize + bodySize) < 0) {
         return false;
     }
-
     return true;
 }
 
