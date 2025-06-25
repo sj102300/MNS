@@ -117,54 +117,6 @@ bool Aircraft::calcImpactPoint(TCC::Position& batteryLoc, double vm) {
     return true;
 }
 
-
-bool Aircraft::calcWDLImpactPoint(TCC::Position& curMissileLoc) {
-    double vt = 1.0; // 항공기 속도 (km/s)
-    double vm = 2.25; // 미사일 속도 (km/s)
-
-    if (dirVec_.isZeroVector()) {
-        impactPoint_ = { -200, -200, 10 }; // 유효하지 않은 값
-        std::cout << "impossible to intercept: zero direction vector" << std::endl;
-        return false;
-    }
-
-    // 1. 위치 평면 좌표로 변환
-    double tx, ty, mx, my;
-    latLonToXY(curMissileLoc, pos_, tx, ty);
-    latLonToXY(curMissileLoc, curMissileLoc, mx, my); // = 0,0
-
-    // 3. 이차방정식으로 요격 시간 t 계산
-    double a = vt * vt - vm * vm;
-    double b = 2 * vt * ((tx - mx) * dirVec_.dx_ + (ty - my) * dirVec_.dy_);
-    double c = (tx - mx) * (tx - mx) + (ty - my) * (ty - my);
-    double discriminant = b * b - 4 * a * c;
-
-    if (discriminant < 0) {
-        std::cout << "impossible to intercept: discriminant < 0" << std::endl;
-        impactPoint_ = { -200, -200, 10 };   // 수학적으로 요격 불가능
-        return false;
-    }
-
-    double sqrtD = std::sqrt(discriminant);
-    double t1 = (-b + sqrtD) / (2 * a);
-    double t2 = (-b - sqrtD) / (2 * a);
-    double t = (t1 > 0) ? t1 : ((t2 > 0) ? t2 : -1);
-    if (t < 0) {
-        std::cout << "impossible to intercept: t < 0" << std::endl;
-        impactPoint_ = { -200, -200, 10 };       //과거에 요격했어야함.
-        return false;
-    }
-
-    // 4. Impact point 계산 (평면 x,y)
-    double impact_x = tx + vt * t * dirVec_.dx_;
-    double impact_y = ty + vt * t * dirVec_.dy_;
-
-    // 5. 위경도로 되돌리기
-    impactPoint_ = xyToLatLon(curMissileLoc, impact_x, impact_y, pos_.altitude_);
-
-    return true;
-}
-
 //return value: NotEngagable -> Engageable 상태로 변화했으면 true. EngagementManager에게 알려주어야 할 경우에만 push
 //교전 가능 범위내로 들어왔는지만 판단.
 bool Aircraft::hasBecomeEngageable(TCC::Position &batteryLoc, unsigned int& engagementStatus) {
