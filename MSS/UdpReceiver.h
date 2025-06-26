@@ -10,10 +10,11 @@
 #include "IReceiver.h" // 이 부분 테스팅 위해 추가
 #include "Missile.h"
 #include "Aircraft.h"
+#include "DestroyedAircrafts.h"
 
 class UdpReceiver : public IReceiver {
 public:
-    UdpReceiver();
+    UdpReceiver(DestroyedAircraftsTracker* tracker);
 
     // 멀티캐스트 주소와 포트를 지정해 초기화
     virtual bool init(const std::string& multicast_address, int port);
@@ -43,4 +44,6 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Missile>> missile_map_;
     std::shared_ptr<Aircraft> aircraft_;
     std::unordered_map <std::string, std::shared_ptr<Aircraft>> Aircraft_map_;
+
+    DestroyedAircraftsTracker* tracker_;
 };

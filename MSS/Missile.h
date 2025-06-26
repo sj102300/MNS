@@ -1,6 +1,9 @@
 #pragma once
 #include "Packet.h"
 #include <thread>
+#include <mutex>
+
+#include "DestroyedAircrafts.h"
 
 class MissileController;
 class UdpMulticast;
@@ -12,6 +15,7 @@ public:
     Location MissileLoc;
     std::string TargetAircraftId;  // [추가] 타겟 항공기 ID
     std::shared_ptr<MissileController> getController();  // ← 이 줄 추가
+	std::mutex mtx;  // 쓰레드 안전을 위한 뮤텍스
 
     // 미사일 생성하자마자 -> 바로 쓰레드 돌리기 시작한다!!
     Missile();
@@ -38,5 +42,4 @@ public:
 private:
     std::shared_ptr<MissileController> controller;
     std::shared_ptr<UdpMulticast> sender;
-
 };

@@ -4,8 +4,8 @@
 #include "Packet.h"
 #include "MissileController.h" // [추가]
 
-UdpReceiver::UdpReceiver()
-    : sock_(INVALID_SOCKET), running_(false), port_(0) {
+UdpReceiver::UdpReceiver(DestroyedAircraftsTracker * tracker)
+    : sock_(INVALID_SOCKET), running_(false), port_(0), tracker_(tracker) {
 }
 
 bool UdpReceiver::init(const std::string& multicast_address, int port) {
@@ -84,7 +84,7 @@ void UdpReceiver::run() {
             case 2002: { // 미사일 발사 명령 처리
                 if (bodyLength < sizeof(OrderPacket)-8) {
                     std::cerr << u8"미사일 패킷 길이 부족\n";
-                    std::cout << u8"packet size : " << sizeof(OrderPacket) << "\n";
+                    //std::cout << u8"packet size : " << sizeof(OrderPacket) << "\n";
                     break;
                 }
 
@@ -99,7 +99,7 @@ void UdpReceiver::run() {
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    std::cout << u8" 미사일 업데이트 하는중 \n";
+                    //std::cout << u8" 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(1);  // 예: 3 = 발사 후 비행 상태
@@ -117,8 +117,8 @@ void UdpReceiver::run() {
                         controller->setAircraftMap(&Aircraft_map_);
                     }
                 }
-                std::cout << u8"[업데이트됨] 미사일: " << missileId
-                    << u8" → 목표: (" << impactPoint.altitude << ", " << impactPoint.latitude << ")\n";
+                //std::cout << u8"[업데이트됨] 미사일: " << missileId
+                //    << u8" → 목표: (" << impactPoint.altitude << ", " << impactPoint.latitude << ")\n";
               
                 break;
             }
@@ -126,7 +126,7 @@ void UdpReceiver::run() {
             case 2003: { // 격추 여부 
                 if (bodyLength < sizeof(InterceptResultPacket) - 8) {
                     std::cerr << u8"미사일 InterceptResultPacket 패킷 길이 부족\n";
-                    std::cout << u8"packet size : " << sizeof(InterceptResultPacket) << "\n";
+                    //std::cout << u8"packet size : " << sizeof(InterceptResultPacket) << "\n";
                     break;
                 }
 
@@ -137,11 +137,14 @@ void UdpReceiver::run() {
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    std::cout << u8" 미사일 업데이트 하는중 \n";
+                    //std::cout << u8" 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(2);  // 2번은 격추 상태!!
                 }
+				std::string aircraftId(Resultpkg.AirCraftId, 8);
+				tracker_->findNewDestroyedAircraft(aircraftId); // 격추된 항공기 ID를 기록
+
                 std::cout << u8"[업데이트됨] 미사일: " << missileId << u8"격추 상태로 변환\n";
 
                 break;
@@ -157,11 +160,11 @@ void UdpReceiver::run() {
                 memcpy(&EDpkg, bodyPtr, sizeof(EDpkg));
 
                 std::string missileId(EDpkg.MissileId, strnlen(EDpkg.MissileId, 8));
-                std::cout << u8"수신한 미사일 ID: [" << missileId << "]\n";
+                //std::cout << u8"수신한 미사일 ID: [" << missileId << "]\n";
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
-                    std::cout << u8" 미사일 업데이트 하는중 \n";
+                    //std::cout << u8" 미사일 업데이트 하는중 \n";
                     auto missile = it->second;
                     missile->setMissileId(missileId);
                     missile->setState(3);  // 3번은 비상폭파 상태임
@@ -170,7 +173,7 @@ void UdpReceiver::run() {
 
                 break;
             }
-                     // ATS를 주기적으로 받기 위함임
+            // ATS를 주기적으로 받기 위함임
             case 1001: {
                 if (bodyLength < sizeof(AirCraftPacket) - 8) {
                     std::cerr << u8"항공기 패킷 길이 부족\n";
@@ -195,9 +198,53 @@ void UdpReceiver::run() {
                     Aircraft_map_[aircraftId] = newAircraft;
                 }
 
-                std::cout << u8"[항공기 업데이트] ID: " << aircraftId
-                    << u8" → 위치: (" << loc.latitude << ", " << loc.longitude << ", " << loc.altitude << ")\n";
+               // std::cout << u8"[항공기 업데이트] ID: " << aircraftId
+               //     << u8" → 위치: (" << loc.latitude << ", " << loc.longitude << ", " << loc.altitude << ")\n";
             
+                break;
+            }
+            case 301: { // IMPACT_POINT 재설정
+                if (bodyLength < sizeof(WDLPacket) - 8) {
+                    std::cerr << u8"WDL 패킷 길이 부족\n";
+                    std::cout << u8"packet size : " << sizeof(WDLPacket) << "\n";
+                    break;
+                }
+
+                WDLPacket wdlPacket;
+                memcpy(&wdlPacket, bodyPtr, sizeof(wdlPacket));
+
+                std::string missileId(wdlPacket.MissileId, strnlen(wdlPacket.MissileId, 8));
+                Location newImpactPoint = wdlPacket.ImpactPoint;
+                std::string aircraftId(wdlPacket.AtsId, strnlen(wdlPacket.AtsId, 8));
+                auto it = missile_map_.find(missileId);
+                if (it != missile_map_.end()) {
+                    std::cout << u8"미사일 [" << missileId << u8"]의 목표 위치를 갱신합니다.\n";
+                    auto missile = it->second;
+                    missile->setState(7);  // 3번은 비상폭파 상태임
+					std::thread([missile]() {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+                        missile->setState(1);  // 1번은 발사 후 비행 상태
+                    }).detach();
+                    missile->setTargetLocation(newImpactPoint);
+                   
+                    missile->setTargetAircraftId(aircraftId);
+                    /*방금 추가한 컨트롤러 코드*/
+                    auto controller = missile->getController();
+                    if (controller) {
+                        controller->setTargetAircraftId(aircraftId);
+
+                        // aircraft map도 연결
+                        controller->setAircraftMap(&Aircraft_map_);
+                    }
+                    //std::cout << u8"[업데이트됨] 미사일: " << missileId
+                    //    << u8" → 새로운 목표: (" << newImpactPoint.latitude << ", "
+                    //    << newImpactPoint.longitude << ", "
+                    //    << newImpactPoint.altitude << ")\n";
+                }
+                else {
+                    std::cerr << u8"해당 미사일 ID를 찾을 수 없습니다: " << missileId << "\n";
+                }
+
                 break;
             }
             default:

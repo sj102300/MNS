@@ -3,6 +3,7 @@
 #include "Missile.h"
 #include "UdpMuticast.h"
 #include "MissileController.h"
+#include "DestroyedAircrafts.h"
 
 Missile::Missile()
     : MissileId("MSS-000"), MissileState(0), MissileLoc({ 0.0, 0.0, 10 }) {
@@ -31,6 +32,7 @@ void Missile::setMissileId(const std::string& id) {
 }
 
 void Missile::setState(uint32_t state) {
+	std::lock_guard<std::mutex> lock(mtx);  // 쓰레드 안전을 위한 뮤텍스 사용
     MissileState = state;
 }
 void Missile::setTargetLocation(const Location& loc) {
