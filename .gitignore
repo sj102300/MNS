@@ -110,6 +110,10 @@ ipch/
 *.opendb
 *.opensdf
 *.sdf
+*.opensdf
+*.tlog
+*.log
+*.ilk
 *.cachefile
 *.VC.db
 *.VC.VC.opendb
@@ -398,3 +402,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.DS_Store

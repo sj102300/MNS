@@ -1,0 +1,54 @@
+{
+  "aircraft_count": 3,
+  "aircraft_list": [
+    {
+      "aircraft_id": "ATS-0001",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.59274354910638,
+        "longitude": 127.01190948486328
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.58730259842386,
+        "longitude": 126.95869445800781
+      }
+    },
+    {
+      "aircraft_id": "ATS-0002",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.59900015064849,
+        "longitude": 126.99165344238281
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.571793706897495,
+        "longitude": 126.97551727294922
+      }
+    },
+    {
+      "aircraft_id": "ATS-0003",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.58811876638321,
+        "longitude": 127.06581115722656
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.58213332686043,
+        "longitude": 127.00366973876953
+      }
+    }
+  ],
+  "battery_location": {
+    "altitude": 10,
+    "latitude": 37.55247109621964,
+    "longitude": 127.0022964477539
+  },
+  "scenario_id": "SCENE-14",
+  "scenario_title": "시나리오 테스트"
+}

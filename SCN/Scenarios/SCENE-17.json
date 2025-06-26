@@ -1,0 +1,39 @@
+{
+    "scenario_id": "SCENE-17",
+    "scenario_title": "항공기 종점도달 테스트 시나리오",
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "start_point": {
+                "latitude": 0.700000,
+                "longitude": 20.000000,
+                "altitude": 10.000000
+            },
+            "end_point": {
+                "latitude": 1.000000,
+                "longitude": 20.000000,
+                "altitude": 10.000000
+            },
+            "friend_or_foe": "E"
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "start_point": {
+                "latitude": 0.200000,
+                "longitude": 30.00000,
+                "altitude": 10.000000
+            },
+			"end_point": {
+				"latitude": 0.800000,
+				"longitude": 30.000000,
+				"altitude": 10.000000
+			},
+            "friend_or_foe": "E"
+        }
+    ],
+    "battery_location": {
+        "latitude": 0.000000,
+        "longitude": 0.000000,
+        "altitude": 10.000000
+    }
+}

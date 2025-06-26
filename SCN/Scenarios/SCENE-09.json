@@ -1,0 +1,96 @@
+{
+  "aircraft_count": 6,
+  "aircraft_list": [
+    {
+      "aircraft_id": "ATS-0001",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 35.995785386420316,
+        "longitude": 127.353515625
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 40.39676430557204,
+        "longitude": 128.16650390625
+      }
+    },
+    {
+      "aircraft_id": "ATS-0002",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 35.88905007936091,
+        "longitude": 128.9794921875
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 40.24599150419901,
+        "longitude": 125.4638671875
+      }
+    },
+    {
+      "aircraft_id": "ATS-0003",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 40.56389453066508,
+        "longitude": 127.177734375
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 35.65729624809628,
+        "longitude": 128.21044921875
+      }
+    },
+    {
+      "aircraft_id": "ATS-0004",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 39.892879900294794,
+        "longitude": 128.0126953125
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 35.353216101238225,
+        "longitude": 126.80419921875
+      }
+    },
+    {
+      "aircraft_id": "ATS-0005",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 39.35129035526703,
+        "longitude": 125.79345703125
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 35.8356283888737,
+        "longitude": 130.05615234375
+      }
+    },
+    {
+      "aircraft_id": "ATS-0006",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 39.47012512235816,
+        "longitude": 127.529296875
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 35.63944106897393,
+        "longitude": 127.90283203125
+      }
+    }
+  ],
+  "battery_location": {
+    "altitude": 10,
+    "latitude": 38.272688535980954,
+    "longitude": 127.3974609375
+  },
+  "scenario_id": "SCENE-09",
+  "scenario_title": "한국-북한 시나리오"
+}

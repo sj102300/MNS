@@ -12,22 +12,22 @@
 #endif
 
 
-// ¼±È¸À² °è»ê
+// ï¿½ï¿½È¸ï¿½ï¿½ ï¿½ï¿½ï¿½
 double Cal_RateOfTurn(double w, double t) {
-	double v = 2000.0; // ¼Óµµ(m/s)
-	double aoa = 0.05236; // ¹ŞÀ½°¢(rad), ¾à 3µµ
-	double L = 0.4135 * v * v * aoa / 2; // ¾ç·Â
-	double l = (4.61 * 0.5) / (4.61 * 0.25); // ¸ğ¸àÆ®¾Ï ºñÀ²
-	double T = L * l; // ÅäÅ©
-	double I = 400 * (3 * 0.275 * 0.275 + 4.61 * 4.61) / 12; // °ü¼º¸ğ¸àÆ®
-	double a = T / I; // °¢°¡¼Óµµ
+	double v = 2000.0; // ï¿½Óµï¿½(m/s)
+	double aoa = 0.05236; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(rad), ï¿½ï¿½ 3ï¿½ï¿½
+	double L = 0.4135 * v * v * aoa / 2; // ï¿½ï¿½ï¿½
+	double l = (4.61 * 0.5) / (4.61 * 0.25); // ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	double T = L * l; // ï¿½ï¿½Å©
+	double I = 400 * (3 * 0.275 * 0.275 + 4.61 * 4.61) / 12; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+	double a = T / I; // ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½
 
 	w += a * t;
 
 	return w;
 }
 
-// ÁÂÇ¥ ¾÷µ¥ÀÌÆ®
+// ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 std::pair<double, double> update_latlon(double heading, double w, double dt, double x, double y) {
 	double v = 2000.0;
 	double R = 6371000.0;
@@ -53,20 +53,20 @@ std::pair<double, double> update_latlon(double heading, double w, double dt, dou
 	};
 }
 
-// º£¸£´©ÀÌ ¾Ğ·ÂÀå °è»ê
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ğ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 double Bernoulli(double MissileVelocity, double AirVelocity) {
 	double density = 0.413;
 	return (density * (pow(AirVelocity, 2) - pow(MissileVelocity, 2))) / 2;
 }
 
-// Ç×·Â °è»ê
+// ï¿½×·ï¿½ ï¿½ï¿½ï¿½
 double Drag_cal(double deltaP, double MissileRadius) {
 	double pi = 3.14159265358979;
 	double Area = pow(MissileRadius, 2) * pi;
 	return deltaP * Area;
 }
 
-// ·©Å² ¿À¹ß ¼ÓµµÀå °è»ê
+// ï¿½ï¿½Å² ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 double RankineOval(double Missilelength, double MissileRadius, double AirVelocity, double x, double r) {
 	double pi = 3.14159265358979;
 	double Q = pi * pow(MissileRadius, 2) * AirVelocity;
@@ -74,7 +74,7 @@ double RankineOval(double Missilelength, double MissileRadius, double AirVelocit
 	double denom1 = pow((x + Missilelength / 2), 2) + pow(r, 2);
 	double denom2 = pow((x - Missilelength / 2), 2) + pow(r, 2);
 
-	// ºĞ¸ğ°¡ ³Ê¹« ÀÛÀ¸¸é ±âº» À¯¼Ó ¹İÈ¯
+	// ï¿½Ğ¸ï¿½ ï¿½Ê¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
 	if (denom1 < 1e-6 || denom2 < 1e-6) {
 		return AirVelocity;
 	}
@@ -96,7 +96,7 @@ double RankineOval(double Missilelength, double MissileRadius, double AirVelocit
 	return V;
 }
 
-// ÀÚÆø ¿©ºÎ ÆÇ´Ü
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½
 float decision_suicide(double range) {
 	if (range >= 130) {
 		double AirVelocity = 2000.0;
@@ -168,7 +168,7 @@ void MissileController::setTarget(Location pos) {
 		dir_long_ = dy / len;
 	}
 
-	// °Å¸® °è»ê (Á¤¹Ğ)
+	// ê±°ë¦¬ ê³„ì‚° (ì •ë°€)
 	double distance_km = haversine(missile_->MissileLoc.latitude, missile_->MissileLoc.longitude,
 		impact_point.latitude, impact_point.longitude);
 
@@ -185,8 +185,8 @@ void MissileController::start(float speed) {
 }
 void MissileController::updateLoop(float speed) {
 	while (running_) {
-		updatePosition(speed); // À§Ä¡ °»½Å
-		std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 1ÃÊ ÁÖ±â
+		updatePosition(speed); // ìœ„ì¹˜ ê°±ì‹ 
+		std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 1ì´ˆ ì£¼ê¸°
 	}
 }
 
@@ -199,7 +199,11 @@ void MissileController::stop() {
 
 void MissileController::updatePosition(float speed_kmps) {  // Proportional Navigation
 	if (!missile_ || !hasTarget_) return;
+<<<<<<< HJS
 	if (!(missile_->MissileState == 1 || missile_->MissileState == 5 || missile_->MissileState == 7)) return;
+=======
+   	if (!(missile_->MissileState == 1 || missile_->MissileState == 5)) return;
+>>>>>>> main
 	if (!launch_time_recorded_ || estimatedTimeToImpact_ < 0.0) return;
 	if (missile_->MissileState == 2 || missile_->MissileState == 3 || missile_->MissileState == 4) {
 		running_ = false;
@@ -209,16 +213,16 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 	//	state7Count_++;
 	//	if (state7Count_ >= 3) {
 	//		missile_->MissileState = 1;
-	//		state7Count_ = 0;  // ÃÊ±âÈ­
+	//		state7Count_ = 0;  // ï¿½Ê±ï¿½È­
 	//	}
 	//	else {
-	//		return;  // 3È¸ È£Ãâ Àü±îÁø ³ª¸ÓÁö ·ÎÁ÷ ½ÇÇà ¾È ÇÔ
+	//		return;  // 3È¸ È£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½
 	//	}
 	//}
 	constexpr double PN_GAIN = 3.0;
 	constexpr double TIME_STEP = 0.1;
 
-	// Á¾¸» À¯µµ ·ÎÁ÷ ½ÃÀÛ
+	// ì¢…ë§ ìœ ë„ ë¡œì§ ì‹œì‘
 	Location& msLoc = missile_->MissileLoc;
 	bool isTerminalGuidance = false;
 
@@ -228,14 +232,22 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 		if (it != aircraftMap_->end() && it->second) {
 			const Location& acLoc = it->second->getLocation();
 
-			// °Å¸® °è»ê (haversine)
+			// ê±°ë¦¬ ê³„ì‚° (haversine)
 			double distance_km = haversine(msLoc.latitude, msLoc.longitude, acLoc.latitude, acLoc.longitude);
 
+<<<<<<< HJS
 			if (tracker_ != nullptr && !tracker_->isDestroyedAircraft(targetAircraftId_)) {
+=======
+			if (distance_km <= 5.0) {  // ì¢…ë§ ëª¨ë“œ ì‹œì‘ ë²”ìœ„
+				// ìœ„ê²½ë„ ì°¨ì´ â†’ ê±°ë¦¬(km) ë°©í–¥ ë²¡í„°
+				double dLatRad = toRad(acLoc.latitude - msLoc.latitude);
+				double dLonRad = toRad(acLoc.longitude - msLoc.longitude);
+>>>>>>> main
 
 
-				if (distance_km <= 5.0) {  // Á¾¸» ¸ğµå ½ÃÀÛ ¹üÀ§
-					// À§°æµµ Â÷ÀÌ ¡æ °Å¸®(km) ¹æÇâ  º¤ÅÍ
+<<<<<<< HJS
+				if (distance_km <= 5.0) {  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+					// ï¿½ï¿½ï¿½æµµ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Å¸ï¿½(km) ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½
 
 					double dLatRad = toRad(acLoc.latitude - msLoc.latitude);
 					double dLonRad = toRad(acLoc.longitude - msLoc.longitude);
@@ -245,30 +257,61 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 
 					double range = sqrt(dx * dx + dy * dy);
 					if (range < 1e-6 || std::isnan(range)) {
-						std::cerr << u8"[ERROR] Á¾¸» À¯µµ »ı·«: range == 0 ¶Ç´Â NaN ¡æ ¹Ì»çÀÏ ID: "
+						std::cerr << u8"[ERROR] ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: range == 0 ï¿½Ç´ï¿½ NaN ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½ï¿½ ID: "
 							<< missile_->MissileId << "\n";
 					}
 					else {
-						// ´ÜÀ§ LOS º¤ÅÍ
+						// ï¿½ï¿½ï¿½ï¿½ LOS ï¿½ï¿½ï¿½ï¿½
 						double los_x = dx / range;
 						double los_y = dy / range;
 
-						// »ó´ë ¼Óµµ (V_m - V_t), °°Àº ¹æÇâÀÌ¹Ç·Î ´Ü¼ø °è»ê
+						// ï¿½ï¿½ï¿½ ï¿½Óµï¿½ (V_m - V_t), ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¹Ç·ï¿½ ï¿½Ü¼ï¿½ ï¿½ï¿½ï¿½
 						double Vm = speed_kmps;
 						double Vt = speed_kmps / 2;
 						double Vrel_x = Vm * dir_lat_ - Vt * los_x;
 						double Vrel_y = Vm * dir_long_ - Vt * los_y;
 
-						// LOS °¢¼Óµµ ¥ë_dot = (R ¡¿ V_rel) / |R|^2
+						// LOS ï¿½ï¿½ï¿½Óµï¿½ ï¿½ï¿½_dot = (R ï¿½ï¿½ V_rel) / |R|^2
 						double los_rate = (dx * Vrel_y - dy * Vrel_x) / (range * range);  // rad/s
+=======
+				double range = sqrt(dx * dx + dy * dy);
+				if (range < 1e-6 || std::isnan(range)) {
+					std::cerr << u8"[ERROR] ì¢…ë§ ìœ ë„ ìƒëµ: range == 0 ë˜ëŠ” NaN â†’ ë¯¸ì‚¬ì¼ ID: "
+							  << missile_->MissileId << "\n";
+				}
+				else {
+					// ë‹¨ìœ„ LOS ë²¡í„°
+					double los_x = dx / range;
+					double los_y = dy / range;
 
-						// Æó¼â ¼Óµµ Vc = -Vrel ¡¤ LOS
+					// ìƒëŒ€ ì†ë„ (V_m - V_t), ê°™ì€ ë°©í–¥ì´ë¯€ë¡œ ë‹¨ìˆœ ê³„ì‚°
+					double Vm = speed_kmps;
+					double Vt = speed_kmps / 2;
+					double Vrel_x = Vm * dir_lat_ - Vt * los_x;
+					double Vrel_y = Vm * dir_long_ - Vt * los_y;
+
+					// LOS ê°ì†ë„ Î»_dot = (R Ã— V_rel) / |R|^2
+					double los_rate = (dx * Vrel_y - dy * Vrel_x) / (range * range);  // rad/s
+
+					// íì‡„ ì†ë„ Vc = -Vrel Â· LOS
+					double Vc = -(Vrel_x * los_x + Vrel_y * los_y);  // > 0
+
+					// ì¡°í–¥ ê°ë„ ë³€í™”ëŸ‰ Î¸_dot = N * Î»_dot
+					double heading_change = PN_GAIN * los_rate;  // rad/s
+
+					// dir ë²¡í„° íšŒì „
+					double angle = -heading_change * TIME_STEP;
+					double cosA = cos(angle);
+					double sinA = sin(angle);
+>>>>>>> main
+
+						// ï¿½ï¿½ï¿½ ï¿½Óµï¿½ Vc = -Vrel ï¿½ï¿½ LOS
 						double Vc = -(Vrel_x * los_x + Vrel_y * los_y);  // > 0
 
-						// Á¶Çâ °¢µµ º¯È­·® ¥è_dot = N * ¥ë_dot
+						// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È­ï¿½ï¿½ ï¿½ï¿½_dot = N * ï¿½ï¿½_dot
 						double heading_change = PN_GAIN * los_rate;  // rad/s
 
-						// dir º¤ÅÍ È¸Àü
+						// dir ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½
 						double angle = -heading_change * TIME_STEP;
 						double cosA = cos(angle);
 						double sinA = sin(angle);
@@ -276,33 +319,49 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 						double new_dir_lat = dir_lat_ * cosA - dir_long_ * sinA;
 						double new_dir_long = dir_lat_ * sinA + dir_long_ * cosA;
 
+<<<<<<< HJS
 						dir_lat_ = new_dir_lat;
 						dir_long_ = new_dir_long;
 					}
 
 					if (!hasEnteredTerminalGuidance_) {
-						std::cout << u8"[Á¾¸» À¯µµ ÁøÀÔ] ¹Ì»çÀÏ: " << missile_->MissileId
-							<< u8" ¡æ Ç×°ø±â: " << targetAircraftId_
-							<< u8", °Å¸®: " << distance_km << u8" km\n";
+						std::cout << u8"[ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½] ï¿½Ì»ï¿½ï¿½ï¿½: " << missile_->MissileId
+							<< u8" ï¿½ï¿½ ï¿½×°ï¿½ï¿½ï¿½: " << targetAircraftId_
+							<< u8", ï¿½Å¸ï¿½: " << distance_km << u8" km\n";
 						hasEnteredTerminalGuidance_ = true;
 
-						missile_->MissileState = 5; // 5¹øÀÌ Á¾¸» À¯µµ »óÅÂ¶ó°í °¡Á¤
+						missile_->MissileState = 5; // 5ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¶ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 					}
 				}
 			}
+=======
+				if (!hasEnteredTerminalGuidance_) {
+					std::cout << u8"[ì¢…ë§ ìœ ë„ ì§„ì…] ë¯¸ì‚¬ì¼: " << missile_->MissileId
+						<< u8" â†’ í•­ê³µê¸°: " << targetAircraftId_
+						<< u8", ê±°ë¦¬: " << distance_km << u8" km\n";
+					hasEnteredTerminalGuidance_ = true;
+					missile_->MissileState = 5;
+				}	
+			}	
+>>>>>>> main
 		}
 		else {
-			std::cout << u8"[°æ°í] À¯È¿ÇÑ Ç×°ø±â Á¤º¸¸¦ Ã£À» ¼ö ¾øÀ½: " << targetAircraftId_ << "\n";
+			std::cout << u8"[ê²½ê³ ] ìœ íš¨í•œ í•­ê³µê¸° ì •ë³´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŒ: " << targetAircraftId_ << "\n";
 		}
 	}
-	// Á¾¸» À¯µµ ³¡
+	// ì¢…ë§ ìœ ë„ ë
 
+<<<<<<< HJS
 
-	// À§Ä¡ ¾÷µ¥ÀÌÆ® (¹İÁö¸§ ±â¹İ ¡æ À§µµ/°æµµ ´ÜÀ§·Î º¯È¯)
-	double move_km = speed_kmps * 0.1; // 0.1ÃÊ´ç ÀÌµ¿ °Å¸®
+	// ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½æµµ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯)
+	double move_km = speed_kmps * 0.1; // 0.1ï¿½Ê´ï¿½ ï¿½Ìµï¿½ ï¿½Å¸ï¿½
+=======
+	// ìœ„ì¹˜ ì—…ë°ì´íŠ¸ (ë°˜ì§€ë¦„ ê¸°ë°˜ â†’ ìœ„ë„/ê²½ë„ ë‹¨ìœ„ë¡œ ë³€í™˜)
+	double move_km = speed_kmps * 0.1; // 0.1ì´ˆë‹¹ ì´ë™ ê±°ë¦¬
+>>>>>>> main
 	double delta_lat = (dir_lat_ * move_km) / EARTH_RADIUS_KM * 180.0 / M_PI;
 	double cosLat = cos(toRad(msLoc.latitude));
-	if (std::abs(cosLat) < 1e-6) cosLat = 1e-6;  // divide by 0 ¿¡·¯ ¹æÁö
+	if (std::abs(cosLat) < 1e-6) cosLat = 1e-6;  // divide by 0 ì—ëŸ¬ ë°©ì§€
 	double delta_long = (dir_long_ * move_km) / (EARTH_RADIUS_KM * cosLat) * 180.0 / M_PI;
 
 	msLoc.latitude += delta_lat;
@@ -314,14 +373,14 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 	if (elapsed > estimatedTimeToImpact_ + 10.0) {
 		std::cout << u8"Estimated time to impact: " << estimatedTimeToImpact_ << "s\n" << std::endl;
 		std::cout << u8"Elapsed time since launch: " << elapsed << "s\n" << std::endl;
-		std::cout << u8"[Missile] ¿¹»ó Ãæµ¹ ½Ã°£ ÃÊ°ú - ÀÚÆø!\n";
-		missile_->MissileState = 4; // 4¹øÀÌ ÀÚÆø »óÅÂ¶ó°í °¡Á¤
+		std::cout << u8"[Missile] ì˜ˆìƒ ì¶©ëŒ ì‹œê°„ ì´ˆê³¼ - ìí­!\n";
+		missile_->MissileState = 4; // 4ë²ˆì´ ìí­ ìƒíƒœë¼ê³  ê°€ì •
 		running_ = false;
 		return;
 	}
 }
 
-// [Ãß°¡]
+// [ì¶”ê°€]
 void MissileController::setTargetAircraftId(const std::string& id) {
 	targetAircraftId_ = id;
 }
@@ -334,7 +393,7 @@ double MissileController::toRad(double deg) {
 	return deg * M_PI / 180.0;
 }
 
-// À§°æµµ ±âÁØ °Å¸® (km)
+// ìœ„ê²½ë„ ê¸°ì¤€ ê±°ë¦¬ (km)
 double MissileController::haversine(double lat1, double lon1, double lat2, double lon2) {
 	double dLat = toRad(lat2 - lat1);
 	double dLon = toRad(lon2 - lon1);

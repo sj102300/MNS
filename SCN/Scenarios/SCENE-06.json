@@ -1,0 +1,96 @@
+{
+  "aircraft_count": 6,
+  "aircraft_list": [
+    {
+      "aircraft_id": "ATS-0001",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.59301558619925,
+        "longitude": 127.00984954833984
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.5883908203809,
+        "longitude": 126.95594787597656
+      }
+    },
+    {
+      "aircraft_id": "ATS-0002",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.60144824283121,
+        "longitude": 127.03697204589844
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.597096023259894,
+        "longitude": 126.97380065917969
+      }
+    },
+    {
+      "aircraft_id": "ATS-0003",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.6038962544593,
+        "longitude": 127.00366973876953
+      },
+      "friend_or_foe": "E",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.57560320760583,
+        "longitude": 126.97311401367188
+      }
+    },
+    {
+      "aircraft_id": "ATS-0004",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.582405402733876,
+        "longitude": 127.05413818359375
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.582405402733876,
+        "longitude": 126.99405670166016
+      }
+    },
+    {
+      "aircraft_id": "ATS-0005",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.57342637392012,
+        "longitude": 127.02220916748047
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.59111130566643,
+        "longitude": 126.99371337890625
+      }
+    },
+    {
+      "aircraft_id": "ATS-0006",
+      "end_point": {
+        "altitude": 10,
+        "latitude": 37.576419503832696,
+        "longitude": 127.04315185546875
+      },
+      "friend_or_foe": "O",
+      "start_point": {
+        "altitude": 10,
+        "latitude": 37.56580695492944,
+        "longitude": 126.99920654296875
+      }
+    }
+  ],
+  "battery_location": {
+    "altitude": 10,
+    "latitude": 37.582405402733876,
+    "longitude": 127.01122283935547
+  },
+  "scenario_id": "SCENE-06",
+  "scenario_title": "통합테스트1"
+}

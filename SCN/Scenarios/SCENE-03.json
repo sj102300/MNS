@@ -1,0 +1,21 @@
+{
+    "scenario_id": "SCENE-03",
+    "scenario_title": "우군 식별 및 오인사격 방지 훈련",
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "start_point": { "latitude": 36.987, "longitude": 126.987, "altitude": 10.0 },
+            "end_point":   { "latitude": 36.555, "longitude": 127.555, "altitude": 10.0 },
+            "friend_or_foe": "O"
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "start_point": { "latitude": 37.111, "longitude": 127.111, "altitude": 10.0 },
+            "end_point":   { "latitude": 36.444, "longitude": 128.444, "altitude": 10.0 },
+            "friend_or_foe": "E"
+        }
+    ],
+    "battery_location": {
+        "latitude": 35.300, "longitude": 129.300, "altitude": 10.0
+    }
+}
