@@ -546,6 +546,8 @@ namespace OCC.ViewModels
                 return false;
             }
         }
+
+        public Missile IsSelectedByUser { get; set; }
         public Missile _selectedMissile { get; set; }
         public Missile SelectedMissile
         {
@@ -554,8 +556,20 @@ namespace OCC.ViewModels
             {
                 if (_selectedMissile != value)
                 {
+                    // 이전 미사일은 선택 해제
+
+                    //Debug.Write(_selectedMissile.Id + " 선택 해제");
+
+                    if (_selectedMissile != null)
+                        _selectedMissile.IsSelectedByUser = false;
+
                     _selectedMissile = value;
-                    OnPropertyChanged();
+
+                    // 새로 선택된 미사일은 플래그 설정
+                    if (_selectedMissile != null)
+                        _selectedMissile.IsSelectedByUser = true;
+
+                    OnPropertyChanged(nameof(SelectedMissile));
                 }
             }
         }
