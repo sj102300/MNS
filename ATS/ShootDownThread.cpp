@@ -1,5 +1,4 @@
 #include "ShootDownThread.h"
-#include "InterceptResultPacket.h"
 #include "Missile.h" 
 
 #include <winsock2.h>
