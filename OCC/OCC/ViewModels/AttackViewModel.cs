@@ -35,6 +35,7 @@ using System.ComponentModel.Design;
 using System.Windows.Media.Imaging;
 using WpfAnimatedGif;
 using System.IO;
+using System.Windows.Threading;
 
 
 namespace OCC.ViewModels
@@ -83,6 +84,18 @@ namespace OCC.ViewModels
         public ICommand WdlCommand { get; }
         //public ICommand SelectAircraftCommand { get; }
 
+        private readonly object _missileUpdateLock = new();
+        private readonly Dictionary<string, (double lat, double lon, double alt, uint status)> _missileUpdateBuffer = new();
+        private readonly DispatcherTimer _missileUpdateTimer;
+
+        private readonly object _aircraftUpdateLock = new();
+        private readonly Dictionary<string, (double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)> _aircraftUpdateBuffer = new();
+        private readonly DispatcherTimer _aircraftUpdateTimer;
+
+        private readonly object _impactPointUpdateLock = new();
+        private readonly Dictionary<string, (string aircraftId, string missileId, double lat, double lon, double alt)> _impactPointUpdateBuffer = new();
+        private readonly DispatcherTimer _impactPointUpdateTimer;
+
         public AttackViewModel(NavigationService navigationService)
         {
             //Debug.WriteLine($"[AttackViewModel 생성됨] HashCode: {this.GetHashCode()}");
@@ -115,7 +128,159 @@ namespace OCC.ViewModels
 
                 );
 
+            _missileUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            _missileUpdateTimer.Tick += MissileUpdateTimer_Tick;
+            _missileUpdateTimer.Start();
+
+            _aircraftUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            _aircraftUpdateTimer.Tick += AircraftUpdateTimer_Tick;
+            _aircraftUpdateTimer.Start();
+
+            _impactPointUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            _impactPointUpdateTimer.Tick += ImpactPointUpdateTimer_Tick;
+            _impactPointUpdateTimer.Start();
+
             StartReceiving();
+        }
+
+        private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
+        {
+            lock (_missileUpdateLock)
+            {
+                _missileUpdateBuffer[id] = (lat, lon, alt, status);
+            }
+        }
+
+        private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)
+        {
+            lock (_aircraftUpdateLock)
+            {
+                _aircraftUpdateBuffer[id] = (lat, lon, alt, status, foe, iplat, iplon, ipalti);
+            }
+        }
+
+        private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
+        {
+            lock (_impactPointUpdateLock)
+            {
+                _impactPointUpdateBuffer[commandId] = (aircraftId, missileId, lat, lon, alt);
+            }
+        }
+
+        private void MissileUpdateTimer_Tick(object? sender, EventArgs e)
+        {
+            Dictionary<string, (double lat, double lon, double alt, uint status)> updates;
+            lock (_missileUpdateLock)
+            {
+                if (_missileUpdateBuffer.Count == 0) return;
+                updates = new Dictionary<string, (double, double, double, uint)>(_missileUpdateBuffer);
+                _missileUpdateBuffer.Clear();
+            }
+
+            foreach (var kv in updates)
+            {
+                var id = kv.Key;
+                var (lat, lon, alt, status) = kv.Value;
+                if (missileLookup.TryGetValue(id, out var missile))
+                {
+                    missile.Latitude = lat;
+                    missile.Longitude = lon;
+                    missile.Altitude = alt;
+                    missile.Status = status;
+                }
+                else
+                {
+                    var newMissile = new Missile(id)
+                    {
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                        Status = status
+                    };
+                    MissileList.Add(newMissile);
+                    missileLookup[id] = newMissile;
+                }
+            }
+        }
+
+        private void AircraftUpdateTimer_Tick(object? sender, EventArgs e)
+        {
+            Dictionary<string, (double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)> updates;
+            lock (_aircraftUpdateLock)
+            {
+                if (_aircraftUpdateBuffer.Count == 0) return;
+                updates = new Dictionary<string, (double, double, double, uint, uint, double, double, double)>(_aircraftUpdateBuffer);
+                _aircraftUpdateBuffer.Clear();
+            }
+
+            foreach (var kv in updates)
+            {
+                var id = kv.Key;
+                var (lat, lon, alt, status, foe, iplat, iplon, ipalti) = kv.Value;
+                if (aircraftLookup.TryGetValue(id, out var ac))
+                {
+                    ac.Latitude = lat;
+                    ac.Longitude = lon;
+                    ac.Altitude = alt;
+                    ac.Status = status;
+                    ac.Foe = foe;
+                    ac.IpLatitude = iplat;
+                    ac.IpLongitude = iplon;
+                    ac.IpAltitude = ipalti;
+                }
+                else
+                {
+                    var newAc = new AircraftWithIp(id)
+                    {
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                        Status = status,
+                        Foe = foe,
+                        IpLatitude = iplat,
+                        IpLongitude = iplon,
+                        IpAltitude = ipalti
+                    };
+                    AircraftList.Add(newAc);
+                    aircraftLookup[id] = newAc;
+                }
+            }
+        }
+
+        private void ImpactPointUpdateTimer_Tick(object? sender, EventArgs e)
+        {
+            Dictionary<string, (string aircraftId, string missileId, double lat, double lon, double alt)> updates;
+            lock (_impactPointUpdateLock)
+            {
+                if (_impactPointUpdateBuffer.Count == 0) return;
+                updates = new Dictionary<string, (string, string, double, double, double)>(_impactPointUpdateBuffer);
+                _impactPointUpdateBuffer.Clear();
+            }
+
+            foreach (var kv in updates)
+            {
+                var commandId = kv.Key;
+                var (aircraftId, missileId, lat, lon, alt) = kv.Value;
+                if (impactPointLookup.TryGetValue(commandId, out var ip))
+                {
+                    ip.Latitude = lat;
+                    ip.Longitude = lon;
+                    ip.Altitude = alt;
+                }
+                else
+                {
+                    var newIP = new ImpactPoint(commandId)
+                    {
+                        AircraftId = aircraftId,
+                        MissileId = missileId,
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                    };
+                    ImpactPointList.Add(newIP);
+                    impactPointLookup[commandId] = newIP;
+                }
+            }
         }
 
         // 기존 코드 유지
@@ -337,99 +502,99 @@ namespace OCC.ViewModels
             UdpReceiver.Start(AircraftList, aircraftLookup, MissileList, missileLookup, ImpactPointList, impactPointLookup);
         }
 
-        private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
-        {
-            Application.Current.Dispatcher.BeginInvoke(() =>
-            {
-                if (missileLookup.TryGetValue(id, out var missile))
-                {
-                    missile.Latitude = lat;
-                    missile.Longitude = lon;
-                    missile.Altitude = alt;
-                    missile.Status = status;
-                }
-                else
-                {
-                    // 새로운 미사일 정보가 들어온 경우
-                    var newMissile = new Missile(id)
-                    {
-                        Latitude = lat,
-                        Longitude = lon,
-                        Altitude = alt,
-                        Status = status
-                    };
-                    MissileList.Add(newMissile);
-                    missileLookup[id] = newMissile;
+        //private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
+        //{
+        //    Application.Current.Dispatcher.BeginInvoke(() =>
+        //    {
+        //        if (missileLookup.TryGetValue(id, out var missile))
+        //        {
+        //            missile.Latitude = lat;
+        //            missile.Longitude = lon;
+        //            missile.Altitude = alt;
+        //            missile.Status = status;
+        //        }
+        //        else
+        //        {
+        //            // 새로운 미사일 정보가 들어온 경우
+        //            var newMissile = new Missile(id)
+        //            {
+        //                Latitude = lat,
+        //                Longitude = lon,
+        //                Altitude = alt,
+        //                Status = status
+        //            };
+        //            MissileList.Add(newMissile);
+        //            missileLookup[id] = newMissile;
 
-                    // missile_id 기준으로 MissileList 정렬
-                    var sorted = MissileList.OrderBy(m => m.Id).ToList();
-                    MissileList.Clear();
-                    foreach (var m in sorted)
-                        MissileList.Add(m);
-                }
-            });
-        }
-        private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
-        {
-            Application.Current.Dispatcher.BeginInvoke(() =>
-            {
-                if (impactPointLookup.TryGetValue(commandId, out var ip))
-                {
-                    ip.Latitude = lat;
-                    ip.Longitude = lon;
-                    ip.Altitude = alt;
-                }
-                else
-                {
-                    // 새로운 정보가 들어온 경우
-                    var newIP = new ImpactPoint(commandId)
-                    {
-                        AircraftId = aircraftId,
-                        MissileId = missileId,
-                        Latitude = lat,
-                        Longitude = lon,
-                        Altitude = alt,
-                    };
-                    ImpactPointList.Add(newIP);
-                    impactPointLookup[commandId] = newIP;
-                }
-            });
-        }
+        //            // missile_id 기준으로 MissileList 정렬
+        //            var sorted = MissileList.OrderBy(m => m.Id).ToList();
+        //            MissileList.Clear();
+        //            foreach (var m in sorted)
+        //                MissileList.Add(m);
+        //        }
+        //    });
+        //}
+        //private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
+        //{
+        //    Application.Current.Dispatcher.BeginInvoke(() =>
+        //    {
+        //        if (impactPointLookup.TryGetValue(commandId, out var ip))
+        //        {
+        //            ip.Latitude = lat;
+        //            ip.Longitude = lon;
+        //            ip.Altitude = alt;
+        //        }
+        //        else
+        //        {
+        //            // 새로운 정보가 들어온 경우
+        //            var newIP = new ImpactPoint(commandId)
+        //            {
+        //                AircraftId = aircraftId,
+        //                MissileId = missileId,
+        //                Latitude = lat,
+        //                Longitude = lon,
+        //                Altitude = alt,
+        //            };
+        //            ImpactPointList.Add(newIP);
+        //            impactPointLookup[commandId] = newIP;
+        //        }
+        //    });
+        //}
 
-        private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)
-        {
-            Application.Current.Dispatcher.BeginInvoke(() =>
-            {
-                if (aircraftLookup.TryGetValue(id, out var ac))
-                {
-                    ac.Latitude = lat;
-                    ac.Longitude = lon;
-                    ac.Altitude = alt;
-                    ac.Status = status;
-                    ac.Foe = foe;
-                    ac.IpLatitude = iplat;
-                    ac.IpLongitude = iplon;
-                    ac.IpAltitude = ipalti;
-                }
-                else
-                {
-                    // 새로운 항공기 정보가 들어온 경우
-                    var newAc = new AircraftWithIp(id)
-                    {
-                        Latitude = lat,
-                        Longitude = lon,
-                        Altitude = alt,
-                        Status = status,
-                        Foe = foe,
-                        IpLatitude = iplat,
-                        IpLongitude = iplon,
-                        IpAltitude = ipalti
-                    };
-                    AircraftList.Add(newAc);
-                    aircraftLookup[id] = newAc;
-                }
-            });
-        }
+        //private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)
+        //{
+        //    Application.Current.Dispatcher.BeginInvoke(() =>
+        //    {
+        //        if (aircraftLookup.TryGetValue(id, out var ac))
+        //        {
+        //            ac.Latitude = lat;
+        //            ac.Longitude = lon;
+        //            ac.Altitude = alt;
+        //            ac.Status = status;
+        //            ac.Foe = foe;
+        //            ac.IpLatitude = iplat;
+        //            ac.IpLongitude = iplon;
+        //            ac.IpAltitude = ipalti;
+        //        }
+        //        else
+        //        {
+        //            // 새로운 항공기 정보가 들어온 경우
+        //            var newAc = new AircraftWithIp(id)
+        //            {
+        //                Latitude = lat,
+        //                Longitude = lon,
+        //                Altitude = alt,
+        //                Status = status,
+        //                Foe = foe,
+        //                IpLatitude = iplat,
+        //                IpLongitude = iplon,
+        //                IpAltitude = ipalti
+        //            };
+        //            AircraftList.Add(newAc);
+        //            aircraftLookup[id] = newAc;
+        //        }
+        //    });
+        //}
 
 
         public void QuitReceiving()

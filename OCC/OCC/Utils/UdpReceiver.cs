@@ -112,7 +112,7 @@ namespace OCC.Utils
 
             if(id == "ATS-0001")
             {
-                Debug.WriteLine($"항공기 {id}번 현재 위도 : {lat}, 현재 경도 : {lon}");
+                //Debug.WriteLine($"항공기 {id}번 현재 위도 : {lat}, 현재 경도 : {lon}");
             }
             
             AircraftReceived?.Invoke(id, lat, lon, alt, status, foe, ipLat, ipLon, ipAlt);
@@ -167,7 +167,7 @@ namespace OCC.Utils
 
             if (id == "MSS-100")
             {
-                Debug.WriteLine($"미사일 {id}번 현재 위도 : {lat}, 현재 경도 : {lon}");
+                //Debug.WriteLine($"미사일 {id}번 현재 위도 : {lat}, 현재 경도 : {lon}");
             }
             //Debug.WriteLine($"[Missile] ID: {id}, Lat: {lat:F6}, Lon: {lon:F6}, Alt: {alt:F2}, Status: {status}");
         }

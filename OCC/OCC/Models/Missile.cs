@@ -58,10 +58,6 @@ namespace OCC.Models
                                 VisualState = MissileVisualState.Launching;
                                 hasLaunched = true;
                             }
-                            else
-                            {
-                                VisualState = MissileVisualState.InFlight;
-                            }
                             break;
 
                         case 2: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
