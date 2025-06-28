@@ -36,6 +36,12 @@ void AircraftManager::start() {
 void AircraftManager::handleReceivedAircraft(NewAircraft& newAircraft) {
 	//std::cout << std::fixed << std::setprecision(9); // 소수점 9자리까지 고정 출력
 	pushNewAircraftQueue(newAircraft);
+
+	//if (newAircraft.aircraftId_ == "ATS-0001") {
+	//	auto now = std::chrono::system_clock::now();
+	//	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+	//	std::cout << "handleReceivedAircraft() [ATS-0001] timestamp(ms since epoch): " << ms << std::endl;
+	//}
 }
 
 void AircraftManager::pushNewAircraftQueue(NewAircraft& newAircraft) {
@@ -83,6 +89,12 @@ void AircraftManager::judgeEngagable() {
 				addAircraft(newAircraftWithIp.aircraftData_); 
 			}
 
+			//if (newAircraftWithIp.aircraftData_.aircraftId_ == "ATS-0001") {
+			//	auto now = std::chrono::system_clock::now();
+			//	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+			//	std::cout << "judgeEngagable() [ATS-0001] timestamp(ms since epoch): " << ms << std::endl;
+			//}
+
 			Aircraft* targetAircraft = aircrafts_[newAircraftWithIp.aircraftData_.aircraftId_];
 			targetAircraft->updatePosition(newAircraftWithIp.aircraftData_.location_);
 
@@ -93,7 +105,6 @@ void AircraftManager::judgeEngagable() {
 			}
 			sender_->sendAircraftData(newAircraftWithIp);
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 }
 

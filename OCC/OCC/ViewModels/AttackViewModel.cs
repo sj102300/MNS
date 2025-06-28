@@ -502,64 +502,73 @@ namespace OCC.ViewModels
             UdpReceiver.Start(AircraftList, aircraftLookup, MissileList, missileLookup, ImpactPointList, impactPointLookup);
         }
 
-        //private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
-        //{
-        //    Application.Current.Dispatcher.BeginInvoke(() =>
-        //    {
-        //        if (missileLookup.TryGetValue(id, out var missile))
-        //        {
-        //            missile.Latitude = lat;
-        //            missile.Longitude = lon;
-        //            missile.Altitude = alt;
-        //            missile.Status = status;
-        //        }
-        //        else
-        //        {
-        //            // 새로운 미사일 정보가 들어온 경우
-        //            var newMissile = new Missile(id)
-        //            {
-        //                Latitude = lat,
-        //                Longitude = lon,
-        //                Altitude = alt,
-        //                Status = status
-        //            };
-        //            MissileList.Add(newMissile);
-        //            missileLookup[id] = newMissile;
+        private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
+        {
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (missileLookup.TryGetValue(id, out var missile))
+                {
+                    missile.Latitude = lat;
+                    missile.Longitude = lon;
+                    missile.Altitude = alt;
+                    missile.Status = status;
+                }
+                else
+                {
+                    // 새로운 미사일 정보가 들어온 경우
+                    var newMissile = new Missile(id)
+                    {
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                        Status = status
+                    };
+                    MissileList.Add(newMissile);
+                    missileLookup[id] = newMissile;
 
-        //            // missile_id 기준으로 MissileList 정렬
-        //            var sorted = MissileList.OrderBy(m => m.Id).ToList();
-        //            MissileList.Clear();
-        //            foreach (var m in sorted)
-        //                MissileList.Add(m);
-        //        }
-        //    });
-        //}
-        //private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
-        //{
-        //    Application.Current.Dispatcher.BeginInvoke(() =>
-        //    {
-        //        if (impactPointLookup.TryGetValue(commandId, out var ip))
-        //        {
-        //            ip.Latitude = lat;
-        //            ip.Longitude = lon;
-        //            ip.Altitude = alt;
-        //        }
-        //        else
-        //        {
-        //            // 새로운 정보가 들어온 경우
-        //            var newIP = new ImpactPoint(commandId)
-        //            {
-        //                AircraftId = aircraftId,
-        //                MissileId = missileId,
-        //                Latitude = lat,
-        //                Longitude = lon,
-        //                Altitude = alt,
-        //            };
-        //            ImpactPointList.Add(newIP);
-        //            impactPointLookup[commandId] = newIP;
-        //        }
-        //    });
-        //}
+                    // missile_id 기준으로 MissileList 정렬
+                    var sorted = MissileList.OrderBy(m => m.Id).ToList();
+                    MissileList.Clear();
+                    foreach (var m in sorted)
+                        MissileList.Add(m);
+
+                    // MSS-100 우선 선택. 없으면 첫번째
+                    if (SelectedMissile == null)
+                    {
+                        var mss100 = MissileList.FirstOrDefault(m => m.Id == "MSS-100");
+                        SelectedMissile = mss100 ?? MissileList.FirstOrDefault();
+                    }
+
+
+                }
+            });
+        }
+        private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
+        {
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (impactPointLookup.TryGetValue(commandId, out var ip))
+                {
+                    ip.Latitude = lat;
+                    ip.Longitude = lon;
+                    ip.Altitude = alt;
+                }
+                else
+                {
+                    // 새로운 정보가 들어온 경우
+                    var newIP = new ImpactPoint(commandId)
+                    {
+                        AircraftId = aircraftId,
+                        MissileId = missileId,
+                        Latitude = lat,
+                        Longitude = lon,
+                        Altitude = alt,
+                    };
+                    ImpactPointList.Add(newIP);
+                    impactPointLookup[commandId] = newIP;
+                }
+            });
+        }
 
         //private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)
         //{
@@ -702,6 +711,8 @@ namespace OCC.ViewModels
                 return false;
             }
         }
+
+        public Missile IsSelectedByUser { get; set; }
         public Missile _selectedMissile { get; set; }
         public Missile SelectedMissile
         {
@@ -710,8 +721,29 @@ namespace OCC.ViewModels
             {
                 if (_selectedMissile != value)
                 {
+                    // 이전 미사일은 선택 해제
+
+                    //Debug.Write(_selectedMissile.Id + " 선택 해제");
+
+                    if (_selectedMissile != null)
+                        _selectedMissile.IsSelectedByUser = false;
+
                     _selectedMissile = value;
-                    OnPropertyChanged();
+
+                    // 새로 선택된 미사일은 플래그 설정
+                    if (_selectedMissile != null)
+                    {
+                        _selectedMissile.IsSelectedByUser = true;
+                        if (_selectedMissile.VisualState == MissileVisualState.EmergencyExplode
+                            || _selectedMissile.VisualState == MissileVisualState.SelfExplode
+                            || _selectedMissile.VisualState == MissileVisualState.HitSuccess
+                            )
+                        {
+                            _selectedMissile.VisualState = MissileVisualState.Done;
+                        }
+                    }
+
+                    OnPropertyChanged(nameof(SelectedMissile));
                 }
             }
         }

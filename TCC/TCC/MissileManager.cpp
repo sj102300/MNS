@@ -23,7 +23,7 @@ MissileManager::MissileManager(TCC::UdpSender* sender, EngagementManager* engage
     }
 #endif
 
-    for (int i = 100;i <= 105;++i) {
+    for (int i = 100;i <= 200;++i) {
         std::string id = "MSS-" + std::to_string(i);
         TCC::Position pos = { 0.0, 0.0, 0.0 }; // 초기 위치
         int status = Missile::MissileStatus::Wait; // 초기 상태

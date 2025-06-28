@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +12,7 @@ namespace OCC.Models
 {
     public class Missile : INotifyPropertyChanged
     {
-        public enum MissileStatus
+        public enum MissileStatus  // 미사일 상태 
         {
             BeforeLaunch = 0,  // 발사전
             InFlight = 1, // 비행중
@@ -23,9 +24,6 @@ namespace OCC.Models
             WeaponDataLink = 7,
         }
 
-        //1 -> 5 -> 2 
-        /// FollowUp(5)일때 HitSuccess(2) 상태로 바꾸고 -> 2번이 되면 ? Done
-
         public string Id { get; }  // 식별자는 불변
         private double latitude { get; set; }
         private double longitude { get; set; }
@@ -35,8 +33,22 @@ namespace OCC.Models
 
         private bool hasHit = false;
 
+        private bool isSelectedByUser = false;
+        public bool IsSelectedByUser
+        {
+            get => isSelectedByUser;
+            set
+            {
+                if (isSelectedByUser != value)
+                {
+                    isSelectedByUser = value;
+                    OnPropertyChanged(nameof(IsSelectedByUser));
+                }
+            }
+        }
+
         private uint status;
-        public uint Status
+        public uint Status  // 미사일 상태 전이
         {
             get => status;
             set
@@ -44,69 +56,92 @@ namespace OCC.Models
                 var old = status; 
                 var newVal = value;
 
-                if (old != newVal)
+                if (old != newVal || isSelectedByUser)
                 {
+                    //if (isSelectedByUser)  // 미사일 살아있음 + 클릭 시
+                    //{
+                    //    Debug.WriteLine($"===========================================================");
+                    //    Debug.WriteLine($"[전이 전 : Status] VisualState={VisualState}");
+                    //    Debug.WriteLine($"[newValue] VisualState={newVal}");
+                    //    Debug.WriteLine($"===========================================================");
+                    //}
                     switch (newVal)
                     {
                         case 0: // 대기 상태
                             VisualState = MissileVisualState.Waiting;
                             break;
 
-                        case 1: // 비행 중
-                            if ((old == 0 || old == 6) && !hasLaunched)
+                        case 1: // 비행 중 = 여기서는 in_flight.gif
+                            if (IsSelectedByUser)
+                            {
+                                VisualState = MissileVisualState.InFlight;
+                            }
+                            else
                             {
                                 VisualState = MissileVisualState.Launching;
-                                hasLaunched = true;
                             }
                             break;
 
-                        case 2: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
+                        case 2: // 명중 성공 = 여기서는 empty.png
+                            if (IsSelectedByUser)
+                            {
+                                VisualState = MissileVisualState.Done;
+                            }
                             break;
-                        case 5: // 명중 성공,  시뮬레이터와 .gif 동기화를 위해, 종말 유도 모드 5 -> 2 로 간주
-                            if (old == 1 && !hasHit) 
+
+                        case 5: // 유도 모드 = 여기서 hit_success.gif  1회 완전 실행
                             {
                                 VisualState = MissileVisualState.HitSuccess;
-                                hasHit = true;
+                                //hasHit = true;
                             }
-                            //else
-                            //    VisualState = MissileVisualState.Done;
                             break;
+
+                        //case 6: // 발사 요청 = 이거 못받는 경우가 있네 100프로 안받아지는지는 모름
+                        //    VisualState = MissileVisualState.Launching;
+                        //    break;
 
                         case 7: // WDL
                             if (old == 1)
                             {
                                 VisualState = MissileVisualState.WeaponDataLink;
                             }
-                            else
-                            {
+                            else {
                                 VisualState = MissileVisualState.InFlight;
                             }
-                                break;
+                            break;
 
                         case 3: // 비상 폭파
-                            if (old == 1)
-                                VisualState = MissileVisualState.EmergencyExplode;
-                            else
+                            if (IsSelectedByUser)
+                            {
                                 VisualState = MissileVisualState.Done;
+                            }
+                            else
+                                VisualState = MissileVisualState.EmergencyExplode;
                             break;
 
                         case 4: // 자폭
-                            if (old == 1)
-                                VisualState = MissileVisualState.SelfExplode;
-                            else
+                            if (IsSelectedByUser)
+                            {
                                 VisualState = MissileVisualState.Done;
+                            }
+                            else 
+                                VisualState = MissileVisualState.SelfExplode;
                             break;
 
                         default:
                             VisualState = MissileVisualState.Done;  // X
                             break;
                     }
+                    //Debug.WriteLine($"[전이 후 : Status] VisualState={VisualState}");
                 }
+
+                isSelectedByUser = false;
                 status = newVal;
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(MissileStatusText));
             }
         }
+
         private MissileVisualState visualState;
         public MissileVisualState VisualState
         {
