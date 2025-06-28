@@ -19,11 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AircraftCoordinate.cpp" />
+    <ClCompile Include="AircraftWorker.cpp" />
     <ClCompile Include="ATS.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShootDownAndSender.cpp" />
+    <ClCompile Include="UdpMulticastReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AircraftWorker.h" />
     <ClInclude Include="ATS.h" />
+    <ClInclude Include="InterceptResultPacket.h" />
+    <ClInclude Include="Missile.h" />
+    <ClInclude Include="ShootDownAndSender.h" />
+    <ClInclude Include="UdpMulticastReceiver.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
@@ -142,7 +151,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\user\Desktop\MNS\ATS\inlcude</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\user\Desktop\MNS\Aircraft;C:\Users\user\Desktop\MNS\ATS\inlcude</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>

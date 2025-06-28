@@ -1,21 +1,21 @@
 #pragma once
 
-#include "JsonParser.h"
+#include "AircraftWorker.h"
 #include <vector>
 #include <string>
-#include <windows.h>
-
-using namespace sm;
+#include <thread>
+#include <memory>
+#include <mutex>
 
 class ATS {
 public:
-    void setAircraftList(const std::vector<AircraftInfo>& list);
+    void setAircraftList(const std::vector<ats::AircraftInfo>& list);
     void launchAll();
     void terminateAll();
 
 private:
-    std::vector<AircraftInfo> aircrafts_;
-    std::vector<HANDLE> runningProccessMember;
-    std::string makeCommandString(const AircraftInfo& info);
-    void makeCommand(const std::string& command);  // CreateProcess ·¡ÆÛ
+    std::vector<ats::AircraftInfo> aircrafts_;
+    std::vector<std::thread> workerThreads_;
+    std::vector<std::shared_ptr<ats::AircraftWorker>> workers_;
+    std::mutex mtx_;
 };
