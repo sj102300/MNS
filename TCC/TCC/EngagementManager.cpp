@@ -274,7 +274,7 @@ bool EngagementManager::launchMissile(std::string &commandId, std::string& aircr
 		return false;		//교전 불가능 한 항공기임.
 	}
 
-	if (!aircraft->calcImpactPoint(batteryLoc_, 2.25)) {
+	if (!aircraft->calcImpactPoint(batteryLoc_, 2.0)) {
 		std::cout << "--------------------------------" << std::endl;
 		std::cout << "Failed to calculate impact point." << std::endl;
 		std::cout << "--------------------------------" << std::endl;
