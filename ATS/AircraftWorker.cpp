@@ -39,6 +39,14 @@ void AircraftWorker::operator()() {
 
             if (ShootDowns(info_.currentPoint, mpos)) {
                 sendSuccessInfo(info_.id, missile.missileId);
+
+                std::thread([coord, info = info_]() mutable {
+                    for (int i = 0; i < 10; ++i) {
+                        coord.sendAircraftInfo(info.currentPoint, info.id, info.IFF);
+                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                    }
+                    }).detach();
+
                 //std::cout << "[격추 종료] " << info_.id << std::endl;
                 return;
             }
