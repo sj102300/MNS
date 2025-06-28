@@ -29,9 +29,9 @@ public partial class App : Application
 
         ServiceProvider = services.BuildServiceProvider();
 
-        base.OnStartup(e);
+        Task.Run(() => GifCache.PreloadAllGifs());
 
-        //GifCache.PreloadAllGifs();  // 로딩 렉 심해서 GIF 캐싱
+        base.OnStartup(e);
     }
 }
 

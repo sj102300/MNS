@@ -24,9 +24,6 @@ namespace OCC.Models
             WeaponDataLink = 7,
         }
 
-        //1 -> 5 -> 2 
-        /// FollowUp(5)일때 HitSuccess(2) 상태로 바꾸고 -> 2번이 되면 ? Done
-
         public string Id { get; }  // 식별자는 불변
         private double latitude { get; set; }
         private double longitude { get; set; }
@@ -35,6 +32,20 @@ namespace OCC.Models
         private bool hasLaunched = false; // launching.gif를 1번만 보여주기 위한 플래그
 
         private bool hasHit = false;
+
+        private bool isSelectedByUser = false;
+        public bool IsSelectedByUser
+        {
+            get => isSelectedByUser;
+            set
+            {
+                if (isSelectedByUser != value)
+                {
+                    isSelectedByUser = value;
+                    OnPropertyChanged(nameof(IsSelectedByUser));
+                }
+            }
+        }
 
         private uint status;
         public uint Status  // 미사일 상태 전이
@@ -45,10 +56,15 @@ namespace OCC.Models
                 var old = status; 
                 var newVal = value;
 
-                // 발사 후 비행 중인 애 눌러도 in_flight 가 아님 발사이미지 나옴
-                if (old != newVal)
+                if (old != newVal || isSelectedByUser)
                 {
-                    Debug.WriteLine($"[전이 전 : Status] VisualState={VisualState}");
+                    //if (isSelectedByUser)  // 미사일 살아있음 + 클릭 시
+                    //{
+                    //    Debug.WriteLine($"===========================================================");
+                    //    Debug.WriteLine($"[전이 전 : Status] VisualState={VisualState}");
+                    //    Debug.WriteLine($"[newValue] VisualState={newVal}");
+                    //    Debug.WriteLine($"===========================================================");
+                    //}
                     switch (newVal)
                     {
                         case 0: // 대기 상태
@@ -56,66 +72,70 @@ namespace OCC.Models
                             break;
 
                         case 1: // 비행 중 = 여기서는 in_flight.gif
-                            if (old == 0)  // ((old == 0) && !hasLaunched)
+                            if (IsSelectedByUser)
                             {
-                                VisualState = MissileVisualState.Launching;
-                                // hasLaunched = true;
+                                VisualState = MissileVisualState.InFlight;
                             }
                             else
                             {
-                                VisualState = MissileVisualState.InFlight;
+                                VisualState = MissileVisualState.Launching;
                             }
                             break;
 
                         case 2: // 명중 성공 = 여기서는 empty.png
-                            //VisualState = MissileVisualState.Done;  // X
+                            if (IsSelectedByUser)
+                            {
+                                VisualState = MissileVisualState.Done;
+                            }
                             break;
 
                         case 5: // 유도 모드 = 여기서 hit_success.gif  1회 완전 실행
-                            if (old == 1 && !hasHit) 
                             {
                                 VisualState = MissileVisualState.HitSuccess;
-                                hasHit = true;
+                                //hasHit = true;
                             }
-                            else
-                                VisualState = MissileVisualState.Done;
                             break;
 
-                        case 6: // 발사 요청 = 이거 못받는 경우가 있네 100프로 안받아지는지는 모름
-                            VisualState = MissileVisualState.Launching;
-                            break;
+                        //case 6: // 발사 요청 = 이거 못받는 경우가 있네 100프로 안받아지는지는 모름
+                        //    VisualState = MissileVisualState.Launching;
+                        //    break;
 
                         case 7: // WDL
                             if (old == 1)
                             {
                                 VisualState = MissileVisualState.WeaponDataLink;
                             }
-                            else
-                            {
+                            else {
                                 VisualState = MissileVisualState.InFlight;
                             }
-                                break;
+                            break;
 
                         case 3: // 비상 폭파
-                            if (old == 1)
-                                VisualState = MissileVisualState.EmergencyExplode;
-                            else
+                            if (IsSelectedByUser)
+                            {
                                 VisualState = MissileVisualState.Done;
+                            }
+                            else
+                                VisualState = MissileVisualState.EmergencyExplode;
                             break;
 
                         case 4: // 자폭
-                            if (old == 1)
-                                VisualState = MissileVisualState.SelfExplode;
-                            else
+                            if (IsSelectedByUser)
+                            {
                                 VisualState = MissileVisualState.Done;
+                            }
+                            else 
+                                VisualState = MissileVisualState.SelfExplode;
                             break;
 
                         default:
                             VisualState = MissileVisualState.Done;  // X
                             break;
                     }
-                    Debug.WriteLine($"[전이 후 : Status] VisualState={VisualState}");
+                    //Debug.WriteLine($"[전이 후 : Status] VisualState={VisualState}");
                 }
+
+                isSelectedByUser = false;
                 status = newVal;
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(MissileStatusText));

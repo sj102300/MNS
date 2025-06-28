@@ -19,15 +19,15 @@ namespace OCC.Converters
             var state = (OCC.Models.MissileVisualState)value;
             return state switch
             {
-                MissileVisualState.Waiting => "images/waiting.png?v={Guid.NewGuid()}",
-                MissileVisualState.Launching => "images/launching.gif?v={Guid.NewGuid()}",
-                MissileVisualState.InFlight => "images/in_flight.gif?v={Guid.NewGuid()}",
-                MissileVisualState.HitSuccess => "images/hit_success.gif?v={Guid.NewGuid()}",
-                MissileVisualState.EmergencyExplode => "images/explode.gif?v={Guid.NewGuid()}",  // 비폭과
-                MissileVisualState.SelfExplode => "images/explode.gif?v={Guid.NewGuid()}",       // 자폭을 동일한 영상으로 처리
-                MissileVisualState.Done => "images/empty.png?v={Guid.NewGuid()}",
-                MissileVisualState.WeaponDataLink => "images/weapon_datalink.gif?v={Guid.NewGuid()}",  // 추가
-                _ => "images/unknown.gif?v={Guid.NewGuid()}"
+                MissileVisualState.Waiting => "images/waiting.png",
+                MissileVisualState.Launching => "images/launching.gif",
+                MissileVisualState.InFlight => "images/in_flight.gif",
+                MissileVisualState.HitSuccess => "images/hit_success.gif",
+                MissileVisualState.EmergencyExplode => "images/explode.gif",  // 비폭과
+                MissileVisualState.SelfExplode => "images/explode.gif",       // 자폭을 동일한 영상으로 처리
+                MissileVisualState.Done => "images/empty.png",
+                MissileVisualState.WeaponDataLink => "images/weapon_datalink.gif",  // 추가
+                _ => "images/unknown.gif"
             };
         }
 
