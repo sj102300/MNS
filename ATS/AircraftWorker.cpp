@@ -32,8 +32,8 @@ void AircraftWorker::operator()() {
             //std::cout << "[도달 종료] " << info_.id << std::endl;
             break;
         }
-
-        auto missiles = receiver.receiveAllMissiles();
+        std::unordered_map<std::string, ParsedMissileData> missiles;
+        receiver.receiveAllMissiles(missiles);
         for (const auto& [mid, missile] : missiles) {
             std::pair<double, double> mpos = { missile.latitude, missile.longitude };
 

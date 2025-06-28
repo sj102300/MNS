@@ -53,8 +53,7 @@ bool UdpMulticastReceiver::init(const std::string& multicast_address, int port) 
     return true;
 }
 
-std::unordered_map<std::string, ParsedMissileData> UdpMulticastReceiver::receiveAllMissiles() {
-    std::unordered_map<std::string, ParsedMissileData> missiles;
+void UdpMulticastReceiver::receiveAllMissiles(std::unordered_map<std::string, ParsedMissileData>& missiles) {
     Missile rawPacket{};
     sockaddr_in senderAddr{};
     int senderLen = sizeof(senderAddr);
@@ -79,5 +78,6 @@ std::unordered_map<std::string, ParsedMissileData> UdpMulticastReceiver::receive
         missiles[idStr] = data;
     }
 
-    return missiles;
+    return;
+
 }

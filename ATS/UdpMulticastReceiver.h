@@ -11,7 +11,7 @@ public:
     ~UdpMulticastReceiver();
 
     bool init(const std::string& multicast_address, int port);
-    std::unordered_map<std::string, ParsedMissileData> receiveAllMissiles();
+    void receiveAllMissiles(std::unordered_map<std::string, ParsedMissileData>& missiles);
 
 private:
     SOCKET sock_;
