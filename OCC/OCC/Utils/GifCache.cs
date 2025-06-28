@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
 namespace OCC.Utils
@@ -16,14 +21,14 @@ namespace OCC.Utils
             if (_cache.TryGetValue(relativePath, out var cached))
                 return cached;
 
-            var uri = new Uri($"pack://application:,,,/{relativePath}");
+            var uri = new Uri($"pack://application:,,,/{relativePath}", UriKind.Absolute);
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.UriSource = uri;
-            bitmap.CacheOption = BitmapCacheOption.OnLoad; // 디스크 캐싱
-            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;  // 파일 다 읽고 메모리에 고정
+            bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
             bitmap.EndInit();
-            bitmap.Freeze(); // UI Thread 외에서도 사용 가능
+            bitmap.Freeze();  // 렌더링 성능 + 스레드 안전
 
             _cache[relativePath] = bitmap;
             return bitmap;
@@ -32,20 +37,17 @@ namespace OCC.Utils
         public static void PreloadAllGifs()
         {
             string[] paths = {
-                "images/waiting.png",
-                "images/launching.gif",
-                "images/in_flight.gif",
-                "images/hit_success.gif",
-                "images/emergency_explode.gif",
-                "images/self_explode.gif",
-                "images/empty.png"
-            };
+            "images/waiting.png",
+            "images/launching.gif",
+            "images/in_flight.gif",
+            "images/hit_success.gif",
+            "images/explode.gif",
+            "images/empty.png",
+            "images/weapon_datalink.gif"
+        };
 
             foreach (var path in paths)
-            {
-                _ = Get(path); // 강제로 로딩해서 캐시에 미리 저장
-            }
+                _ = Get(path);  // 미리 로드해 두기
         }
-
     }
 }

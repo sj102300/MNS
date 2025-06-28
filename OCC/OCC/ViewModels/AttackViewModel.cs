@@ -567,7 +567,16 @@ namespace OCC.ViewModels
 
                     // 새로 선택된 미사일은 플래그 설정
                     if (_selectedMissile != null)
+                    {
                         _selectedMissile.IsSelectedByUser = true;
+                        if (_selectedMissile.VisualState == MissileVisualState.EmergencyExplode
+                            || _selectedMissile.VisualState == MissileVisualState.SelfExplode
+                            || _selectedMissile.VisualState == MissileVisualState.HitSuccess
+                            )
+                        {
+                            _selectedMissile.VisualState = MissileVisualState.Done;
+                        }
+                    }
 
                     OnPropertyChanged(nameof(SelectedMissile));
                 }

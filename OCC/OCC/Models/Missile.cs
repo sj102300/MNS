@@ -24,9 +24,6 @@ namespace OCC.Models
             WeaponDataLink = 7,
         }
 
-        //1 -> 5 -> 2 
-        /// FollowUp(5)일때 HitSuccess(2) 상태로 바꾸고 -> 2번이 되면 ? Done
-
         public string Id { get; }  // 식별자는 불변
         private double latitude { get; set; }
         private double longitude { get; set; }
@@ -59,12 +56,15 @@ namespace OCC.Models
                 var old = status; 
                 var newVal = value;
 
-                // 발사 후 비행 중인 애 눌러도 in_flight 가 아님 발사이미지 나옴
-                //Debug.WriteLine($"===> [방금 선택해서] isSelectedByUser={isSelectedByUser}");
                 if (old != newVal || isSelectedByUser)
                 {
-                    Debug.WriteLine($"======> [조건 진입!!!] isSelectedByUser={isSelectedByUser}");
-                    Debug.WriteLine($"[전이 전 : Status] VisualState={VisualState}");
+                    //if (isSelectedByUser)  // 미사일 살아있음 + 클릭 시
+                    //{
+                    //    Debug.WriteLine($"===========================================================");
+                    //    Debug.WriteLine($"[전이 전 : Status] VisualState={VisualState}");
+                    //    Debug.WriteLine($"[newValue] VisualState={newVal}");
+                    //    Debug.WriteLine($"===========================================================");
+                    //}
                     switch (newVal)
                     {
                         case 0: // 대기 상태
@@ -76,10 +76,9 @@ namespace OCC.Models
                             {
                                 VisualState = MissileVisualState.InFlight;
                             }
-                            else if (!IsSelectedByUser && !hasLaunched)
+                            else
                             {
                                 VisualState = MissileVisualState.Launching;
-                                 hasLaunched = true;
                             }
                             break;
 
@@ -91,14 +90,9 @@ namespace OCC.Models
                             break;
 
                         case 5: // 유도 모드 = 여기서 hit_success.gif  1회 완전 실행
-                            //if (IsSelectedByUser)
-                            //{
-                            //    VisualState = MissileVisualState.Done;
-                            //}
-                            if (!IsSelectedByUser && !hasHit) 
                             {
                                 VisualState = MissileVisualState.HitSuccess;
-                                hasHit = true;
+                                //hasHit = true;
                             }
                             break;
 
@@ -121,7 +115,7 @@ namespace OCC.Models
                             {
                                 VisualState = MissileVisualState.Done;
                             }
-                            else if (!IsSelectedByUser)
+                            else
                                 VisualState = MissileVisualState.EmergencyExplode;
                             break;
 
@@ -130,7 +124,7 @@ namespace OCC.Models
                             {
                                 VisualState = MissileVisualState.Done;
                             }
-                            else if (!IsSelectedByUser)
+                            else 
                                 VisualState = MissileVisualState.SelfExplode;
                             break;
 
@@ -138,8 +132,9 @@ namespace OCC.Models
                             VisualState = MissileVisualState.Done;  // X
                             break;
                     }
-                    Debug.WriteLine($"[전이 후 : Status] VisualState={VisualState}");
+                    //Debug.WriteLine($"[전이 후 : Status] VisualState={VisualState}");
                 }
+
                 isSelectedByUser = false;
                 status = newVal;
                 OnPropertyChanged(nameof(Status));
