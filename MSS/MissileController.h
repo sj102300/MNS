@@ -16,6 +16,15 @@ class Aircraft;  // [추가] 선언
 
 class MissileController {
 public:
+	enum class MovementState {
+		Straight,
+		Turning
+	};
+	void setMovementState(MovementState state);
+	MovementState getMovementState() const;
+	void updateTurnToNewTarget(float speed = 5.0f);
+	void forceTurnToNewTarget();  // [추가] 새로운 곡선 함수 실행
+
 	MissileController(DestroyedAircraftsTracker * tracker);
 
 	void setMissile(std::shared_ptr<Missile> m);
@@ -61,8 +70,12 @@ private:
 
 	DestroyedAircraftsTracker* tracker_;
 
-	// WDL 곡선경로 추가
-	//bool isTurningToNewTarget_ = false;
-	//double target_heading_rad_ = 0.0;
-
+	MovementState currentMovementState_ = MovementState::Straight;  // 현재 이동 상태
+	double turning_heading_ = 0.0;
+	double turning_w_ = 0.0;
+	bool turning_initialized_ = false;  // 회전 초기화 여부
+	double compute_heading(double from_lat, double from_lon, double to_lat, double to_lon);
+	double Cal_RateOfTurn(double current_w, double heading_error, double dt);
+	std::pair<double, double> update_latlon(double heading, double dt, double lat_deg, double lon_deg);
+	bool isTurningToNewTarget_ = false;  // [추가] 새로운 곡선 함수 실행 여부
 };

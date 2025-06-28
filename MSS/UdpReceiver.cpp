@@ -94,8 +94,8 @@ void UdpReceiver::run() {
                 std::string aircraftId(orderpkg.AtsId, strnlen(orderpkg.AtsId, 8));
                 Location impactPoint = orderpkg.ImpactPoint;
 
-                std::cout << u8"[명령 수신] 미사일: " << missileId
-                    << u8", 타겟 항공기: " << aircraftId << "\n";
+              //  std::cout << u8"[명령 수신] 미사일: " << missileId
+               //     << u8", 타겟 항공기: " << aircraftId << "\n";
 
                 auto it = missile_map_.find(missileId);
                 if (it != missile_map_.end()) {
@@ -225,7 +225,7 @@ void UdpReceiver::run() {
                         std::this_thread::sleep_for(std::chrono::milliseconds(3000));
                         missile->setState(1);  // 1번은 발사 후 비행 상태
                     }).detach();
-                    missile->setTargetLocation(newImpactPoint);
+                    //missile->setTargetLocation(newImpactPoint);
                    
                     missile->setTargetAircraftId(aircraftId);
                     /*방금 추가한 컨트롤러 코드*/
@@ -235,6 +235,12 @@ void UdpReceiver::run() {
 
                         // aircraft map도 연결
                         controller->setAircraftMap(&Aircraft_map_);
+                        
+                        controller->setMovementState(MissileController::MovementState::Turning);
+                        controller->forceTurnToNewTarget();
+
+                        controller->updateTurnToNewTarget();
+                        missile->setTargetLocation(newImpactPoint);
                     }
                     //std::cout << u8"[업데이트됨] 미사일: " << missileId
                     //    << u8" → 새로운 목표: (" << newImpactPoint.latitude << ", "

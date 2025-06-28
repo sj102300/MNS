@@ -101,33 +101,29 @@ void UdpMulticast::start() {
 
     // 전송 루프 내용: 2.5초마다 데이터 전송
 void UdpMulticast::run() {
-        while (running_) {
-            if (missile_) {
-                MissilePacket packet = serializeMissile(*missile_);
-                int sent = sendto(sock_, reinterpret_cast<const char*>(&packet), sizeof(packet), 0,
-                    (sockaddr*)&destAddr_, sizeof(destAddr_));
-                if (sent == SOCKET_ERROR) {
-                    std::cerr << u8"sendto failed: " << WSAGetLastError() << "\n";
-                }
-                else if (missile_ -> MissileState == 2 || missile_->MissileState == 3 || missile_->MissileState == 4) {
-                    /*std::cout << u8"Missile state is " << missile_->MissileState
-                        << u8" → stopping multicast.\n";*/
-
-                    closesocket(sock_);
-                    running_ = false;         
-                    break;
-                }
-                else {
-                    //std::cout << u8" <Udp Multicast success> \n\n";
-                    //std::cout << u8"MSS-ID: " << missile_->MissileId << "\n"
-                    //    << u8"Latitude: " << missile_->MissileLoc.latitude << "\n"
-                    //    << u8"Longitude: " << missile_->MissileLoc.longitude << "\n"
-                    //    << u8"Altitude: " << missile_->MissileLoc.altitude << "\n\n";
-                }
+    while (running_) {
+        if (missile_) {
+            MissilePacket packet = serializeMissile(*missile_);
+            int sent = sendto(sock_, reinterpret_cast<const char*>(&packet), sizeof(packet), 0,
+                (sockaddr*)&destAddr_, sizeof(destAddr_));
+            if (sent == SOCKET_ERROR) {
+                std::cerr << u8"sendto failed: " << WSAGetLastError() << "\n";
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            else if (missile_->MissileState == 2 || missile_->MissileState == 3 || missile_->MissileState == 4) {
+                closesocket(sock_);
+                running_ = false;
+                break;
+            }
+        }
+        // 미사일 상태에 따라 sleep 시간 조절
+        if (missile_ && missile_->MissileState == 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 발사 전: 0.1초
+        }
+        else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 그 외: 1초
         }
     }
+}
 
 
     // 종료 및 자원 해제

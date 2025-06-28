@@ -56,8 +56,8 @@ void LCHLauncher::run() {
             int sent = sender_->send(buffer, bytes);
             if (sent < 0)
                 std::cerr << u8"[LCH] MSS 전송 실패\n";
-            else
-                std::cout << u8"[LCH] MSS 전송 완료 (" << sent << " bytes)\n";
+            //else
+                //std::cout << u8"[LCH] MSS 전송 완료 (" << sent << " bytes)\n";
         }else if (eventCode == 3001) {
             if (bodyLength < sizeof(MissilePacket) - 8) {
                 std::cerr << u8"[LCH] 미사일 패킷 크기 이상\n";

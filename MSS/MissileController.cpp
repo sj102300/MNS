@@ -6,142 +6,127 @@
 #include <thread>
 #include <iostream>
 #include <utility>
+#include <algorithm>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-
-// 선회율 계산
-double Cal_RateOfTurn(double w, double t) {
-	double v = 2000.0; // 속도(m/s)
-	double aoa = 0.05236; // 받음각(rad), 약 3도
-	double L = 0.4135 * v * v * aoa / 2; // 양력
-	double l = (4.61 * 0.5) / (4.61 * 0.25); // 모멘트암 비율
-	double T = L * l; // 토크
-	double I = 400 * (3 * 0.275 * 0.275 + 4.61 * 4.61) / 12; // 관성모멘트
-	double a = T / I; // 각가속도
-
-	w += a * t;
-
-	return w;
+void MissileController::setMovementState(MovementState state) {
+	currentMovementState_ = state;
+	if (state == MovementState::Straight) {
+		std::cout << u8"[MissileController] 현재 상태: 직진 중\n";
+	}
+	else if (state == MovementState::Turning) {
+		std::cout << u8"[MissileController] 현재 상태: 회전 중\n";
+	}
 }
-
-// 좌표 업데이트
-std::pair<double, double> update_latlon(double heading, double w, double dt, double x, double y) {
+MissileController::MovementState MissileController::getMovementState() const {
+	return currentMovementState_;
+}
+double MissileController::compute_heading(double from_lat, double from_lon, double to_lat, double to_lon) {
+	constexpr double PI = 3.14159265358979323846;
+	double dLon = (to_lon - from_lon) * PI / 180.0;
+	double lat1 = from_lat * PI / 180.0;
+	double lat2 = to_lat * PI / 180.0;
+	double y = sin(dLon) * cos(lat2);
+	double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
+	return fmod(atan2(y, x) + 2 * PI, 2 * PI);
+}
+double MissileController::Cal_RateOfTurn(double current_w, double heading_error, double dt) {
+	constexpr double PI = 3.14159265358979323846;
+	double aoa = 0.05236; // 3도(rad)
 	double v = 2000.0;
-	double R = 6371000.0;
-	double pi = 3.14159265358979;
+	double air_density = 0.4135;
 
-	double lat = x * pi / 180.0;
-	double lon = y * pi / 180.0;
+	double L = air_density * v * v * aoa / 2.0;
+	double l = (4.61 * 0.5) / (4.61 * 0.25);
+	double T = L * l;
+	double I = 400 * (3 * 0.275 * 0.275 + 4.61 * 4.61) / 12;
 
-	double new_heading = heading + w * dt;
+	double max_angular_accel = T / I;
 
-	double dNorth = v * std::cos(new_heading) * dt;
-	double dEast = v * std::sin(new_heading) * dt;
+	double Kp = 1.0;
+	double Kd = 2.0;
 
-	double dLat = dNorth / R;
-	double dLon = dEast / (R * std::cos(lat));
+	double angular_accel = Kp * heading_error - Kd * current_w;
+
+	// 실제 물리 제약 반영
+	angular_accel = std::clamp(angular_accel, -max_angular_accel, max_angular_accel);
+
+	double new_w = current_w + angular_accel * dt;
+	return new_w;
+}
+void MissileController::updateTurnToNewTarget(float speed_kmps) {
+	if (!missile_ || !hasTarget_) return;
+
+	constexpr double PI = 3.14159265358979323846;
+	constexpr double dt = 0.1;
+	constexpr double EARTH_RADIUS_M = 6371000.0;
+
+	double& lat = missile_->MissileLoc.latitude;
+	double& lon = missile_->MissileLoc.longitude;
+
+	// 1. 초기 heading 계산
+	if (!turning_initialized_) {
+		turning_heading_ = compute_heading(lat, lon, impact_point.latitude, impact_point.longitude);
+		turning_initialized_ = true;
+	}
+
+	// 2. 목표 방향 계산
+	double desired_heading = compute_heading(lat, lon, impact_point.latitude, impact_point.longitude);
+	double heading_error = desired_heading - turning_heading_;
+
+	if (heading_error > PI) heading_error -= 2 * PI;
+	if (heading_error < -PI) heading_error += 2 * PI;
+
+	// 3. 선회율 계산
+	turning_w_ = Cal_RateOfTurn(turning_w_, heading_error, dt);
+
+	// 4. 현재 heading 업데이트
+	turning_heading_ += turning_w_ * dt;
+	turning_heading_ = fmod(turning_heading_ + 2 * PI, 2 * PI);
+
+	// 5. 현재 위치 업데이트
+	auto new_pos = update_latlon(turning_heading_, dt, lat, lon);
+	lat = new_pos.first;
+	lon = new_pos.second;
+
+	// 6. 도달 체크 → 직선 상태로 전환
+	double distance_km = haversine(lat, lon, impact_point.latitude, impact_point.longitude);
+	if (distance_km < 0.05 || distance_km <= 5.0) {  // 50m 이내면 전환
+		std::cout << u8"[INFO] 목표 근처 도달, 직선 운동 상태로 전환(종말 유도)\n";
+		setMovementState(MovementState::Straight);
+		turning_initialized_ = false;  // 초기화
+
+		if (distance_km <= 5.0) {
+			updatePosition(speed_kmps);  // 종말 유도 상태로 전환
+		}
+	}
+}
+std::pair<double, double> MissileController::update_latlon(double heading, double dt, double lat_deg, double lon_deg) {
+	double v = 2000.0;
+	constexpr double EARTH_RADIUS_M = 6371000.0;
+	double lat = lat_deg * M_PI / 180.0;
+	double lon = lon_deg * M_PI / 180.0;
+
+	double dNorth = v * cos(heading) * dt;
+	double dEast = v * sin(heading) * dt;
+
+	double dLat = dNorth / EARTH_RADIUS_M;
+	double dLon = dEast / (EARTH_RADIUS_M * cos(lat));
 
 	double new_lat = lat + dLat;
 	double new_lon = lon + dLon;
 
-	return {
-		new_lat * 180.0 / pi,
-		new_lon * 180.0 / pi
-	};
+	return { new_lat * 180.0 / M_PI, new_lon * 180.0 / M_PI };
+}
+void MissileController::forceTurnToNewTarget() {
+	isTurningToNewTarget_ = true;
+	launch_time_recorded_ = true;
+	hasTarget_ = true;
 }
 
-// 베르누이 압력장 계산
-double Bernoulli(double MissileVelocity, double AirVelocity) {
-	double density = 0.413;
-	return (density * (pow(AirVelocity, 2) - pow(MissileVelocity, 2))) / 2;
-}
-
-// 항력 계산
-double Drag_cal(double deltaP, double MissileRadius) {
-	double pi = 3.14159265358979;
-	double Area = pow(MissileRadius, 2) * pi;
-	return deltaP * Area;
-}
-
-// 랭킨 오발 속도장 계산
-double RankineOval(double Missilelength, double MissileRadius, double AirVelocity, double x, double r) {
-	double pi = 3.14159265358979;
-	double Q = pi * pow(MissileRadius, 2) * AirVelocity;
-
-	double denom1 = pow((x + Missilelength / 2), 2) + pow(r, 2);
-	double denom2 = pow((x - Missilelength / 2), 2) + pow(r, 2);
-
-	// 분모가 너무 작으면 기본 유속 반환
-	if (denom1 < 1e-6 || denom2 < 1e-6) {
-		return AirVelocity;
-	}
-
-	double Vx = AirVelocity
-		+ Q / (4 * pi) * (2 * (x + Missilelength / 2)) / denom1
-		- Q / (4 * pi) * (2 * (x - Missilelength / 2)) / denom2;
-
-	double Vr = Q / (4 * pi) * (2 * r) / denom1
-		- Q / (4 * pi) * (2 * r) / denom2;
-
-	double V = std::sqrt(Vx * Vx + Vr * Vr);
-
-	if (std::isnan(V) || std::isinf(V)) {
-		std::cerr << "[RankineOval] Invalid velocity V detected.\n";
-		return AirVelocity;
-	}
-
-	return V;
-}
-
-// 자폭 여부 판단
-float decision_suicide(double range) {
-	if (range >= 130) {
-		double AirVelocity = 2000.0;
-		double Missilelength = 4.61;
-		double MissileRadius = 0.275;
-		double missile_mass = 400.0;
-		double dt = 0.1;
-		double velocity_now = AirVelocity;
-
-		for (int i = 0; i < 1000; ++i) {
-			double velocity = 0.0;
-			double dx = Missilelength / 100;
-			double current_dx = dx;
-
-			for (int j = 0; j < 100; j++) {
-				double local_v = RankineOval(Missilelength, MissileRadius, velocity_now, current_dx, MissileRadius);
-				if (std::isnan(local_v) || std::isinf(local_v)) {
-					std::cerr << "[decision_suicide] Invalid local velocity at x = " << current_dx << "\n";
-					return 0.0f;
-				}
-				velocity += local_v;
-				current_dx += dx;
-			}
-			velocity /= 100;
-
-			double delta_pressure = Bernoulli(velocity_now, velocity);
-			double Drag = Drag_cal(delta_pressure, MissileRadius);
-			double acceleration = -Drag / missile_mass;
-
-			velocity_now += acceleration * dt;
-
-			if (std::isnan(velocity_now) || std::isinf(velocity_now)) {
-				std::cerr << "[decision_suicide] Invalid velocity_now at iteration " << i << "\n";
-				return 0.0f;
-			}
-
-			if (velocity_now <= 10.0) {
-				std::cout << "[decision_suicide] Velocity too low, self-destruct triggered.\n";
-				return 0.0f;
-			}
-		}
-		return static_cast<float>(velocity_now);
-	}
-	return 2000.0f;
-}
 
 MissileController::MissileController(DestroyedAircraftsTracker* tracker)
 	:impact_point({ 0, 0, 10 }), hasTarget_(false) {
@@ -183,9 +168,11 @@ void MissileController::start(float speed) {
 	running_ = true;
 	updateThread_ = std::thread(&MissileController::updateLoop, this, speed);
 }
+
 void MissileController::updateLoop(float speed) {
 	while (running_) {
-		updatePosition(speed); // 위치 갱신
+		if (currentMovementState_ == MovementState::Straight) updatePosition(speed); // 위치 갱신
+		else if (currentMovementState_ == MovementState::Turning) updateTurnToNewTarget(speed);//새로운 곡선 함수 실행 해야 함
 		std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 1초 주기
 	}
 }
@@ -281,9 +268,9 @@ void MissileController::updatePosition(float speed_kmps) {  // Proportional Navi
 					}
 
 					if (!hasEnteredTerminalGuidance_) {
-						std::cout << u8"[종말 유도 진입] 미사일: " << missile_->MissileId
+						/*std::cout << u8"[종말 유도 진입] 미사일: " << missile_->MissileId
 							<< u8" → 항공기: " << targetAircraftId_
-							<< u8", 거리: " << distance_km << u8" km\n";
+							<< u8", 거리: " << distance_km << u8" km\n";*/
 						hasEnteredTerminalGuidance_ = true;
 
 						missile_->MissileState = 5; // 5번이 종말 유도 상태라고 가정
