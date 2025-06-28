@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Missile.h"
-#include "ShootDown.h"
-#include "sender.h"
-#include "AircraftCoordinate.h"
-#include "UdpMulticastReceiver.h"
+#include "ShootDownThread.h"
 #include <string>
 #include <thread>
 #include <atomic>
 #include <utility>
+#include <vector>
+#define NOMINMAX
+#include <winsock2.h>
 
 namespace ats {
 
@@ -32,13 +31,19 @@ namespace ats {
 
     class AircraftWorker {
     public:
-        AircraftWorker(AircraftInfo info);
-        void operator()();
+        AircraftWorker(AircraftInfo info, ShootDownThread* shootDownThread);
         void stop();
+        void operator()();
 
     private:
         AircraftInfo info_;
-        std::atomic<bool> running_;
+        bool running_;
+        ShootDownThread* shootDownThread_;  // 격추 판단 요청용
+
+        std::vector<double> makeDirection(std::pair<double, double> from, std::pair<double, double> to);
+        std::pair<double, double> movePoint(std::pair<double, double> current, double dx, double dy);
+        bool reachedDestination(std::pair<double, double> current, std::pair<double, double> dest);
+        void sendAircraftInfo(SOCKET udpSocket, const sockaddr_in& addr);
     };
 
 } // namespace ats

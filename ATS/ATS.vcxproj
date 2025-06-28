@@ -19,11 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AircraftCoordinate.cpp" />
     <ClCompile Include="AircraftWorker.cpp" />
     <ClCompile Include="ATS.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ShootDownAndSender.cpp" />
+    <ClCompile Include="ShootDownThread.cpp" />
     <ClCompile Include="UdpMulticastReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -31,7 +30,7 @@
     <ClInclude Include="ATS.h" />
     <ClInclude Include="InterceptResultPacket.h" />
     <ClInclude Include="Missile.h" />
-    <ClInclude Include="ShootDownAndSender.h" />
+    <ClInclude Include="ShootDownThread.h" />
     <ClInclude Include="UdpMulticastReceiver.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 // InterceptResultPacket.h
 #pragma once
+#include <string>
 
 #pragma pack(push, 1)
 struct InterceptResultPacket {
@@ -10,3 +11,6 @@ struct InterceptResultPacket {
     char MissileId[8];           // πÃªÁ¿œ ID
 };
 #pragma pack(pop)
+
+void initializeMultiSenderSocket();
+void sendSuccessInfo(std::string aircraftId, std::string missileId);

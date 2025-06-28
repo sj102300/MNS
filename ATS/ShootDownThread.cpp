@@ -1,5 +1,6 @@
-#include "ShootDownAndSender.h"
-#include "InterceptResultPacket.h"  // 구조체 정의 포함
+#include "ShootDownThread.h"
+#include "InterceptResultPacket.h"
+#include "Missile.h" 
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -10,6 +11,9 @@
 
 constexpr double EarthR = 6371.0;
 constexpr double pi = 3.14159265358979;
+// 전역 변수 정의 (링커 에러 해결)
+std::unordered_map<std::string, ParsedMissileData> globalMissiles;
+std::mutex missileMtx;
 
 double toRadians(double degree) {
     return degree * (pi / 180);
@@ -99,5 +103,49 @@ void sendSuccessInfo(std::string aircraftId, std::string missileId) {
     }
     else {
         std::cout << "통신 성공" << std::endl;
+    }
+}
+
+void ShootDownQueue::push(const AircraftSnapshot& data) {
+    std::lock_guard<std::mutex> lock(mtx_);
+    queue_.push(data);
+}
+
+bool ShootDownQueue::tryPop(AircraftSnapshot& out) {
+    std::lock_guard<std::mutex> lock(mtx_);
+    if (queue_.empty()) return false;
+    out = queue_.front();
+    queue_.pop();
+    return true;
+}
+
+void ShootDownThread::enqueue(const AircraftSnapshot& snapshot) {
+    queue_.push(snapshot);
+}
+
+void ShootDownThread::start() {
+    running_ = true;
+    worker_ = std::thread(&ShootDownThread::run, this);
+}
+
+void ShootDownThread::stop() {
+    running_ = false;
+    if (worker_.joinable()) worker_.join();
+}
+
+void ShootDownThread::run() {
+    while (running_) {
+        AircraftSnapshot snapshot;
+        if (queue_.tryPop(snapshot)) {
+            std::lock_guard<std::mutex> lock(missileMtx);
+            for (const auto& [mid, missile] : globalMissiles) {
+                std::pair<double, double> mpos = { missile.latitude, missile.longitude };
+                if (ShootDowns(snapshot.currentPoint, mpos)) {
+                    sendSuccessInfo(snapshot.id, mid);
+                    break;
+                }
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }

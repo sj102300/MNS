@@ -2,6 +2,8 @@
 
 #include <string>
 #include <cstdint>
+#include <unordered_map>
+#include <mutex>
 
 #pragma pack(push, 1)
 struct Missile {
@@ -22,3 +24,6 @@ struct ParsedMissileData {
     double altitude;
     uint32_t eventCode;
 };
+
+extern std::unordered_map<std::string, ParsedMissileData> globalMissiles;
+extern std::mutex missileMtx;

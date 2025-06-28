@@ -1,12 +1,13 @@
 #include "ATS.h"
 #include "ScenarioManager.h"
 #include "AircraftWorker.h"  // ats::AircraftInfo
-#include "ShootDownAndSender.h"
+#include "ShootDownThread.h"
 #include <condition_variable>
 #include <mutex>
 #include <iostream>
 #include <atomic>
 #include <thread>
+#include <windows.h>
 
 #pragma comment(lib, "ScenarioManager.lib")
 
