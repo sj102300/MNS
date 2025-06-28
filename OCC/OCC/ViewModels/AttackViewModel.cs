@@ -143,13 +143,13 @@ namespace OCC.ViewModels
             StartReceiving();
         }
 
-        private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
-        {
-            lock (_missileUpdateLock)
-            {
-                _missileUpdateBuffer[id] = (lat, lon, alt, status);
-            }
-        }
+        //private void OnMissileReceived(string id, double lat, double lon, double alt, uint status)
+        //{
+        //    lock (_missileUpdateLock)
+        //    {
+        //        _missileUpdateBuffer[id] = (lat, lon, alt, status);
+        //    }
+        //}
 
         private void OnAircraftReceived(string id, double lat, double lon, double alt, uint status, uint foe, double iplat, double iplon, double ipalti)
         {
@@ -159,13 +159,13 @@ namespace OCC.ViewModels
             }
         }
 
-        private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
-        {
-            lock (_impactPointUpdateLock)
-            {
-                _impactPointUpdateBuffer[commandId] = (aircraftId, missileId, lat, lon, alt);
-            }
-        }
+        //private void OnImpactPointReceived(string commandId, string aircraftId, string missileId, double lat, double lon, double alt)
+        //{
+        //    lock (_impactPointUpdateLock)
+        //    {
+        //        _impactPointUpdateBuffer[commandId] = (aircraftId, missileId, lat, lon, alt);
+        //    }
+        //}
 
         private void MissileUpdateTimer_Tick(object? sender, EventArgs e)
         {
@@ -362,7 +362,7 @@ namespace OCC.ViewModels
                 client.Timeout = TimeSpan.FromSeconds(3);
                 // 실제 SCN API 주소와 파라미터로 교체
                 string url = $"{Network.SCN}/scenario/info"; // 예시
-                
+
                 // POST body 생성
                 var postData = new
                 {
@@ -370,7 +370,7 @@ namespace OCC.ViewModels
                 };
                 var jsonBody = JsonConvert.SerializeObject(postData);
                 var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-                
+
                 var response = await client.PostAsync(url, content);
                 if (!response.IsSuccessStatusCode)
                     return null;
@@ -398,7 +398,7 @@ namespace OCC.ViewModels
 
         private void SendManualFirePacketAsync(AircraftWithIp aircraft)
         {
-            if(aircraft == null)
+            if (aircraft == null)
             {
                 MessageBox.Show("선택된 항공기가 없습니다!");
                 return;
@@ -859,7 +859,7 @@ namespace OCC.ViewModels
 
         private void SendEmergencyDestroyPacketAsync(Missile missile)
         {
-            if(missile == null)
+            if (missile == null)
             {
                 MessageBox.Show("미사일을 선택하세요!");
                 return;
@@ -877,7 +877,7 @@ namespace OCC.ViewModels
                 using var udpClient = new UdpClient();
                 udpClient.Client.ReceiveTimeout = RetryIntervalMs;
 
-                string missileId = missile != null ? missile.Id  : "MSS-100";
+                string missileId = missile != null ? missile.Id : "MSS-100";
                 byte[] buffer = CreateEmergencyDestroyPacket(missileId);
 
                 bool ackReceived = false;
@@ -894,7 +894,7 @@ namespace OCC.ViewModels
                         var response = udpClient.Receive(ref localEP);
                         if (response != null && response.Length > 0)
                         {
-                            ackReceived = true; 
+                            ackReceived = true;
                             Debug.WriteLine("ACK 수신 완료!");
                             break;
                         }

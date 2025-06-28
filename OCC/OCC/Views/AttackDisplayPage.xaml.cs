@@ -391,6 +391,17 @@ namespace OCC.Views
                 {
                     mapControl.Markers.Remove(newMarker);
                     _missileMarkers.Remove(missile.Id);
+
+                    // 점선 경로(GMapRoute)도 같이 삭제
+                    if (_missileRoutes.TryGetValue(missile.Id, out var route))
+                    {
+                        mapControl.Markers.Remove(route);
+                        _missileRoutes.Remove(missile.Id);
+                    }
+                    if (_missileRoutePoints.ContainsKey(missile.Id))
+                    {
+                        _missileRoutePoints.Remove(missile.Id);
+                    }
                 };
                 markerGrid.BeginAnimation(UIElement.OpacityProperty, fade);
             };
