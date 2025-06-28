@@ -74,6 +74,7 @@ namespace OCC.Views
 
         private void OnMissileDestroyReceived(string launchCommandId, string aircraftId, string missileId, uint destroyType)
         {
+            Debug.WriteLine($"[MissileDestroy] launchCommand: {launchCommandId}, aircraftId : {aircraftId}, missileId : {missileId}, destroyType : {destroyType}");
             // UI 스레드에서 실행
             Dispatcher.BeginInvoke(() =>
             {
@@ -104,10 +105,18 @@ namespace OCC.Views
                 if(destroyType == 30)
                 {
                     // 2. 항공기 마커 제거
-                    if (_aircraftMarkers.TryGetValue(aircraftId, out var aircraftMarker))
+                    if (destroyType == 30)
                     {
-                        mapControl.Markers.Remove(aircraftMarker);
-                        _aircraftMarkers.Remove(aircraftId);
+                        if (_aircraftMarkers.TryGetValue(aircraftId, out var aircraftMarker))
+                        {
+                            mapControl.Markers.Remove(aircraftMarker);
+                            _aircraftMarkers.Remove(aircraftId);
+                            Debug.WriteLine($"[Destroy] Aircraft marker removed: {aircraftId}");
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"[Destroy] Aircraft marker not found: {aircraftId}");
+                        }
                     }
                 }
 

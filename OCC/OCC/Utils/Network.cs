@@ -13,6 +13,7 @@ namespace OCC.Utils
         public static readonly string TCC = "http://192.168.2.67:8080";     //승엽
         //public static readonly string TCC = "http://192.168.2.65:8080";     //명준
         //public static readonly string TCC = "http://192.168.2.64:8080";     //승주
+        //public static readonly string TCC = "http://192.168.2.67:8080";     //승엽
         public static readonly string ATS = "http://192.168.2.55:8080";
         public static readonly string MSS = "http://192.168.2.22:8080";
         public static readonly string LCH = "http://192.168.2.11:8080";
