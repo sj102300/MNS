@@ -1,0 +1,40 @@
+{
+    "aircraft_count": 2,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.02244668175846,
+                "longitude": 128.16650390625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.41916639395372,
+                "longitude": 127.44140625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 38.41916639395372,
+                "longitude": 127.46337890625
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 36.02244668175846,
+                "longitude": 128.16650390625
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.204081555898505,
+        "longitude": 127.880859375
+    },
+    "scenario_id": "SCENE-54",
+    "scenario_title": "OCC 미사일 상태 로그 출력 - TEST"
+}

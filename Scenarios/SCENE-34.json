@@ -1,0 +1,54 @@
+{
+    "aircraft_count": 3,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.41380035066288,
+                "longitude": 128.5400390625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.985032786959074,
+                "longitude": 125.96923828125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.5184402388786,
+                "longitude": 125.83740234375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.00211029922513,
+                "longitude": 128.60595703125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.91476428895593,
+                "longitude": 127.55126953125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.47860556892209,
+                "longitude": 127.012939453125
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 38.2036553180715,
+        "longitude": 127.24365234375
+    },
+    "scenario_id": "SCENE-34",
+    "scenario_title": "OCC 미사일 상태 GIF 상태전이 4 - TEST"
+}

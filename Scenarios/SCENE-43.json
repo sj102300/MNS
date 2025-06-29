@@ -1,0 +1,40 @@
+{
+    "aircraft_count": 2,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.111252520761575,
+                "longitude": 126.573486328125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.745515184882635,
+                "longitude": 126.309814453125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 38.805470223177444,
+                "longitude": 127.33154296875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 36.16448788632062,
+                "longitude": 127.7490234375
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.54457732085582,
+        "longitude": 126.97998046875
+    },
+    "scenario_id": "SCENE-43",
+    "scenario_title": "MSS 타겟 재설정 시나리오 - TEST"
+}

@@ -1,0 +1,40 @@
+{
+    "aircraft_count": 2,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.57142382346276,
+                "longitude": 128.748779296875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.384727668850836,
+                "longitude": 126.4306640625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.39475669987384,
+                "longitude": 126.968994140625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.65977773071253,
+                "longitude": 128.47412109375
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.527153617233786,
+        "longitude": 127.63916015625
+    },
+    "scenario_id": "SCENE-38",
+    "scenario_title": "LCH 발사대 명령 전달 2 - TEST"
+}

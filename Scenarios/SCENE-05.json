@@ -1,0 +1,54 @@
+{
+    "aircraft_count": 3,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.55546506818696,
+                "longitude": 128.87237548828125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.717661788100855,
+                "longitude": 126.7987060546875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.04640889969956,
+                "longitude": 128.66912841796875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.54816542304656,
+                "longitude": 126.14776611328125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.182224980422504,
+                "longitude": 126.331787109375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.6361819125974,
+                "longitude": 126.16424560546875
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.54457732085582,
+        "longitude": 127.001953125
+    },
+    "scenario_id": "SCENE-05",
+    "scenario_title": "미사일 임무 변경 2 - TEST"
+}

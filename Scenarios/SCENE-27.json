@@ -1,0 +1,54 @@
+{
+    "aircraft_count": 3,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.47430675509521,
+                "longitude": 128.95751953125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 37.92686760148135,
+                "longitude": 126.474609375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.057981047025,
+                "longitude": 128.232421875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.45358870894137,
+                "longitude": 127.37548828125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.17335693522159,
+                "longitude": 127.15576171875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.350272538257634,
+                "longitude": 128.572998046875
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.265309955618726,
+        "longitude": 127.803955078125
+    },
+    "scenario_id": "SCENE-27",
+    "scenario_title": "임무 변경 곡선 경로 1 - TEST"
+}

@@ -1,0 +1,26 @@
+{
+    "aircraft_count": 1,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.53612263184686,
+                "longitude": 127.880859375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.736946065676,
+                "longitude": 126.1669921875
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.53586597792037,
+        "longitude": 127.0458984375
+    },
+    "scenario_id": "SCENE-30",
+    "scenario_title": "임무 변경 표적 유도 1 - TEST"
+}

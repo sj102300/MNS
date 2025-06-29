@@ -1,0 +1,54 @@
+{
+    "aircraft_count": 3,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.474858084971025,
+                "longitude": 126.32080078125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.444984668894705,
+                "longitude": 127.68310546875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.29153547292737,
+                "longitude": 126.27685546875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.47939467327643,
+                "longitude": 127.96875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.16031654673676,
+                "longitude": 126.243896484375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.487994609214795,
+                "longitude": 128.243408203125
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.23032838760386,
+        "longitude": 127.8369140625
+    },
+    "scenario_id": "SCENE-37",
+    "scenario_title": "LCH 발사대 명령 전달 1 - TEST"
+}

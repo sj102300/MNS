@@ -1,0 +1,40 @@
+{
+    "aircraft_count": 2,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 38.35888785866675,
+                "longitude": 128.902587890625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.367502153950454,
+                "longitude": 127.02392578125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 38.220919766831194,
+                "longitude": 128.836669921875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.220919766831194,
+                "longitude": 126.76025390625
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.265309955618726,
+        "longitude": 127.803955078125
+    },
+    "scenario_id": "SCENE-35",
+    "scenario_title": "TCC 미사일-표적 할당 1 - TEST"
+}

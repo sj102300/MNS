@@ -1,0 +1,138 @@
+{
+    "aircraft_count": 9,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.137879119634185,
+                "longitude": 129.056396484375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.0277188402116,
+                "longitude": 125.771484375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.02999636902565,
+                "longitude": 128.858642578125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.96795115401591,
+                "longitude": 125.540771484375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.254590974650235,
+                "longitude": 129.2431640625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.15562239342322,
+                "longitude": 125.96923828125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0004",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.137879119634185,
+                "longitude": 126.84814453125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.97712009843963,
+                "longitude": 127.628173828125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0005",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.17380831799957,
+                "longitude": 126.650390625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 40.01078714046551,
+                "longitude": 127.430419921875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0006",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.10193405724607,
+                "longitude": 127.100830078125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.96870074491694,
+                "longitude": 127.85888671875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0007",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 39.61415207700265,
+                "longitude": 126.45263671875
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 36.057981047025,
+                "longitude": 129.385986328125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0008",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 39.698734143481396,
+                "longitude": 126.67236328125
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 36.15561783381853,
+                "longitude": 129.583740234375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0009",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 39.56335316582929,
+                "longitude": 126.287841796875
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 35.96022296929668,
+                "longitude": 129.210205078125
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.53586597792037,
+        "longitude": 127.001953125
+    },
+    "scenario_id": "SCENE-17",
+    "scenario_title": "MFR 표적 추적 2 - TEST"
+}

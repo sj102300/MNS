@@ -1,0 +1,54 @@
+{
+    "aircraft_count": 3,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.67282488678655,
+                "longitude": 128.16650390625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.45358870894137,
+                "longitude": 125.7275390625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.08366678241555,
+                "longitude": 127.81219482421875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.02345139405933,
+                "longitude": 126.5240478515625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.3903348621365,
+                "longitude": 127.2711181640625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.202462225882364,
+                "longitude": 126.65313720703125
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.95719224376525,
+        "longitude": 127.2216796875
+    },
+    "scenario_id": "SCENE-14",
+    "scenario_title": "MFR 광역 탐지 1 - TEST"
+}

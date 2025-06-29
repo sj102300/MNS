@@ -1,0 +1,40 @@
+{
+    "aircraft_count": 2,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.738884124394296,
+                "longitude": 128.21044921875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.39333888832237,
+                "longitude": 126.397705078125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.52729481454623,
+                "longitude": 127.11181640625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.668356101515066,
+                "longitude": 128.51806640625
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.63163475580644,
+        "longitude": 127.650146484375
+    },
+    "scenario_id": "SCENE-46",
+    "scenario_title": "OCC 선택된 미사일 상태 GIF - TEST"
+}

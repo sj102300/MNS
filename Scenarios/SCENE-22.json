@@ -1,0 +1,456 @@
+{
+    "aircraft_count": 25,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.743624998844375,
+                "longitude": 123.5302734375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.68713141244413,
+                "longitude": 122.0416259765625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.67582559793001,
+                "longitude": 123.7005615234375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.626806395355175,
+                "longitude": 121.9427490234375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.585293905836004,
+                "longitude": 123.85986328125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.55508302243049,
+                "longitude": 121.849365234375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0004",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.51351558059736,
+                "longitude": 124.024658203125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.483264729155586,
+                "longitude": 121.6845703125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0005",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.44921240385257,
+                "longitude": 124.1400146484375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.39998810407942,
+                "longitude": 121.5692138671875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0006",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.36967413462375,
+                "longitude": 124.266357421875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.32796494040747,
+                "longitude": 121.4923095703125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0007",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.29761098988109,
+                "longitude": 124.2938232421875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.263442671779885,
+                "longitude": 121.376953125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0008",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.22165245637912,
+                "longitude": 124.3597412109375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.18743678432542,
+                "longitude": 121.365966796875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0009",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.153199801248405,
+                "longitude": 124.4146728515625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.10751733820335,
+                "longitude": 121.3055419921875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0010",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 46.065608461386894,
+                "longitude": 124.4805908203125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 46.038922598235985,
+                "longitude": 121.2725830078125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0011",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.96260622242163,
+                "longitude": 124.5135498046875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.94351068030586,
+                "longitude": 121.234130859375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0012",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.85941212790755,
+                "longitude": 124.5794677734375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.87088761346192,
+                "longitude": 121.1846923828125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0013",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.76369095661866,
+                "longitude": 124.595947265625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.76369095661866,
+                "longitude": 121.1737060546875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0014",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.648608383880266,
+                "longitude": 124.6014404296875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.65628792636447,
+                "longitude": 121.168212890625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0015",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.56790960986129,
+                "longitude": 124.60693359375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.579445114377855,
+                "longitude": 121.1517333984375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0016",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.487094732298345,
+                "longitude": 124.595947265625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.49479638966969,
+                "longitude": 121.1407470703125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0017",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.42544355958044,
+                "longitude": 124.5794677734375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.417732423704614,
+                "longitude": 121.1737060546875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0018",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.35986533395973,
+                "longitude": 124.573974609375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.36372498305677,
+                "longitude": 121.212158203125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0019",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.28648197278281,
+                "longitude": 124.56298828125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.29034662473613,
+                "longitude": 121.22314453125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0020",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.19365133152568,
+                "longitude": 124.530029296875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.19365133152568,
+                "longitude": 121.256103515625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0021",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.10842333769409,
+                "longitude": 124.464111328125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.11230010229609,
+                "longitude": 121.278076171875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0022",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 45.03859654645258,
+                "longitude": 124.4146728515625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 45.0502402697946,
+                "longitude": 121.35498046875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0023",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 44.976456663207756,
+                "longitude": 124.3597412109375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 44.984227835166486,
+                "longitude": 121.39892578125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0024",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 44.922028967099045,
+                "longitude": 124.332275390625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 44.898687012155165,
+                "longitude": 121.4593505859375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0025",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 44.855868807357254,
+                "longitude": 124.25537109375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 44.82860426955569,
+                "longitude": 121.497802734375
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 45.598665689820635,
+        "longitude": 122.882080078125
+    },
+    "scenario_id": "SCENE-22",
+    "scenario_title": "{
+    "aircraft_count": 6,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 34.777715803604686,
+                "longitude": 126.76025390625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 41.95131994679696,
+                "longitude": 129.35302734375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.5097258429375,
+                "longitude": 128.86962890625
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 40.329795743702064,
+                "longitude": 124.82666015625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.26356186215208,
+                "longitude": 128.03466796875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 41.39329428878487,
+                "longitude": 127.99072265625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0004",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.31775185163687,
+                "longitude": 127.3974609375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 39.06184913429152,
+                "longitude": 125.8154296875
+            }
+        },
+        {
+            "aircraft_id": "ATS-0005",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 40.88029480552824,
+                "longitude": 126.38671875
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 35.33529320309328,
+                "longitude": 128.95751953125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0006",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 41.16211393939691,
+                "longitude": 127.4853515625
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 34.97600151317589,
+                "longitude": 127.41943359375
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.17782559332974,
+        "longitude": 128.25439453125
+    },
+    "scenario_id": "SCENE-20",
+    "scenario_title": "MSS 미사일 유도 기능 1 - TEST"
+}

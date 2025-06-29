@@ -1,0 +1,40 @@
+{
+    "aircraft_count": 2,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.88459964717594,
+                "longitude": 126.595458984375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 37.89219554724435,
+                "longitude": 126.661376953125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.90239987514363,
+                "longitude": 128.419189453125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 37.81412370160446,
+                "longitude": 128.4027099609375
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 36.853252223440165,
+        "longitude": 127.4853515625
+    },
+    "scenario_id": "SCENE-06",
+    "scenario_title": "미사일 임무 변경 3 - TEST"
+}

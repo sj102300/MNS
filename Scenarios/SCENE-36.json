@@ -1,0 +1,96 @@
+{
+    "aircraft_count": 6,
+    "aircraft_list": [
+        {
+            "aircraft_id": "ATS-0001",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 35.862343734896484,
+                "longitude": 126.9580078125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.86537485161164,
+                "longitude": 126.881103515625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0002",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 38.89103282648846,
+                "longitude": 127.034912109375
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 35.862343734896484,
+                "longitude": 127.1337890625
+            }
+        },
+        {
+            "aircraft_id": "ATS-0003",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.56199695314351,
+                "longitude": 124.7607421875
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 37.53586597792037,
+                "longitude": 129.111328125
+            }
+        },
+        {
+            "aircraft_id": "ATS-0004",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 37.387617499783936,
+                "longitude": 129.111328125
+            },
+            "friend_or_foe": "E",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 37.43997405227057,
+                "longitude": 124.749755859375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0005",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.377067839836826,
+                "longitude": 125.15625
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.651198332299494,
+                "longitude": 128.177490234375
+            }
+        },
+        {
+            "aircraft_id": "ATS-0006",
+            "end_point": {
+                "altitude": 10,
+                "latitude": 36.25313319699068,
+                "longitude": 128.638916015625
+            },
+            "friend_or_foe": "O",
+            "start_point": {
+                "altitude": 10,
+                "latitude": 38.642617906345265,
+                "longitude": 125.364990234375
+            }
+        }
+    ],
+    "battery_location": {
+        "altitude": 10,
+        "latitude": 37.56199695314351,
+        "longitude": 126.990966796875
+    },
+    "scenario_id": "SCENE-36",
+    "scenario_title": "TCC 미사일-표적 할당 2 - TEST"
+}
