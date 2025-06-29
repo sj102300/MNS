@@ -10,7 +10,7 @@
 
 constexpr double EarthR = 6371.0;
 constexpr double pi = 3.14159265358979;
-// 전역 변수 정의 (링커 에러 해결)
+
 std::unordered_map<std::string, ParsedMissileData> globalMissiles;
 std::mutex missileMtx;
 
@@ -74,7 +74,7 @@ void initializeMultiSenderSocket() {
 }
 
 void sendSuccessInfo(std::string aircraftId, std::string missileId) {
-    std::cout << "격추성공: 항공기 ID " << aircraftId << ", 미사일 ID " << missileId << std::endl;
+    std::cout << u8"격추성공: 항공기 ID " << aircraftId << u8", 미사일 ID " << missileId << std::endl;
 
     InterceptResultPacket packet{};
     packet.EventCode = 2003;
@@ -101,7 +101,7 @@ void sendSuccessInfo(std::string aircraftId, std::string missileId) {
         std::cerr << "Failed to send data. Error: " << WSAGetLastError() << std::endl;
     }
     else {
-        std::cout << "통신 성공" << std::endl;
+        std::cout << u8"통신 성공" << std::endl;
     }
 }
 
@@ -136,12 +136,45 @@ void ShootDownThread::run() {
     while (running_) {
         AircraftSnapshot snapshot;
         if (queue_.tryPop(snapshot)) {
+
+            // IFF 확인: 적(Foe)일 경우에만 격추 시도
+            if (snapshot.IFF != 'F') {
+                continue;
+            }
+
+            // 이미 격추된 항공기인지 확인
+
+            {
+                std::lock_guard<std::mutex> lock(resultMtx_);
+                if (destroyedAircrafts_.count(snapshot.id)) {
+                    continue;  // 이미 격추된 항공기면 skip
+                }
+            }
+
             std::lock_guard<std::mutex> lock(missileMtx);
+            auto now = std::chrono::steady_clock::now();
+            constexpr auto validDuration = std::chrono::seconds(2);
+
             for (const auto& [mid, missile] : globalMissiles) {
+                if (now - missile.lastUpdated > validDuration) continue;
+
+                {
+                    std::lock_guard<std::mutex> lock(resultMtx_);
+                    if (destroyedMissiles_.count(mid)) continue;  // 이미 격추된 미사일
+                }
+
                 std::pair<double, double> mpos = { missile.latitude, missile.longitude };
                 if (ShootDowns(snapshot.currentPoint, mpos)) {
                     sendSuccessInfo(snapshot.id, mid);
-                    break;
+
+                    // 기록 추가
+                    {
+                        std::lock_guard<std::mutex> lock(resultMtx_);
+                        destroyedAircrafts_.insert(snapshot.id);
+                        destroyedMissiles_.insert(mid);
+                    }
+
+                    break;  // 한 발만 격추하면 됨
                 }
             }
         }

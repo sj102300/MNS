@@ -1,6 +1,7 @@
 #include "UdpMulticastReceiver.h"
 #include <iostream>
 #include <cstring>  // for memset
+#include <thread>
 
 UdpMulticastReceiver::UdpMulticastReceiver() : sock_(INVALID_SOCKET) {}
 
@@ -58,6 +59,8 @@ void UdpMulticastReceiver::receiveAllMissiles(std::unordered_map<std::string, Pa
     sockaddr_in senderAddr{};
     int senderLen = sizeof(senderAddr);
 
+    //int count = 0;
+
     while (true) {
         int recvLen = recvfrom(sock_, reinterpret_cast<char*>(&rawPacket), sizeof(rawPacket), 0,
             (sockaddr*)&senderAddr, &senderLen);
@@ -76,8 +79,30 @@ void UdpMulticastReceiver::receiveAllMissiles(std::unordered_map<std::string, Pa
         data.altitude = rawPacket.altitude;
 
         missiles[idStr] = data;
+        //++count;
     }
 
-    return;
+    // 여기에 로그 출력 추가
+    //if (count > 0) 
+    //    std::cout << u8"\n[MissileReceiver] 미사일 수신됨! 총 " << missiles.size() << u8"개\n";
 
+    return;
+}
+
+void runMissileReceiverThread() {
+    std::thread([] {
+        UdpMulticastReceiver receiver;
+        if (!receiver.init("239.0.0.1", 9000)) {
+            std::cerr << u8"[ATS] 미사일 수신기 초기화 실패\n";
+            return;
+        }
+
+        while (true) {
+            {
+                std::lock_guard<std::mutex> lock(missileMtx);
+                receiver.receiveAllMissiles(globalMissiles);
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        }).detach();
 }

@@ -8,6 +8,7 @@
 #include <utility>
 #include <queue>
 #include <mutex>
+#include <unordered_set> 
 
 #pragma pack(push, 1)
 struct InterceptResultPacket {
@@ -50,6 +51,10 @@ private:
     ShootDownQueue queue_;
     std::thread worker_;
     std::atomic<bool> running_ = false;
+
+    std::unordered_set<std::string> destroyedAircrafts_;  // 추가
+    std::unordered_set<std::string> destroyedMissiles_;   // 추가
+    std::mutex resultMtx_;  // 동시 접근 보호
 };
 
 // 외부 함수 선언

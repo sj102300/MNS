@@ -1,7 +1,8 @@
 #include "ATS.h"
 #include "ScenarioManager.h"
-#include "AircraftWorker.h"  // ats::AircraftInfo
+#include "AircraftManager.h"  // ats::AircraftInfo
 #include "ShootDownThread.h"
+#include "UdpMulticastReceiver.h"
 #include <condition_variable>
 #include <mutex>
 #include <iostream>
@@ -50,6 +51,8 @@ void handleQuit() {
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     initializeMultiSenderSocket();
+
+    runMissileReceiverThread();  // 스레드 시작
 
     ScenarioManager scenarioRunner(
         SCN_LOCAL_IP,

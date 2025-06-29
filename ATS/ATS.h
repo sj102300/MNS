@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ShootDownThread.h"
-#include "AircraftWorker.h"
+#include "AircraftManager.h"
 #include <vector>
 #include <memory>
 #include <mutex>
@@ -15,9 +15,6 @@ public:
 
 private:
     std::vector<ats::AircraftInfo> aircrafts_;
-    std::vector<std::shared_ptr<ats::AircraftWorker>> workers_;
-    std::vector<std::thread> workerThreads_;
+    ShootDownThread shootDownThread_;
     std::mutex mtx_;
-
-    ShootDownThread shootDownThread_;  // 격추 판단 스레드 (한 번만 생성됨)
 };

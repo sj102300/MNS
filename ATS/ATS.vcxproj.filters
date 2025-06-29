@@ -21,21 +21,18 @@
     <ClCompile Include="ATS.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="AircraftWorker.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="UdpMulticastReceiver.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ShootDownThread.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="AircraftManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ATS.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="AircraftWorker.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Missile.h">
@@ -44,10 +41,10 @@
     <ClInclude Include="UdpMulticastReceiver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="InterceptResultPacket.h">
+    <ClInclude Include="ShootDownThread.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ShootDownThread.h">
+    <ClInclude Include="AircraftManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

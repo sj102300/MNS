@@ -23,6 +23,8 @@ struct ParsedMissileData {
     double longitude;
     double altitude;
     uint32_t eventCode;
+
+    std::chrono::steady_clock::time_point lastUpdated;
 };
 
 extern std::unordered_map<std::string, ParsedMissileData> globalMissiles;

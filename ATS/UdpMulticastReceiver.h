@@ -12,9 +12,11 @@ public:
 
     bool init(const std::string& multicast_address, int port);
     void receiveAllMissiles(std::unordered_map<std::string, ParsedMissileData>& missiles);
-
+    
 private:
     SOCKET sock_;
     sockaddr_in localAddr_;
     ip_mreq mreq_;
 };
+
+void runMissileReceiverThread();

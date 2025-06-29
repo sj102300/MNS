@@ -19,16 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AircraftWorker.cpp" />
+    <ClCompile Include="AircraftManager.cpp" />
     <ClCompile Include="ATS.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShootDownThread.cpp" />
     <ClCompile Include="UdpMulticastReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AircraftWorker.h" />
+    <ClInclude Include="AircraftManager.h" />
     <ClInclude Include="ATS.h" />
-    <ClInclude Include="InterceptResultPacket.h" />
     <ClInclude Include="Missile.h" />
     <ClInclude Include="ShootDownThread.h" />
     <ClInclude Include="UdpMulticastReceiver.h" />
