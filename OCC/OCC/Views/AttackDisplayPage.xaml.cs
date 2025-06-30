@@ -330,19 +330,10 @@ namespace OCC.Views
                 _missileMarkers.Remove(missile.Id);
             }
 
-            double markerSize;
-            string destroyImgPath;
-
-            if (missile_status == 30)
-            {
-                markerSize = 120;
-                destroyImgPath = "pack://application:,,,/images/destroy.png";
-            }
-            else
-            {
-                markerSize = 120;
-                destroyImgPath = "pack://application:,,,/images/emergencyDestroy.png";
-            }
+            double markerSize = 120;
+            string destroyImgPath = (missile_status == 30)
+                ? "pack://application:,,,/images/destroy.png"
+                : "pack://application:,,,/images/emergencyDestroy.png";
 
             var image = new Image
             {
@@ -392,12 +383,32 @@ namespace OCC.Views
                     mapControl.Markers.Remove(newMarker);
                     _missileMarkers.Remove(missile.Id);
 
-                    // 점선 경로(GMapRoute)도 같이 삭제
+                    // 점선 경로(GMapRoute)도 같이 삭제 (애니메이션 적용 포함)
                     if (_missileRoutes.TryGetValue(missile.Id, out var route))
                     {
-                        mapControl.Markers.Remove(route);
-                        _missileRoutes.Remove(missile.Id);
+                        if (route.Shape is UIElement routeShape)
+                        {
+                            var routeFade = new System.Windows.Media.Animation.DoubleAnimation
+                            {
+                                From = 1.0,
+                                To = 0.0,
+                                Duration = TimeSpan.FromSeconds(60),
+                                FillBehavior = System.Windows.Media.Animation.FillBehavior.Stop
+                            };
+                            routeFade.Completed += (s3, e3) =>
+                            {
+                                mapControl.Markers.Remove(route);
+                                _missileRoutes.Remove(missile.Id);
+                            };
+                            routeShape.BeginAnimation(UIElement.OpacityProperty, routeFade);
+                        }
+                        else
+                        {
+                            mapControl.Markers.Remove(route);
+                            _missileRoutes.Remove(missile.Id);
+                        }
                     }
+
                     if (_missileRoutePoints.ContainsKey(missile.Id))
                     {
                         _missileRoutePoints.Remove(missile.Id);
@@ -406,11 +417,8 @@ namespace OCC.Views
                 markerGrid.BeginAnimation(UIElement.OpacityProperty, fade);
             };
             timer.Start();
-            //if (missile_status != (uint)Missile.MissileStatus.HitSuccess)
-            //{
-                // 사라지는 애니메이션 조건이 있다면 여기에 추가
-            //}
         }
+
 
         private void MissileList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

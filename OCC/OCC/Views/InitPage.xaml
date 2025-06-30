@@ -36,7 +36,7 @@
                  VerticalAlignment="Stretch"
                  HorizontalAlignment="Stretch">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="지대공 유도무기 시뮬레이터"
+                <TextBlock Text="지대공 유도무기 체계 교전 모의 시스템"
                            FontSize="40"
                            FontWeight="Bold"
                            Foreground="#4FC3F7"
