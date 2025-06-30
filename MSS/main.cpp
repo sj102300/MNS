@@ -152,8 +152,8 @@ int main() {
             missiles.clear();
             missileMap.clear();
 
-            // 미사일 생성
-            for (int i = 0; i < 65; ++i) {
+            // 미사일 생성 -- 최대 몇 발인지
+            for (int i = 0; i < 55; ++i) {
                 auto missile = std::make_shared<Missile>();
 
                 std::string id = "MSS-" + std::to_string(100 + i);

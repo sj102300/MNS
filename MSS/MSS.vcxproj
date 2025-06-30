@@ -151,6 +151,8 @@
     <ClInclude Include="Isender.h" />
     <ClInclude Include="Missile.h" />
     <ClInclude Include="MissileController.h" />
+    <ClInclude Include="MissileThreadPool.cpp" />
+    <ClInclude Include="MissileThreadPool.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="UdpReceiver.h" />
   </ItemGroup>

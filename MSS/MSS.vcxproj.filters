@@ -70,5 +70,11 @@
     <ClInclude Include="DestroyedAircrafts.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="MissileThreadPool.cpp">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileThreadPool.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
